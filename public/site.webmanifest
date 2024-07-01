@@ -1,0 +1,81 @@
+{
+  "id": "/",
+  "name": "두람쥐 | Dooramg",
+  "short_name": "DRG",
+  "description": "본격 두바퀴 관리 서비스입니다.",
+  "display": "standalone",
+  "start_url": "/",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay",
+    "browser"
+  ],
+  "dir": "ltr",
+  "lang": "ko",
+  "orientation": "portrait-primary",
+  "theme_color": "#331714",
+  "categories": [
+    "navigation",
+    "productivity",
+    "sports",
+    "travel"
+  ],
+  "icons": [
+    {
+      "src": "/image/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/image/android-chrome-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/image/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/pwa/screens/screen1.jpeg",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "/pwa/screens/screen2.jpeg",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "/pwa/screens/screen3.jpeg",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "/pwa/screens/screen4.jpeg",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "/pwa/screens/screen5.jpeg",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "wide"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "background_color": "#ffffff",
+  "prefer_related_applications": false,
+  "handler_link": "auto",
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}

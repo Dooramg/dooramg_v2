@@ -1,0 +1,56 @@
+<template>
+  <div>
+    <div
+      v-if="$pwa?.offlineReady || $pwa?.needRefresh"
+      class="flex flex-col gap-2 fixed right-0 bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg"
+      role="alert"
+    >
+      <span>
+        {{ $pwa.offlineReady ? $t('pwa.readyPwa') : $t('pwa.newContent') }}
+      </span>
+      <AButton
+        v-if="$pwa.needRefresh"
+        custom-class="w-fit"
+        :label="$t('pwa.reload')"
+        button-size="xs"
+        @click="$pwa.updateServiceWorker()"
+      />
+      <AButton
+        custom-class="w-fit"
+        :label="$t('pwa.close')"
+        button-size="xs"
+        @click="$pwa.cancelPrompt()"
+      />
+    </div>
+    <div
+      v-if="$pwa?.showInstallPrompt && !$pwa?.offlineReady && !$pwa?.needRefresh"
+      class="fixed right-0 bottom-16 md:bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg"
+      role="alert"
+    >
+      <div class="flex flex-col gap-2">
+        <div class="flex gap-2 items-center">
+          <Icon
+            :width="40"
+            :height="40"
+            name="tabler:devices-down"
+          />
+          <span>
+            {{ $t('pwa.installPwa') }}
+          </span>
+        </div>
+        <div class="flex justify-end gap-2">
+          <AButton
+            :label="$t('pwa.install')"
+            button-size="xs"
+            @click="$pwa.install()"
+          />
+          <AButton
+            :label="$t('pwa.cancel')"
+            button-size="xs"
+            @click="$pwa.cancelInstall()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

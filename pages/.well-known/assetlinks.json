@@ -1,0 +1,18 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.dooramg.www.twa",
+      "sha256_cert_fingerprints": ["D7:5E:F0:27:F1:07:F2:C6:88:26:A4:14:F3:73:8B:D9:56:4F:C9:42:C9:54:DE:A0:C7:6C:AB:50:E8:7B:B4:A5"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.dooramg.www.twa",
+      "sha256_cert_fingerprints": ["88:05:D0:98:4C:6A:23:80:5B:B1:42:D5:63:1F:7A:C8:2E:71:8E:8F:F9:64:26:6D:7B:26:73:93:08:13:18:DB"]
+    }
+  }
+]
