@@ -31,7 +31,7 @@ const props = withDefaults(
 )
 
 const emits = defineEmits([
-  'close-dialog',
+  'close',
   'click:first-button',
   'click:second-button',
 ])
@@ -42,7 +42,7 @@ watch(() => props.dialogTrigger, (value) => {
 
 watch(() => modalTrigger.value, (value) => {
   if (!value) {
-    emits('close-dialog')
+    emits('close')
   }
 }, { immediate: true })
 </script>

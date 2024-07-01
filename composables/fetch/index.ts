@@ -1,4 +1,5 @@
 export const useFetchComposable = () => {
+  const toast = useToast()
   const client = useSupabaseClient()
 
   /**
@@ -22,7 +23,7 @@ export const useFetchComposable = () => {
       .eq('id', id)
 
     if (error) {
-      return error
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
     }
   }
 
@@ -32,7 +33,7 @@ export const useFetchComposable = () => {
       .upsert(upsertData)
 
     if (error) {
-      return error
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
     }
   }
 
@@ -54,7 +55,9 @@ export const useFetchComposable = () => {
         upsert: true,
       })
 
-    return error
+    if (error) {
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
+    }
   }
 
   const deleteData = async (deleteId: string, table: string, admin: boolean, matOpt: string, matOptVal: string, subMatOpt: string, subMatOptVal: string) => {
@@ -66,7 +69,7 @@ export const useFetchComposable = () => {
         .eq(matOpt, matOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
     else if (subMatOpt && subMatOptVal) {
@@ -78,7 +81,7 @@ export const useFetchComposable = () => {
         .eq(subMatOpt, subMatOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
     else {
@@ -89,7 +92,7 @@ export const useFetchComposable = () => {
         .eq(matOpt, matOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
   }

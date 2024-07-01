@@ -6,7 +6,7 @@
     :double-second-text="$t('texts.close')"
     @click-first-button="submitImage"
     @click-second-button="closeDialog(false)"
-    @close-dialog="closeDialog(false)"
+    @close="closeDialog(false)"
   >
     <div class="flex flex-column gap-6">
       <DGFormGroup :label="$t('texts.upload')">

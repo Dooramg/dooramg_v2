@@ -2,7 +2,8 @@
 import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
-const { updateData, loadStorage, uploadStorage } = useFetchComposable()
+const { updateData, loadStorage, uploadStorage, deleteData, logout } = useFetchComposable()
+const { vehicleData } = storeToRefs(useVehicleStore())
 const { emailRegex, numberRegex } = useUi()
 const toast = useToast()
 const { t } = useLocale()
@@ -47,6 +48,7 @@ const editUserData = ref({
 })
 const postCodeTrigger = ref(false)
 const insertAddressDetail = ref(false)
+const deleteConfirmTrigger = ref(false)
 
 const initEditUserData = () => {
   if (!userInfoData.value) {
@@ -72,11 +74,7 @@ const uploadImage = async (file: File) => {
   const fileExt = file.name.split('.').pop()
   const fileName = `${genUid()}.${fileExt}`
 
-  const uploadError = await uploadStorage('user_avatar', fileName, file)
-
-  if (uploadError) {
-    toast.add({ title: String(uploadError), color: 'red', timeout: 3000 })
-  }
+  await uploadStorage('user_avatar', fileName, file)
 
   toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'emerald', timeout: 3000 })
   await downloadImage(fileName)
@@ -136,6 +134,19 @@ const updateUserData = async () => {
   }
 
   userInfoData.value = data
+}
+
+const deleteAccount = async () => {
+  await deleteData('vehicleManagement', userInfoData.value?.id ?? '', false, '', '', '', '')
+  await deleteData('vehicles', userInfoData.value?.id ?? '', false, '', '', '', '')
+  await deleteData('userInfo', userInfoData.value?.id ?? '', false, '', '', '', '')
+
+  await logout()
+
+  userCoreId.value = ''
+  userInfoData.value = null
+  vehicleData.value = null
+  navigateTo('/login')
 }
 
 watch(userInfoData, () => {
@@ -260,7 +271,15 @@ watch(userInfoData, () => {
         />
       </DGFormGroup>
       <DGFormGroup class="flex justify-end pt-4">
-        <div class="flex gap-4">
+        <div class="w-dvw md:w-[400px] flex gap-4">
+          <AButton
+            custom-class="mr-4"
+            button-size="xs"
+            button-variant="ghost"
+            :button-text="$t('buttons.deleteAccount')"
+            @click="() => deleteConfirmTrigger = true"
+          />
+          <div class="flex-auto" />
           <AButton
             use-leading
             button-variant="outline"
@@ -288,5 +307,27 @@ watch(userInfoData, () => {
       @address:select="selectAddress"
       @close="() => postCodeTrigger = false"
     />
+    <DialogConfirm
+      :dialog-trigger="deleteConfirmTrigger"
+      custom-class="confirm-dialog"
+      title-class="text-2xl font-bold"
+      :full-screen="false"
+      :title="$t('setting.deleteDialog.title')"
+      :first-button-text="$t('setting.deleteDialog.confirm')"
+      :second-button-text="$t('setting.deleteDialog.reject')"
+      @click:first-button="deleteAccount"
+      @click:second-button="() => deleteConfirmTrigger = false"
+      @close="() => deleteConfirmTrigger = false"
+    >
+      <div
+        v-for="(text, index) in $tm('setting.deleteDialog.description')"
+        :key="index"
+        class="ml-16"
+      >
+        <p class="text-lg">
+          {{ $rt(text) }}
+        </p>
+      </div>
+    </DialogConfirm>
   </div>
 </template>
