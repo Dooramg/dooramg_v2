@@ -137,9 +137,9 @@ const updateUserData = async () => {
 }
 
 const deleteAccount = async () => {
-  await deleteData('vehicleManagement', userInfoData.value?.id ?? '', false, '', '', '', '')
-  await deleteData('vehicles', userInfoData.value?.id ?? '', false, '', '', '', '')
-  await deleteData('userInfo', userInfoData.value?.id ?? '', false, '', '', '', '')
+  await deleteData('vehicleManagement', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
+  await deleteData('vehicles', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
+  await deleteData('userInfo', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
 
   await logout()
 
@@ -161,14 +161,14 @@ watch(userInfoData, () => {
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-center gap-8 mt-8">
-    <p class="w-dvw md:w-[500px] text-2xl font-bold px-4">
+  <div class="flex flex-col mt-8">
+    <p class="text-2xl font-bold px-8">
       {{ $t('user.title') }}
     </p>
     <DGForm
       :schema="schema"
       :state="editUserData"
-      class="space-y-2 mt-8 mx-a"
+      class="w-dvw md:w-[500px] space-y-2 mt-8 px-8 gap-4"
       @submit="updateUserInfo"
     >
       <DGFormGroup
@@ -309,7 +309,6 @@ watch(userInfoData, () => {
     />
     <DialogConfirm
       :dialog-trigger="deleteConfirmTrigger"
-      custom-class="confirm-dialog"
       title-class="text-2xl font-bold"
       :full-screen="false"
       :title="$t('setting.deleteDialog.title')"

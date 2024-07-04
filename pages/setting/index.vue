@@ -12,11 +12,11 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="w-dvw md:w-[400px] flex flex-col mt-8">
+  <div class="flex flex-col mt-8">
     <p class="text-2xl font-bold px-8">
       {{ $t('setting.title') }}
     </p>
-    <div class="w-auto flex flex-col items-center mt-20 px-8 gap-4">
+    <div class="w-dvw md:w-[500px] flex flex-col items-center mt-20 px-8 gap-4">
       <AButton
         custom-class="w-full flex justify-center"
         button-size="lg"

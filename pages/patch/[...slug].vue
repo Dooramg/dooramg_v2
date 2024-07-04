@@ -5,7 +5,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="w-auto lg:w-[500px] mt-4 px-4">
+  <div class="w-dvw md:w-[400px] mt-8 px-4">
     <ContentDoc />
   </div>
 </template>

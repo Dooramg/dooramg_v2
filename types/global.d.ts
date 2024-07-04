@@ -11,6 +11,11 @@ interface Window {
 
 type SerializeObject = /* unresolved */ any
 
+interface SelectOption {
+  value: string
+  label: string
+}
+
 interface ResWithCount {
   data: any
   count: number
@@ -220,6 +225,7 @@ interface DiaryData {
 interface LikeCountData {
   id?: string
   boardId: string
+  userId: string
   likeCount: number | undefined
   createdAt?: string
 }

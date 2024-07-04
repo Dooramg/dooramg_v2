@@ -21,7 +21,12 @@ export default {
     discord: 'Discord',
     magicEmail: 'Email',
     electricFuel: 'Elec Fuel ⚡️',
+    latestArticle: 'Latest Article',
+    myArticle: 'My Article',
+    secretArticle: 'Secret Article',
     article: 'Article',
+    notice: 'Notice',
+    deleteArticle: 'Delete Article',
     meeting: 'Meeting',
   },
   unit: {
@@ -58,6 +63,7 @@ export default {
     officialFuelEfficient: 'Official Efficient',
     title: 'Title',
     content: 'Content',
+    comment: 'Comment',
     memo: 'Memo',
     fuelAmount: 'Fuel Amount',
     fuelPaidAmount: 'Fuel Paid',
@@ -245,14 +251,10 @@ export default {
   },
   board: {
     noResult: 'No result 😢',
-    likeCount: '+{count} 👍🏻',
     commentWriteTitle: 'Comment Write 🖍️',
     noComment: 'Be the first to leave a heartfelt comment!! 😌',
     commentTitle: 'Comment List 📒',
     useMapInformation: 'Click on a pin on the map, then auto insert the address!',
-    grade: {
-      admin: '👑 {nickName}',
-    },
     notice: {
       title: 'Notice 📰',
       writeTitle: 'Notice Write ✏️',
@@ -367,6 +369,7 @@ export default {
     displacement: 'Input displacement!',
     title: 'Input title!',
     noticeTitle: 'Input notice title!',
+    comment: 'Input comment!',
     totalDistance: 'Input total distance!',
     totalFuelAmount: 'Input total fuel amount!',
     fuelPaidAmount: 'Input fuel paid amount!',
@@ -504,6 +507,10 @@ export default {
     commentDeleteSuccess: {
       title: 'Delete success!',
       description: 'Please write again! 😜',
+    },
+    countUpLike: {
+      title: 'Like success!',
+      description: 'Thank you!',
     },
     alreadyLike: {
       title: 'Already like!',

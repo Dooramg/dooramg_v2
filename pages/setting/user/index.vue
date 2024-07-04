@@ -31,12 +31,12 @@ const logoutProcess = async () => {
 
 <template>
   <div class="flex flex-col mt-8">
-    <p class="text-2xl font-bold px-4">
+    <p class="text-2xl font-bold px-8">
       {{ $t('user.title') }}
     </p>
     <div
       v-if="userInfoData"
-      class="w-dvw md:w-[500px] flex flex-col items-center gap-8 mt-20"
+      class="w-dvw md:w-[500px] flex flex-col items-center gap-8 mt-20 px-8"
     >
       <div class="flex items-end gap-4 mt-4">
         <DGAvatar
@@ -66,7 +66,7 @@ const logoutProcess = async () => {
           button-variant="outline"
           :button-text="$t('buttons.edit')"
           icon-name="i-line-md-edit-twotone-full"
-          :icon-size="24"
+          :icon-size="16"
           @click="navigateTo('/setting/user/edit')"
         />
         <AButton
@@ -74,7 +74,7 @@ const logoutProcess = async () => {
           button-variant="outline"
           :button-text="$t('buttons.logout')"
           icon-name="i-line-md-logout"
-          :icon-size="24"
+          :icon-size="16"
           @click="logoutProcess"
         />
       </div>

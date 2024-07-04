@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     '@nuxtjs/stylelint-module',
     '@nuxtjs/i18n',
     'nuxt-icon',
+    'nuxt-time',
     'nuxt-simple-sitemap',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',

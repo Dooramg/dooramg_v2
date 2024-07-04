@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed bottom-0 flex flex-col justify-between items-center bg-red-100 gap-4">
-    <div class="w-dvw md:w-[500px] fixed bottom-0 flex justify-between items-center border-t-2 p-2 border-amber-800 dark:border-amber-300">
+  <div class="sticky bottom-0 flex flex-col justify-between items-center gap-4">
+    <div class="w-dvw md:w-[500px] fixed bottom-0 flex justify-between items-center border-t-2 p-2 border-amber-800 dark:border-amber-300 bg-zinc-50/90 dark:bg-zinc-900/90">
       <NuxtLink
         class="w-fit py-2 px-4 flex flex-col justify-center items-center gap-1 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-700"
         to="/"
@@ -42,7 +42,7 @@
       </NuxtLink>
       <NuxtLink
         class="w-fit py-2 px-4 flex flex-col justify-center items-center gap-1 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-700"
-        to="/community"
+        to="/board/community"
       >
         <Icon
           name="solar:clipboard-list-outline"

@@ -38,6 +38,8 @@ if (import.meta.server) {
       lang: 'ko',
     },
     meta: () => [
+      { name: 'msapplication-TileColor', content: '#fff7e9' },
+      { name: 'theme-color', content: '#fff7e9' },
     ],
     link: [
       { rel: 'canonical', href: seoUrl },
@@ -90,6 +92,7 @@ useSeoMeta({
         <DGNotifications />
         <MarkerSvg />
       </div>
+      <InstallPwa />
     </NuxtLayout>
   </div>
 </template>

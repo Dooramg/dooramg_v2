@@ -21,7 +21,12 @@ export default {
     discord: 'Discord',
     magicEmail: 'Email',
     electricFuel: '전기밥 ⚡️',
+    latestArticle: '최신글',
+    myArticle: '내글',
+    secretArticle: '비공개글',
     article: '게시물',
+    notice: '공지사항',
+    deleteArticle: '글 삭제',
     meeting: '모임',
   },
   unit: {
@@ -58,6 +63,7 @@ export default {
     officialFuelEfficient: '공인연비',
     title: '제목',
     content: '본문',
+    comment: '댓글',
     memo: '메모',
     fuelAmount: '주유량',
     fuelPaidAmount: '주유금액',
@@ -69,7 +75,7 @@ export default {
   },
   buttons: {
     home: '홈',
-    vehicles: '두바퀴',
+    vehicles: '두바퀴들',
     diary: '일기장',
     community: '두뮤니티',
     setting: '설정',
@@ -245,14 +251,10 @@ export default {
   },
   board: {
     noResult: '검색 결과가 없네요 😢',
-    likeCount: '+{count} 👍🏻',
     commentWriteTitle: '댓글 쓰기 🖍️',
     noComment: '마음을 담은 첫 댓글을 남겨주세여!! 😌',
     commentTitle: '댓글 목록 📒',
     useMapInformation: '아래의 지도에서 핀을 클릭하면 주소가 자동 입력됩니다!',
-    grade: {
-      admin: '👑 {nickName}',
-    },
     notice: {
       title: '알림판 📰',
       writeTitle: '공지사항 글쓰기 ✏️',
@@ -367,6 +369,7 @@ export default {
     displacement: '배기량을 입력해주세요!',
     title: '여행 제목을 입력해주세요!',
     noticeTitle: '공지사항 제목을 입력해주세요!',
+    comment: '댓글을 입력해주세요!',
     totalDistance: '총 주행거리를 입력헤주세요!',
     totalFuelAmount: '총 주유량을 입력해주세요!',
     fuelPaidAmount: '주유금액을 입력해주세요!',
@@ -504,6 +507,10 @@ export default {
     commentDeleteSuccess: {
       title: '댓글삭제 성공!',
       description: '제발 다시써줘요! 😜',
+    },
+    countUpLike: {
+      title: '좋아요를 눌렀어요!',
+      description: '눌러주셔서 감사해요!',
     },
     alreadyLike: {
       title: '이미 눌렀어용!',

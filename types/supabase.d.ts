@@ -12,7 +12,7 @@ interface SupabaseDataBase {
       boardCommunity: {
         Row: {
           content: string | null
-          createdAt: string | null | ComputedRef<string>
+          createdAt: string | null
           id: string
           isPublished: boolean | null
           latitude: number | null
@@ -21,8 +21,6 @@ interface SupabaseDataBase {
           title: string | null
           useLocation: boolean | null
           userId: string | null
-          userInfo?: SupabaseDataBase.public.Tables.userInfo.Row
-          likeCount: SupabaseDataBase.public.Tables.noticeLikeCount.Row.likeCount
         }
         Insert: {
           content?: string | null
@@ -52,6 +50,7 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'boardCommunity_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
@@ -60,7 +59,7 @@ interface SupabaseDataBase {
       boardNotice: {
         Row: {
           content: string | null
-          createdAt: string | null | ComputedRef<string>
+          createdAt: string | null
           id: string
           isPublished: boolean | null
           latitude: number | null
@@ -69,8 +68,6 @@ interface SupabaseDataBase {
           title: string | null
           useLocation: boolean | null
           userId: string | null
-          userInfo?: SupabaseDataBase.public.Tables.userInfo.Row
-          likeCount: SupabaseDataBase.public.Tables.noticeLikeCount.Row.likeCount
         }
         Insert: {
           content?: string | null
@@ -100,6 +97,7 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'boardNotice_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
@@ -137,7 +135,6 @@ interface SupabaseDataBase {
           id: string
           likeCount: number | null
           userId: string | null
-          userInfo: SupabaseDataBase.public.Tables.userInfo.Row
         }
         Insert: {
           boardId?: string | null
@@ -159,12 +156,14 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'communityCommentList_boardId_fkey'
             columns: ['boardId']
+            isOneToOne: false
             referencedRelation: 'boardCommunity'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'communityCommentList_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
@@ -176,24 +175,35 @@ interface SupabaseDataBase {
           createdAt: string | null
           id: string
           likeCount: number | null
+          userId: string | null
         }
         Insert: {
           boardId?: string | null
           createdAt?: string | null
           id?: string
           likeCount?: number | null
+          userId?: string | null
         }
         Update: {
           boardId?: string | null
           createdAt?: string | null
           id?: string
           likeCount?: number | null
+          userId?: string | null
         }
         Relationships: [
           {
             foreignKeyName: 'communityLikeCount_boardId_fkey'
             columns: ['boardId']
+            isOneToOne: false
             referencedRelation: 'boardCommunity'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'communityLikeCount_userId_fkey'
+            columns: ['userId']
+            isOneToOne: false
+            referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
         ]
@@ -299,7 +309,6 @@ interface SupabaseDataBase {
           id: string
           likeCount: number | null
           userId: string | null
-          userInfo: SupabaseDataBase.public.Tables.userInfo.Row
         }
         Insert: {
           boardId?: string | null
@@ -321,12 +330,14 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'noticeCommentList_boardId_fkey'
             columns: ['boardId']
+            isOneToOne: false
             referencedRelation: 'boardNotice'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'noticeCommentList_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
@@ -338,24 +349,70 @@ interface SupabaseDataBase {
           createdAt: string | null
           id: string
           likeCount: number | null
+          userId: string | null
         }
         Insert: {
           boardId?: string | null
           createdAt?: string | null
           id?: string
           likeCount?: number | null
+          userId?: string | null
         }
         Update: {
           boardId?: string | null
           createdAt?: string | null
           id?: string
           likeCount?: number | null
+          userId?: string | null
         }
         Relationships: [
           {
             foreignKeyName: 'noticeLikeCount_boardId_fkey'
             columns: ['boardId']
+            isOneToOne: false
             referencedRelation: 'boardNotice'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'noticeLikeCount_userId_fkey'
+            columns: ['userId']
+            isOneToOne: false
+            referencedRelation: 'userInfo'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_id_fkey'
+            columns: ['id']
+            isOneToOne: true
+            referencedRelation: 'users'
             referencedColumns: ['id']
           },
         ]
@@ -407,6 +464,7 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'userInfo_mainVehicleId_fkey'
             columns: ['mainVehicleId']
+            isOneToOne: false
             referencedRelation: 'vehicles'
             referencedColumns: ['id']
           },
@@ -418,7 +476,7 @@ interface SupabaseDataBase {
           destination: string | null
           driveDistance: number | null
           efficient: number | null
-          fuelAmount: number
+          fuelAmount: number | null
           fuelStationCode: string | null
           fuelStationName: string | null
           id: string
@@ -430,7 +488,6 @@ interface SupabaseDataBase {
           totalDistance: number | null
           userId: string | null
           vehicleId: string | null
-          manageType: SupabaseDataBase.public.Tables.Code
         }
         Insert: {
           createdAt?: string | null
@@ -472,18 +529,21 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'vehicleManagement_manageTypeId_fkey'
             columns: ['manageTypeId']
+            isOneToOne: false
             referencedRelation: 'manageType'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'vehicleManagement_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'vehicleManagement_vehicleId_fkey'
             columns: ['vehicleId']
+            isOneToOne: false
             referencedRelation: 'vehicles'
             referencedColumns: ['id']
           },
@@ -515,6 +575,7 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'vehicleModel_manufacturerId_fkey'
             columns: ['manufacturerId']
+            isOneToOne: false
             referencedRelation: 'manufacturer'
             referencedColumns: ['id']
           },
@@ -612,24 +673,28 @@ interface SupabaseDataBase {
           {
             foreignKeyName: 'vehicles_fuelTypeId_fkey'
             columns: ['fuelTypeId']
+            isOneToOne: false
             referencedRelation: 'fuelData'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'vehicles_manufacturerId_fkey'
             columns: ['manufacturerId']
+            isOneToOne: false
             referencedRelation: 'manufacturer'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'vehicles_userId_fkey'
             columns: ['userId']
+            isOneToOne: false
             referencedRelation: 'userInfo'
             referencedColumns: ['id']
           },
           {
             foreignKeyName: 'vehicles_vehicleModelId_fkey'
             columns: ['vehicleModelId']
+            isOneToOne: false
             referencedRelation: 'vehicleModel'
             referencedColumns: ['id']
           },
@@ -650,3 +715,85 @@ interface SupabaseDataBase {
     }
   }
 }
+
+type PublicSchema = Database[Extract<keyof Database, 'public'>]
+
+type Tables<
+  PublicTableNameOrOptions extends
+  | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+  | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
+    Database[PublicTableNameOrOptions['schema']]['Views'])
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
+  Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+      Row: infer R
+    }
+      ? R
+      : never
+  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
+  PublicSchema['Views'])
+    ? (PublicSchema['Tables'] &
+    PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+        ? R
+        : never
+    : never
+
+type TablesInsert<
+  PublicTableNameOrOptions extends
+  | keyof PublicSchema['Tables']
+  | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+    Insert: infer I
+  }
+    ? I
+    : never
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+      Insert: infer I
+    }
+      ? I
+      : never
+    : never
+
+type TablesUpdate<
+  PublicTableNameOrOptions extends
+  | keyof PublicSchema['Tables']
+  | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+    Update: infer U
+  }
+    ? U
+    : never
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+      Update: infer U
+    }
+      ? U
+      : never
+    : never
+
+type Enums<
+  PublicEnumNameOrOptions extends
+  | keyof PublicSchema['Enums']
+  | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
+    : never = never,
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
+    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never

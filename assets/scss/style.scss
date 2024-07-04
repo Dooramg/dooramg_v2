@@ -1,4 +1,6 @@
 @use 'content/markdown' as *;
+@use 'fonts' as *;
+@use 'common/tiptap_template' as *;
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 @import url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css");
 
@@ -23,4 +25,8 @@ body {
 .page-enter-from,
 .page-leave-to {
   opacity: .3;
+}
+
+.board-content {
+  @include tiptap-template();
 }
