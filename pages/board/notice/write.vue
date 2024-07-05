@@ -16,14 +16,14 @@ definePageMeta({
 })
 
 const writeNoticeDetailData = ref({
+  userId: userCoreId.value,
   title: '',
   content: '',
-  userId: userCoreId.value,
+  isPublished: true,
+  useLocation: false,
   locationAddress: '',
   latitude: 0,
   longitude: 0,
-  isPublished: true,
-  useLocation: false,
 })
 
 const createNoticeArticle = async () => {
@@ -46,11 +46,17 @@ const createNoticeArticle = async () => {
       input-color="amber"
       :input-placeholder="$t('placeholder.noticeTitle')"
     />
-    <DGCheckbox
-      v-model="writeNoticeDetailData.isPublished"
-      color="amber"
-      :label="writeNoticeDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
-    />
+    <div class="w-full flex justify-center gap-4">
+      <p class="text-md font-bold">
+        {{ $t('labelTexts.published') }}
+      </p>
+      <div class="flex-auto" />
+      <DGCheckbox
+        v-model="writeNoticeDetailData.isPublished"
+        color="amber"
+        :label="writeNoticeDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
+      />
+    </div>
     <TiptapTextEditor
       :text-data="writeNoticeDetailData.content"
       full-option

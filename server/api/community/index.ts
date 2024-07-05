@@ -18,9 +18,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (searchType === 'searchTotal') {
-    const { data, error } = await client
+    const { data, count, error } = await client
       .from('boardCommunity')
-      .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)')
+      .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)', { count: 'exact' })
       .order('createdAt', { ascending: false })
       // .eq('isPublished', true)
       .range(supabasePageCalc(page, pageCount, true), supabasePageCalc(page, pageCount, false))
@@ -29,12 +29,12 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusMessage: error.message })
     }
 
-    return data
+    return { data, count }
   }
   else {
-    const { data, error } = await client
+    const { data, count, error } = await client
       .from('boardCommunity')
-      .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)')
+      .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)', { count: 'exact' })
       .order('createdAt', { ascending: false })
       // .eq('isPublished', true)
       .textSearch(textType, searchText, {
@@ -47,6 +47,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusMessage: error.message })
     }
 
-    return data
+    return { data, count }
   }
 })

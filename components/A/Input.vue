@@ -7,6 +7,7 @@ const props = withDefaults(
     inputColor?: string
     inputSize?: string
     inputPlaceholder?: string
+    inputDisabled?: boolean
     useLeading?: boolean
     clearable?: boolean
     useTrailing?: boolean
@@ -20,6 +21,7 @@ const props = withDefaults(
     inputColor: 'amber',
     inputSize: 'md',
     inputPlaceholder: '',
+    inputDisabled: false,
     useLeading: false,
     clearable: false,
     useTrailing: false,
@@ -59,6 +61,7 @@ const switchInputUi = () => {
     :color="inputColor"
     :size="inputSize"
     :placeholder="inputPlaceholder"
+    :disabled="inputDisabled"
     :ui="switchInputUi()"
   >
     <template

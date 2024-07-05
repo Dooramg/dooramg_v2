@@ -77,17 +77,11 @@ const { data: noticeDetailData, refresh: noticeDetailRefresh } = useAsyncData('n
   immediate: true,
 })
 
-const { data: commentData, refresh: noticeCommentRefresh } = useAsyncData('noticeCommentData', async () => {
-  const { data }: SerializeObject = await useFetch('/api/notice/comment', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      id: boardId.value,
-    },
-  })
-
-  return data.value
-}, {
-  immediate: true,
+const { data: commentData, refresh: noticeCommentRefresh }: SerializeObject = await useFetch('/api/notice/comment', {
+  headers: useRequestHeaders(['cookie']),
+  query: {
+    id: boardId.value,
+  },
 })
 
 const countUpLike = () => {

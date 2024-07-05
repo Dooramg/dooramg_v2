@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { countData } = useFetchComposable()
 const { t } = useLocale()
 const { query } = useRoute()
 const router = useRouter()
@@ -25,6 +24,7 @@ const searchText = ref('')
 
 const currentPage = ref(1)
 const currentPageSize = ref(10)
+const articleCount = ref(0)
 
 currentPage.value = parseInt(query.page as string) || 1
 currentPageSize.value = parseInt(query.count as string) || 10
@@ -40,16 +40,8 @@ watch(() => currentPage.value, () => {
   immediate: true,
 })
 
-const { data: count } = useAsyncData('communityCount', async () => {
-  const data = await countData('boardCommunity')
-
-  return data.count
-}, {
-  immediate: true,
-})
-
 const { data: boardCommunityData, refresh: refreshBoardCommunity, pending: _pendingBoardCommunity } = useAsyncData('boardCommunity', async () => {
-  const { data }: SerializeObject = await useFetch('/api/community', {
+  const { data: serverData }: SerializeObject = await useFetch('/api/community', {
     headers: useRequestHeaders(['cookie']),
     query: {
       page: currentPage.value,
@@ -60,26 +52,23 @@ const { data: boardCommunityData, refresh: refreshBoardCommunity, pending: _pend
     },
   })
 
-  const transformData: BoardData[] = data.value.map((article: BoardData) => ({
+  const transformData: BoardData[] = serverData.value.data.map((article: BoardData) => ({
     ...article,
     createdAt: computed(() => useDateFormat(article.createdAt ?? '', 'YYYY-MM-DD HH:MM:ss').value),
   }))
 
+  articleCount.value = serverData.value.count
   return transformData
 }, {
   immediate: true,
   watch: [currentPage, currentPageSize],
 })
 
-const { data: boardNoticeData } = useAsyncData('boardNotice', async () => {
-  const { data }: SerializeObject = await useFetch('/api/notice', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      dataRange: 4,
-    },
-  })
-
-  return data.value
+const { data: boardNoticeData }: SerializeObject = await useFetch('/api/notice', {
+  headers: useRequestHeaders(['cookie']),
+  query: {
+    dataRange: 4,
+  },
 })
 
 const searchCommunity = () => {
@@ -95,7 +84,7 @@ const searchCommunity = () => {
     </p>
     <div class="w-dvw md:w-[500px] flex flex-col items-end mt-4 px-4 gap-4">
       <AVerticalFlicking
-        :vertical-data="boardNoticeData"
+        :vertical-data="boardNoticeData.data"
         flicking-class="w-full h-14 border-2 rounded-md px-2 py-4 my-2 text-lg"
         @click:flicking="(id: string) => navigateTo(`/board/notice/${id}`)"
       />
@@ -174,7 +163,7 @@ const searchCommunity = () => {
         :first-button="{ variant: 'ghost', color: 'amber' }"
         :last-button="{ variant: 'ghost', color: 'amber' }"
         :page-count="currentPageSize"
-        :total="count ?? 0"
+        :total="articleCount ?? 0"
         show-first
         show-last
       />

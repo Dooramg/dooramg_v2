@@ -4,7 +4,7 @@ const { go, back } = useRouter()
 
 <template>
   <div class="h-dvh w-auto lg:w-[500px] flex flex-col items-center">
-    <div class="h-8 w-dvw md:w-[500px] mt-4 px-4 md:px-2 flex items-center gap-4">
+    <div class="h-8 w-dvw md:w-[500px] my-4 px-4 md:px-2 flex items-center gap-4">
       <Icon
         class="cursor-pointer m-1"
         name="line-md:arrow-small-left"

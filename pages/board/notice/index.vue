@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { countData } = useFetchComposable()
 const { t } = useLocale()
 const { query } = useRoute()
 const router = useRouter()
@@ -17,6 +16,7 @@ definePageMeta({
 
 const currentPage = ref(1)
 const currentPageSize = ref(10)
+const articleCount = ref(0)
 
 currentPage.value = parseInt(query.page as string) || 1
 currentPageSize.value = parseInt(query.count as string) || 10
@@ -32,16 +32,8 @@ watch(() => currentPage.value, () => {
   immediate: true,
 })
 
-const { data: count } = useAsyncData('noticeCount', async () => {
-  const data = await countData('boardNotice')
-
-  return data.count
-}, {
-  immediate: true,
-})
-
 const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBoardNotice } = useAsyncData('boardNotice', async () => {
-  const { data }: SerializeObject = await useFetch('/api/notice', {
+  const { data: serverData }: SerializeObject = await useFetch('/api/notice', {
     headers: useRequestHeaders(['cookie']),
     query: {
       page: currentPage.value,
@@ -49,11 +41,12 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
     },
   })
 
-  const transformData: BoardData[] = data.value.map((article: BoardData) => ({
+  const transformData: BoardData[] = serverData.value.data.map((article: BoardData) => ({
     ...article,
     createdAt: computed(() => useDateFormat(article.createdAt ?? '', 'YYYY-MM-DD HH:MM:ss').value),
   }))
 
+  articleCount.value = serverData.value.count
   return transformData
 }, {
   immediate: true,
@@ -124,7 +117,7 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
         :first-button="{ variant: 'ghost', color: 'amber' }"
         :last-button="{ variant: 'ghost', color: 'amber' }"
         :page-count="currentPageSize"
-        :total="count ?? 0"
+        :total="articleCount ?? 0"
         show-first
         show-last
       />

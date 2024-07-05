@@ -64,6 +64,8 @@ const clickMap = (map: any) => {
   if (props.isReadable) {
     return
   }
+
+  infoWindowTrigger.value = false
   marker.value.setPosition(map.coord)
 }
 
@@ -76,6 +78,7 @@ const clickMarker = async (markerObject: any) => {
       orders: 'legalcode,admcode,addr,roadaddr',
     }, returnData)
   }
+
   infoWindowTrigger.value = !infoWindowTrigger.value
 }
 
@@ -83,6 +86,7 @@ const returnData = (status: any, response: any) => {
   if (status !== 200) {
     return alert('잘못됨!')
   }
+
   markerAddress.value = response.v2.address
   emits('update:address', markerAddress.value, markerLatitude.value, markerLongitude.value)
 }
@@ -90,7 +94,7 @@ const returnData = (status: any, response: any) => {
 
 <template>
   <naver-map
-    class="naver-map"
+    class="h-[300px]"
     :map-options="mapOptions"
     @click="clickMap"
     @on-load="loadMap"
@@ -108,7 +112,7 @@ const returnData = (status: any, response: any) => {
       @on-load="loadInfoWindow"
       @click="() => infoWindowTrigger = false"
     >
-      <div class="info-window-component">
+      <div class="w-[160px] md:w-[200px] text-sm px-2">
         {{ markerAddress?.roadAddress ? $t('naverMaps.address', { address: markerAddress.roadAddress }) : $t('naverMaps.address', { address: markerAddress?.jibunAddress }) }}
       </div>
     </naver-info-window>

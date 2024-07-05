@@ -42,10 +42,14 @@ const adminTrigger = computed(() => {
   return userStoreData.value?.isAdmin
 })
 
-const editCommentDetailData = ref({
+const editCommunityDetailData = ref({
   title: '',
   content: '',
   isPublished: false,
+  useLocation: false,
+  locationAddress: '',
+  latitude: 0,
+  longitude: 0,
 })
 
 const insertCommentData = ref<CommentForm>({
@@ -57,6 +61,7 @@ const insertCommentData = ref<CommentForm>({
 const likeCount = ref(0)
 const editCommunityTrigger = ref(false)
 const deleteConfirmTrigger = ref(false)
+const naverMapsLoadTrigger = ref(false)
 
 const { data: communityDetailData, refresh: communityDetailRefresh } = useAsyncData('communityDetail', async () => {
   const { data }: SerializeObject = await useFetch('/api/community/detail', {
@@ -71,23 +76,19 @@ const { data: communityDetailData, refresh: communityDetailRefresh } = useAsyncD
     createdAt: useDateFormat(data.value.createdAt ?? '', 'YYYY-MM-DD HH:MM:ss'),
   }
 
+  naverMapsLoadTrigger.value = true
+
   likeCount.value = data.value.communityLikeCount.length
   return transformData
 }, {
   immediate: true,
 })
 
-const { data: commentData, refresh: communityCommentRefresh } = useAsyncData('communityCommentData', async () => {
-  const { data }: SerializeObject = await useFetch('/api/community/comment', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      id: boardId.value,
-    },
-  })
-
-  return data.value
-}, {
-  immediate: true,
+const { data: commentData, refresh: communityCommentRefresh }: SerializeObject = await useFetch('/api/community/comment', {
+  headers: useRequestHeaders(['cookie']),
+  query: {
+    id: boardId.value,
+  },
 })
 
 const countUpLike = () => {
@@ -114,22 +115,45 @@ const upsertLikeCount = async (count: number) => {
   toast.add({ title: t('messages.countUpLike.title'), description: t('messages.countUpLike.description'), color: 'amber', timeout: 2000 })
 }
 
-const editingCommunityDetail = () => {
-  editCommentDetailData.value = {
-    title: communityDetailData.value?.title ?? '',
-    content: communityDetailData.value?.content ?? '',
-    isPublished: communityDetailData.value?.isPublished ?? false,
-  }
+const initEditingCommunityDetailData = () => {
+  editCommunityDetailData.value.title = communityDetailData.value?.title ?? ''
+  editCommunityDetailData.value.content = communityDetailData.value?.content ?? ''
+  editCommunityDetailData.value.isPublished = communityDetailData.value?.isPublished ?? false
+  editCommunityDetailData.value.useLocation = communityDetailData.value?.useLocation ?? false
+  editCommunityDetailData.value.locationAddress = communityDetailData.value?.locationAddress ?? ''
+  editCommunityDetailData.value.latitude = communityDetailData.value?.latitude ?? 0
+  editCommunityDetailData.value.longitude = communityDetailData.value?.longitude ?? 0
+}
 
+initEditingCommunityDetailData()
+
+const updateNaverMapData = (markAddress: NaverResAddr, latitude: number, longitude: number) => {
+  markAddress.roadAddress
+    ? editCommunityDetailData.value.locationAddress = markAddress.roadAddress
+    : editCommunityDetailData.value.locationAddress = markAddress.jibunAddress
+
+  editCommunityDetailData.value.latitude = latitude
+  editCommunityDetailData.value.longitude = longitude
+}
+
+const editingCommunityDetail = () => {
   editCommunityTrigger.value = !editCommunityTrigger.value
+
+  if (!editCommunityTrigger.value) {
+    communityDetailRefresh()
+    initEditingCommunityDetailData()
+  }
 }
 
 const updateCommunityArticle = async () => {
-  await updateData('boardCommunity', editCommentDetailData.value, boardId.value)
+  await updateData('boardCommunity', editCommunityDetailData.value, boardId.value)
 
   toast.add({ title: t('messages.articleUpdateSuccess.title'), description: t('messages.articleUpdateSuccess.description'), color: 'amber', timeout: 2000 })
-  communityDetailRefresh()
   editCommunityTrigger.value = false
+  naverMapsLoadTrigger.value = false
+
+  communityDetailRefresh()
+  navigateTo('/board/community')
 }
 
 const insertComment = async (event: FormSubmitEvent<Schema>) => {
@@ -158,6 +182,14 @@ const deleteCommunityArticle = async () => {
   toast.add({ title: t('messages.articleDeleteSuccess.title'), description: t('messages.articleDeleteSuccess.description'), color: 'amber', timeout: 2000 })
   navigateTo('/board/community')
 }
+
+setTimeout(() => {
+  naverMapsLoadTrigger.value = true
+}, 300)
+
+onUnmounted(() => {
+  naverMapsLoadTrigger.value = false
+})
 </script>
 
 <template>
@@ -250,31 +282,62 @@ const deleteCommunityArticle = async () => {
           </div>
         </div>
       </template>
-      <div
-        v-if="!editCommunityTrigger"
-        v-dompurify-html="communityDetailData.content"
-        class="board-content"
-      />
-      <div
-        v-else
-        class="flex flex-col gap-4"
-      >
-        <AInput
-          v-model:input-data="editCommentDetailData.title"
-          clearable
-          input-color="amber"
-          :input-placeholder="$t('placeholder.inputTitle')"
+      <div class="flex flex-col gap-4">
+        <div
+          v-if="!editCommunityTrigger"
+          v-dompurify-html="communityDetailData.content"
         />
-        <DGCheckbox
-          v-model="editCommentDetailData.isPublished"
-          color="amber"
-          :label="editCommentDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
-        />
-        <TiptapTextEditor
-          :text-data="editCommentDetailData.content"
-          full-option
-          @update:model-value="(text: string) => editCommentDetailData.content = text"
-        />
+        <div
+          v-else
+          class="flex flex-col gap-4"
+        >
+          <AInput
+            v-model:input-data="editCommunityDetailData.title"
+            clearable
+            input-color="amber"
+            :input-placeholder="$t('placeholder.inputTitle')"
+          />
+          <DGCheckbox
+            v-model="editCommunityDetailData.isPublished"
+            color="amber"
+            :label="editCommunityDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
+          />
+          <TiptapTextEditor
+            :text-data="editCommunityDetailData.content"
+            full-option
+            @update:model-value="(text: string) => editCommunityDetailData.content = text"
+          />
+        </div>
+        <div
+          v-if="communityDetailData.useLocation"
+          class="flex flex-col gap-4"
+        >
+          <p v-show="!editCommunityTrigger">
+            {{ $t('naverMaps.address', { address: editCommunityDetailData.locationAddress }) }}
+          </p>
+          <AInput
+            v-show="editCommunityTrigger && editCommunityDetailData.locationAddress"
+            v-model:input-data="editCommunityDetailData.locationAddress"
+            class="w-full"
+            input-disabled
+            clearable
+            input-color="amber"
+            :input-placeholder="$t('placeholder.selectAddress')"
+          />
+          <NaverMaps
+            v-if="naverMapsLoadTrigger && !editCommunityTrigger"
+            is-readable
+            :load-latitude="communityDetailData.latitude"
+            :load-longitude="communityDetailData.longitude"
+          />
+          <NaverMaps
+            v-if="naverMapsLoadTrigger && editCommunityTrigger"
+            :is-readable="false"
+            :load-latitude="editCommunityDetailData.latitude"
+            :load-longitude="editCommunityDetailData.longitude"
+            @update:address="updateNaverMapData"
+          />
+        </div>
       </div>
       <template
         v-if="!editCommunityTrigger"

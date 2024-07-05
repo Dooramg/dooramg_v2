@@ -23,7 +23,6 @@ const emits = defineEmits([
   <div class="flex flex-col items-center gap-4">
     <NuxtImg
       v-if="index"
-      class="intro-image"
       :src="imageUrl"
       quality="40"
       preload
