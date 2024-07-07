@@ -35,10 +35,11 @@ const createNoticeArticle = async () => {
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-4 gap-4">
+  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-8 gap-4">
     <p class="w-full text-xl font-bold">
       {{ $t('board.notice.writeTitle') }}
     </p>
+    <DGDivider />
     <AInput
       v-model:input-data="writeNoticeDetailData.title"
       class="w-full"
@@ -62,6 +63,7 @@ const createNoticeArticle = async () => {
       full-option
       @update:model-value="(text: string) => writeNoticeDetailData.content = text"
     />
+    <DGDivider />
     <AButton
       custom-class="w-fit"
       :button-text="$t('buttons.write')"

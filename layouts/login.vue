@@ -11,12 +11,12 @@
     </div>
     <slot />
     <div class="flex items-center gap-3 mt-8">
-      <SwitchTheme switch-size="lg" />
+      <SwitchTheme />
       <SwitchLanguage />
-      <DGButton
-        size="sm"
-        color="amber"
-        :label="$t('buttons.policy')"
+      <AButton
+        button-size="sm"
+        button-color="amber"
+        :button-text="$t('buttons.policy')"
         @click="navigateTo('/document')"
       />
     </div>

@@ -188,7 +188,7 @@ export default {
       efficient: '✔︎ 연비: {efficient} km/l',
       sectionEfficient: '✔︎ 구간연비: {efficient} km/l',
       distance: '✔︎ 주행거리: {distance} km',
-      payAmount: '✔︎ 지출: {payAmount} 원',
+      paidAmount: '✔︎ 지출: {paidAmount} 원',
       fuel: '✔︎ 주유량: {fuel} l',
       destination: '✔︎ 목적지: {destination}',
       memo: '메모: {memo}',
@@ -200,7 +200,7 @@ export default {
       label: {
         efficient: '✔︎ 총 연비: {efficient} km/l',
         distance: '✔︎ 누적 주행거리: {distance} km',
-        payAmount: '✔︎ 누적 지출: {payAmount} 원',
+        paidAmount: '✔︎ 누적 지출: {paidAmount} 원',
         fuel: '✔︎ 예상 잔여 연료량: {fuel} l',
         totalFuel: '✔︎ 총 주유량: {totalFuel} l',
       },

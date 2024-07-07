@@ -5,10 +5,10 @@ export default defineEventHandler(async (event) => {
   const id = String(getQuery(event).userId)
 
   const { data, error } = await client
-    .from('vehicles')
-    .select('*, fuelData(id, codeName, opiCode, code), vehicleModel(name), manufacturer(name, logoImage)')
-    .eq('userId', id)
-    .order('createdAt', { ascending: true })
+    .from('userInfo')
+    .select('*')
+    .eq('id', id)
+    .single()
 
   if (error) {
     throw createError({ statusMessage: error.message })

@@ -188,7 +188,7 @@ export default {
       efficient: '✔︎ Efficient: {efficient} km/l',
       sectionEfficient: '︎ Section Efficient: {efficient} km/l',
       distance: '✔︎ Distance: {distance} km',
-      payAmount: '✔︎ Paid: {payAmount} 원',
+      paidAmount: '✔︎ Paid: {paidAmount} 원',
       fuel: '✔︎ Current Fuel: {fuel} l',
       destination: '✔︎ Destination: {destination}',
       memo: 'Memo: {memo}',
@@ -200,7 +200,7 @@ export default {
       label: {
         efficient: '✔︎ Tot Efficient: {efficient} km/l',
         distance: '✔︎ Tot Distance: {distance} km',
-        payAmount: '✔︎ Tot Paid: {payAmount} 원',
+        paidAmount: '✔︎ Tot Paid: {paidAmount} 원',
         fuel: '✔︎ Current Fuel: {fuel} l',
         totalFuel: '✔︎ Total Fuel: {totalFuel} l',
       },

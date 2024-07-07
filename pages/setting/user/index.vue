@@ -38,14 +38,15 @@ const logoutProcess = async () => {
       v-if="userInfoData"
       class="w-dvw md:w-[500px] flex flex-col items-center gap-8 mt-20 px-8"
     >
-      <div class="flex items-end gap-4 mt-4">
+      <div class="flex flex-col gap-4 mt-4">
         <DGAvatar
           img-class="object-cover"
           :src="userInfoData.avatarImage"
           size="3xl"
           :alt="userInfoData.nickName"
+          :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[200px] w-full md:w-[200px]' } }"
         />
-        <p class="text-lg">
+        <p class="text-2xl font-bold">
           {{ $t('user.surHello', { userName: userInfoData.nickName }) }}
         </p>
       </div>

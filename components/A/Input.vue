@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ButtonSize, ButtonVariant } from '#ui/types'
+import type { InputSize, ButtonSize, ButtonVariant } from '#ui/types'
 
 const props = withDefaults(
   defineProps<{
     inputClass?: string
     inputColor?: string
-    inputSize?: string
+    inputSize?: InputSize | undefined
     inputPlaceholder?: string
     inputDisabled?: boolean
     useLeading?: boolean

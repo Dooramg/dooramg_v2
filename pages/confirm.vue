@@ -2,13 +2,23 @@
 const user = useSupabaseUser()
 const client = useSupabaseClient<SupabaseDataBase>()
 
-const { userCoreId, userInfoData } = storeToRefs(useUserInfoStore())
-
-const { vehicleData: vehicleStoreData } = storeToRefs(useVehicleStore())
-const { refreshVehicleData } = useLoadVehicle()
+const { upsertData, updateData } = useFetchComposable()
+const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
+const { vehicleData } = storeToRefs(useVehicleStore())
 
 const { generateTempName } = useUi()
 const { url } = useImageStorage()
+
+const { refresh: refreshVehicleData } = useAsyncData('vehicleData', async () => {
+  const { data } = await useFetch('/api/vehicles', {
+    headers: useRequestHeaders(['cookie']),
+    query: {
+      userId: userCoreId.value,
+    },
+  })
+
+  vehicleData.value = data.value as StoreVehicleData[]
+})
 
 const loadUserData = async () => {
   if (!user.value) {
@@ -26,10 +36,9 @@ const loadUserData = async () => {
   }
 
   if (!data) {
-    await client
-      .from('userInfo')
-      .upsert(saveData())
+    await upsertData('userInfo', saveData(), '', '')
     userInfoData.value = saveData()
+
     return
   }
 
@@ -41,14 +50,11 @@ const loadUserData = async () => {
 }
 
 const updateMainVehicle = async () => {
-  if (!vehicleStoreData.value) {
+  if (!vehicleData.value) {
     return
   }
 
-  await client
-    .from('userInfo')
-    .update({ mainVehicleId: vehicleStoreData.value[0].id })
-    .eq('id', String(user.value?.id))
+  await updateData('userInfo', { mainVehicleId: vehicleData.value[0].id }, String(user.value?.id))
 }
 
 const saveData = () => {

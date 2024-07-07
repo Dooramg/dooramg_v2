@@ -17,9 +17,9 @@ export const useVehicleStore = defineStore('vehicleStoreData', () => {
     if (!vehicleData.value) {
       return null
     }
-    return !userInfoData.value.mainVehicleId
+    return !userInfoData.value?.mainVehicleId
       ? vehicleData.value[0]
-      : vehicleData.value.filter(vehicle => vehicle.id === userInfoData.value.mainVehicleId)[0]
+      : vehicleData.value.filter(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)[0]
   })
 
   const noVehicleData = computed<boolean>(() => vehicleData.value?.length === 0)

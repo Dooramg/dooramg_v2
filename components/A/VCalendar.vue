@@ -4,6 +4,8 @@ import { DatePicker as VCalendarDatePicker } from 'v-calendar'
 import type { DatePickerDate, DatePickerRangeObject } from 'v-calendar/dist/types/src/use/datePicker.d.ts'
 import 'v-calendar/dist/style.css'
 
+const { locale } = useLocale()
+
 const props = defineProps({
   modelValue: {
     type: [Date, Object] as PropType<DatePickerDate | DatePickerRangeObject | null>,
@@ -22,7 +24,6 @@ const date = computed({
 })
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
-
 const smallerThanSm = breakpoints.smaller('sm')
 
 const attrs = {
@@ -40,27 +41,29 @@ const attrs = {
     v-model.range="date"
     :columns="smallerThanSm ? 1 : 2"
     :rows="smallerThanSm ? 2 : 1"
+    :locale="locale === 'ko' ? 'ko' : 'en'"
     v-bind="{ ...attrs, ...$attrs }"
   />
   <VCalendarDatePicker
     v-else
     v-model="date"
+    :locale="locale === 'ko' ? 'ko' : 'en'"
     v-bind="{ ...attrs, ...$attrs }"
   />
 </template>
 
 <style>
 :root {
-  --vc-gray-50: rgb(var(--color-zinc-50));
-  --vc-gray-100: rgb(var(--color-zinc-100));
-  --vc-gray-200: rgb(var(--color-zinc-200));
-  --vc-gray-300: rgb(var(--color-zinc-300));
-  --vc-gray-400: rgb(var(--color-zinc-400));
-  --vc-gray-500: rgb(var(--color-zinc-500));
-  --vc-gray-600: rgb(var(--color-zinc-600));
-  --vc-gray-700: rgb(var(--color-zinc-700));
-  --vc-gray-800: rgb(var(--color-zinc-800));
-  --vc-gray-900: rgb(var(--color-zinc-900));
+  --vc-gray-50: rgb(var(--color-neutral-50));
+  --vc-gray-100: rgb(var(--color-neutral-100));
+  --vc-gray-200: rgb(var(--color-neutral-200));
+  --vc-gray-300: rgb(var(--color-neutral-300));
+  --vc-gray-400: rgb(var(--color-neutral-400));
+  --vc-gray-500: rgb(var(--color-neutral-500));
+  --vc-gray-600: rgb(var(--color-neutral-600));
+  --vc-gray-700: rgb(var(--color-neutral-700));
+  --vc-gray-800: rgb(var(--color-neutral-800));
+  --vc-gray-900: rgb(var(--color-neutral-900));
 }
 
 .vc-primary {

@@ -2,15 +2,13 @@
 import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
-const { updateData, loadStorage, uploadStorage, deleteData, logout } = useFetchComposable()
-const { vehicleData } = storeToRefs(useVehicleStore())
-const { emailRegex, numberRegex } = useUi()
 const toast = useToast()
 const { t } = useLocale()
+const { emailRegex, numberRegex } = useUi()
 
-const client = useSupabaseClient<SupabaseDataBase>()
-
+const { updateData, loadStorage, uploadStorage, deleteData, logout } = useFetchComposable()
 const { userCoreId, userInfoData } = storeToRefs(useUserInfoStore())
+const { vehicleData } = storeToRefs(useVehicleStore())
 
 useHead({
   title: t('pageTitle.user'),
@@ -104,7 +102,7 @@ const updateUserInfo = async (event: FormSubmitEvent<Schema>) => {
   await updateData('userInfo', editUserData.value, editUserData.value.id)
 
   toast.add({ title: t('messages.updateSuccess.title'), description: t('messages.updateSuccess.description'), color: 'amber', timeout: 2000 })
-  updateUserData()
+  refreshUserInfoData()
   navigateTo('/setting')
 }
 
@@ -122,19 +120,16 @@ const selectAddress = (address: string) => {
   insertAddressDetail.value = true
 }
 
-const updateUserData = async () => {
-  const { data, error } = await client
-    .from('userInfo')
-    .select('*')
-    .eq('id', userCoreId.value)
-    .single()
+const { refresh: refreshUserInfoData } = useAsyncData('userInfoData', async () => {
+  const { data } = await useFetch('/api/user', {
+    headers: useRequestHeaders(['cookie']),
+    query: {
+      userId: userCoreId.value,
+    },
+  })
 
-  if (error) {
-    toast.add({ title: error.message, color: 'red', timeout: 2000 })
-  }
-
-  userInfoData.value = data
-}
+  userInfoData.value = data.value
+})
 
 const deleteAccount = async () => {
   await deleteData('vehicleManagement', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
@@ -182,6 +177,7 @@ watch(userInfoData, () => {
           :src="editUserData.avatarImage"
           size="3xl"
           :alt="editUserData.nickName"
+          :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[160px] w-full md:w-[160px]' } }"
         />
         <AUploadFile
           :file-size-alarm="$t('validate.imageUploadSize')"
@@ -270,34 +266,35 @@ watch(userInfoData, () => {
           :input-placeholder="$t('placeholder.inputAddress')"
         />
       </DGFormGroup>
-      <DGFormGroup class="flex justify-end pt-4">
-        <div class="w-dvw md:w-[400px] flex gap-4">
+      <DGFormGroup class="pt-4">
+        <div class="w-full flex flex-wrap gap-4">
           <AButton
-            custom-class="mr-4"
             button-size="xs"
             button-variant="ghost"
             :button-text="$t('buttons.deleteAccount')"
             @click="() => deleteConfirmTrigger = true"
           />
           <div class="flex-auto" />
-          <AButton
-            use-leading
-            button-variant="outline"
-            button-size="md"
-            icon-name="line-md:pencil-twotone"
-            :icon-size="18"
-            :button-text="$t('buttons.save')"
-            @click="updateUserInfo"
-          />
-          <AButton
-            use-leading
-            button-variant="outline"
-            button-size="md"
-            icon-name="line-md:close-circle-twotone"
-            :icon-size="18"
-            :button-text="$t('buttons.cancel')"
-            @click="navigateTo('/setting/user')"
-          />
+          <div class="flex gap-4">
+            <AButton
+              use-leading
+              button-variant="outline"
+              button-size="md"
+              icon-name="line-md:pencil-twotone"
+              :icon-size="18"
+              :button-text="$t('buttons.save')"
+              @click="updateUserInfo"
+            />
+            <AButton
+              use-leading
+              button-variant="outline"
+              button-size="md"
+              icon-name="line-md:close-circle-twotone"
+              :icon-size="18"
+              :button-text="$t('buttons.cancel')"
+              @click="navigateTo('/setting/user')"
+            />
+          </div>
         </div>
       </DGFormGroup>
     </DGForm>

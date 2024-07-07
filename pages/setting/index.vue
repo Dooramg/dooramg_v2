@@ -47,7 +47,7 @@ definePageMeta({
       />
     </div>
     <div class="flex justify-center items-center mt-20 px-8 gap-4">
-      <SwitchTheme switch-size="lg" />
+      <SwitchTheme />
       <SwitchLanguage />
     </div>
     <FooterSetting />

@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import { sub, format, isSameDay, type Duration } from 'date-fns'
-import { ko } from 'date-fns/locale'
 
-const { t } = useLocale()
+const { t, locale } = useLocale()
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const smallerThanSm = breakpoints.smaller('sm')
 
 const selectedDate = defineModel('searchMonth', {
   type: Object,
@@ -31,15 +34,19 @@ const selectRange = (duration: Duration) => {
   <DGPopover :popper="{ placement: 'bottom-start' }">
     <AButton
       icon-name="i-heroicons-calendar-days-20-solid"
-      :button-text="`${format(selectedDate.start, 'yy년 M월 d일', { locale: ko })} - ${format(selectedDate.end, 'yy년 M월 d일', { locale: ko })}`"
+      :button-text="`${format(selectedDate.start, locale === 'ko' ? 'yy년 M월 d일' : 'MMM d, yy')} ~ ${format(selectedDate.end, locale === 'ko' ? 'yy년 M월 d일' : 'MMM d, yy')}`"
+      button-size="xl"
     />
     <template #panel="{ close }">
-      <div class="flex items-center sm:divide-x divide-gray-200 dark:divide-gray-800">
-        <div class="hidden sm:flex flex-col py-4">
+      <div class="flex flex-col sm:flex-row items-center sm:divide-x divide-gray-200 dark:divide-gray-800">
+        <div
+          v-if="!smallerThanSm"
+          class="flex flex-col py-4"
+        >
           <AButton
             v-for="(range, index) in ranges"
             :key="index"
-            class="rounded-none px-6"
+            class="rounded-none px-6 text-sm"
             :class="[isRangeSelected(range.duration) ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50']"
             :button-text="range.label"
             button-color="gray"
@@ -48,6 +55,24 @@ const selectRange = (duration: Duration) => {
             @click="selectRange(range.duration)"
           />
         </div>
+        <div
+          v-else
+          class="flex gap-2"
+        >
+          <AButton
+            v-for="(range, index) in ranges.slice(2, 5)"
+            :key="index"
+            class="rounded-none text-sm"
+            :class="[isRangeSelected(range.duration) ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50']"
+            :button-text="range.label"
+            button-color="gray"
+            button-variant="ghost"
+            button-size="xl"
+            button-truncate
+            @click="selectRange(range.duration)"
+          />
+        </div>
+        <DGDivider v-if="smallerThanSm" />
         <AVCalendar
           v-model="selectedDate"
           @close="close"

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusMessage: error.message })
     }
 
-    return { data, count }
+    return { serverData: data, count }
   }
   else {
     const { data, count, error } = await client
@@ -35,6 +35,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusMessage: error.message })
     }
 
-    return { data, count }
+    return { serverData: data, count }
   }
 })

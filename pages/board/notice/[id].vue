@@ -155,7 +155,7 @@ const deleteNoticeArticle = async () => {
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-4 gap-4">
+  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-8 gap-4">
     <DGCard
       v-if="noticeDetailData"
       :ui="{
@@ -284,7 +284,7 @@ const deleteNoticeArticle = async () => {
           <DGCard
             class="mt-4"
             :ui="{
-              background: userCoreId === commentList.userId ? 'bg-amber-200 dark:bg-amber-900' : 'bg-zinc-100 dark:bg-zinc-900',
+              background: userCoreId === commentList.userId ? 'bg-amber-200 dark:bg-amber-900' : 'bg-neutral-100 dark:bg-neutral-900',
               header: { padding: 'px-1 py-1 sm:p-2' },
               body: { padding: 'px-2 py-1 sm:p-4' },
               footer: { padding: 'px-1 py-1 sm:p-2' },

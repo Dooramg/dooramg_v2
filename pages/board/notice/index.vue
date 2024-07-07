@@ -55,11 +55,11 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
 </script>
 
 <template>
-  <div class="flex flex-col mt-8">
-    <p class="text-2xl font-bold px-4">
+  <div class="w-dvw md:w-[500px] flex flex-col mt-8 px-8 gap-4">
+    <p class="text-2xl font-bold">
       {{ $t('board.notice.title') }}
     </p>
-    <div class="w-dvw md:w-[500px] flex flex-col items-end mt-4 px-4 gap-4">
+    <div class="w-full flex flex-col items-end mt-4 gap-4">
       <AButton
         v-if="userStoreData?.isAdmin"
         button-size="lg"

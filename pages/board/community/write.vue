@@ -43,10 +43,11 @@ const updateNaverMapData = (markAddress: NaverResAddr, latitude: number, longitu
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-4 gap-4">
+  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-8 gap-4">
     <p class="w-full text-xl font-bold">
       {{ $t('board.community.writeTitle') }}
     </p>
+    <DGDivider />
     <AInput
       v-model:input-data="writeCommunityDetailData.title"
       class="w-full"
@@ -109,6 +110,7 @@ const updateNaverMapData = (markAddress: NaverResAddr, latitude: number, longitu
       input-color="amber"
       :input-placeholder="$t('placeholder.selectAddress')"
     />
+    <DGDivider />
     <AButton
       custom-class="w-fit"
       :button-text="$t('buttons.write')"
