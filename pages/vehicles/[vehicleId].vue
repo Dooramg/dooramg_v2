@@ -11,7 +11,7 @@ const { updateData, deleteData, loadStorage, uploadStorage } = useFetchComposabl
 
 const { headTextList, middleTextList, tailTextList } = storeToRefs(usePlateStore())
 const { userCoreId } = storeToRefs(useUserInfoStore())
-const { selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleData, selectedVehicleData } = storeToRefs(useVehicleStore())
 
 useHead({
   title: t('pageTitle.vehicles'),
@@ -163,11 +163,12 @@ const clickSaveButton = async () => {
 const confirmDelete = async () => {
   await deleteData('vehicleManagement', false, 'vehicleId', manageVehicleId, '', '', '', '')
   await deleteData('vehicles', false, 'id', manageVehicleId, '', '', '', '')
-  await updateData('userInfo', { mainVehicleId: null }, userCoreId.value)
+  await updateData('userInfo', { mainVehicleId: vehicleData.value?.at(0)?.id }, userCoreId.value)
 
   refreshVehicleData()
   refreshUserData()
   deleteConfirmTrigger.value = false
+  toast.add({ title: t('messages.deleteVehicleSuccess.title'), description: t('messages.deleteVehicleSuccess.description'), color: 'amber', timeout: 3000 })
   navigateTo('/vehicles')
 }
 

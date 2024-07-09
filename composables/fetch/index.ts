@@ -14,14 +14,18 @@ export const useFetchComposable = () => {
     return { count }
   }
 
-  const insertData = async (insertData: SerializeObject, table: string) => {
-    const { error } = await client
+  const insertData = async (table: string, insertData: SerializeObject) => {
+    const { data, error } = await client
       .from(table)
       .insert(insertData)
+      .select('id')
+      .single()
 
     if (error) {
-      return error
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
     }
+
+    return data
   }
 
   const updateData = async (table: string, updateData: SerializeObject | never, id: string) => {

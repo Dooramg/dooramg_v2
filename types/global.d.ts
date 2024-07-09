@@ -150,6 +150,7 @@ interface InsertVehicleData {
   vehicleModelId?: string
   makeYear?: string
   fuelTypeId?: string
+  userId?: string
 }
 
 interface UpdateVehicleData {

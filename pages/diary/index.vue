@@ -6,8 +6,9 @@ const { comma, digitsRoundUp } = useUi()
 const { updateData, deleteData } = useFetchComposable()
 
 const { refreshVehicleData } = useLoadVehicles()
-const { userInfoData: userStoreData } = storeToRefs(useUserInfoStore())
+const { userInfoData } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
+const { mainDiaryCount } = storeToRefs(useDiaryStore())
 
 useHead({
   title: t('pageTitle.diary'),
@@ -37,7 +38,7 @@ const { data: diaryData, refresh: refreshDiaryData } = await useAsyncData('diary
   const { data }: SerializeObject = await useFetch('/api/management', {
     headers: useRequestHeaders(['cookie']),
     query: {
-      vehicleId: userStoreData.value?.mainVehicleId,
+      vehicleId: userInfoData.value?.mainVehicleId,
       dateFilter: true,
       startDate: searchMonth.value.start,
       endDate: searchMonth.value.end,
@@ -101,7 +102,7 @@ refreshVehicleData()
       <div class="w-full flex flex-col gap-4">
         <DGAvatar
           img-class="object-cover"
-          :src="selectedVehicleData?.bikeImage ?? ''"
+          :src="selectedVehicleData?.bikeImage ? selectedVehicleData?.bikeImage : '/image/no_bike_image.jpg'"
           size="3xl"
           :alt="selectedVehicleData?.bikeImage ?? ''"
           :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[180px] w-full md:w-[180px]' } }"
@@ -135,9 +136,20 @@ refreshVehicleData()
       v-if="!diaryData || !diaryData.count"
       class="flex justify-center mt-40"
     >
-      <p class="text-2xl font-bold">
+      <p
+        v-if="mainDiaryCount"
+        class="text-2xl font-bold"
+      >
         {{ $t('diary.noDiary') }}
       </p>
+      <AButton
+        v-else
+        class="flex justify-center"
+        button-variant="outline"
+        button-size="xl"
+        :button-text="$t('buttons.rideSetting')"
+        @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
+      />
     </div>
     <DGCard
       v-for="(diary, index) in diaryData?.serverData"

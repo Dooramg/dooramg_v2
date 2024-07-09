@@ -123,7 +123,7 @@ export default {
     rideInsert: '다이어리 작성 🖊️',
     rideInsertShort: '작성 🖊️',
     rideSetting: '두바퀴 설정 🛠',
-    vehicleInsert: '두바퀴 등록 📝',
+    vehicleInsert: '새 두바퀴 등록 📝',
   },
   main: {
     manageTitle: '내 두바퀴 점수는? 💯',
@@ -237,6 +237,7 @@ export default {
       carTail: '두바퀴 번호판의 구분 입니다! ex) 차',
       manufacturer: '주요 두바퀴 제조사 입니다! ex) HarleyDavidson',
       models: '두바퀴 모델을 선택합니다! ex) 스포트글라이드',
+      manualVehicleModel: '모델명을 입력하세요! ex) 스포트글라이드',
       fuel: '유종을 선택하세요! ex) 고금유',
     },
     firstStepDialog: {
@@ -421,6 +422,7 @@ export default {
     carNickName: '두바퀴 닉네임을 입력하세요!',
     manufacturerId: '제조사를 선택하세요!',
     vehicleModelId: '모델을 선택하세요!',
+    manualVehicleModel: '모델명을 입력하세요!',
     totalDistance: '총 주행거리를 입력하세요!',
     totalFuelAmount: '총 주유량을 입력하세요!',
     lessTotalDistance: '기존 총 주행거리보다 적게 입력할 수 없어요!',
@@ -474,6 +476,10 @@ export default {
     vehicleSelect: {
       title: '{nickname} 을 선택하셨어요!',
       description: '관리 해볼까요?! 🤨',
+    },
+    deleteVehicleSuccess: {
+      title: '두바퀴 삭제 성공!',
+      description: '두바퀴를 삭제했어요 😜',
     },
     uploadSuccess: {
       title: '업로드 성공!',

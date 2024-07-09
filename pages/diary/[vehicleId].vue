@@ -1,5 +1,14 @@
 <script setup lang="ts">
+const { t } = useLocale()
 
+useHead({
+  title: t('pageTitle.diary'),
+})
+
+definePageMeta({
+  layout: 'with-navigator',
+  middleware: 'auth',
+})
 </script>
 
 <template>

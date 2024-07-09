@@ -123,7 +123,7 @@ export default {
     rideInsert: 'Diary Add 🖊️',
     rideInsertShort: 'Add 🖊️',
     rideSetting: 'Vehicle Setting 🛠',
-    vehicleInsert: 'Vehicle Add 📝',
+    vehicleInsert: 'New Vehicle Add 📝',
   },
   main: {
     manageTitle: 'My point? 💯',
@@ -237,6 +237,7 @@ export default {
       carTail: '두바퀴 번호판의 구분 입니다! ex) 차',
       manufacturer: '주요 두바퀴 제조사 입니다! ex) HarleyDavidson',
       models: '두바퀴 모델을 선택합니다! ex) 스포트글라이드',
+      manualVehicleModel: '모델명을 입력합니다! ex) 스포트글라이드',
       fuel: '유종을 선택하세요! ex) 고금유',
     },
     firstStepDialog: {
@@ -421,6 +422,7 @@ export default {
     carNickName: 'Input nick name!',
     manufacturerId: 'Select manufacturer!',
     vehicleModelId: 'Select model!',
+    manualVehicleModel: 'Input manual model!',
     totalDistance: 'Input total distance!',
     totalFuelAmount: 'Input total fuel amount!',
     lessTotalDistance: 'Disallow enter less then before value!',
@@ -474,6 +476,10 @@ export default {
     vehicleSelect: {
       title: 'Select {nickname}!',
       description: 'Now managed it! 🤨',
+    },
+    deleteVehicleSuccess: {
+      title: 'Delete vehicle complete!',
+      description: 'See you next vehicle! 😜',
     },
     uploadSuccess: {
       title: 'Upload complete!',

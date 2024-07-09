@@ -7,18 +7,18 @@ const { refreshVehicleData } = useLoadVehicles()
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
-const { allDiaryData, mainDiaryData, allDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
+const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
 definePageMeta({
   layout: 'main',
   middleware: 'auth',
 })
 
-const diaryRecord = computed(() => {
-  return individualArticleCount.value > 0
-})
-
 const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () => {
+  if (!userInfoData.value?.mainVehicleId) {
+    return
+  }
+
   const { data }: SerializeObject = await useFetch('/api/management', {
     headers: useRequestHeaders(['cookie']),
     query: {
@@ -33,6 +33,10 @@ const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () =
 })
 
 const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
+  if (!userInfoData.value?.mainVehicleId) {
+    return
+  }
+
   const { data }: SerializeObject = await useFetch('/api/management', {
     headers: useRequestHeaders(['cookie']),
     query: {
@@ -41,7 +45,10 @@ const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
     },
   })
 
+  console.log(data.value.count)
+
   mainDiaryData.value = data.value.serverData
+  mainDiaryCount.value = data.value.count
 }, {
   immediate: true,
 })
@@ -93,11 +100,11 @@ await refreshVehicleData()
               {{ $t('main.hi', { carNickName: selectedVehicleData?.carNickName }) }}
             </p>
             <div class="flex-auto" />
-            <LazyDGAvatar
-              img-class="object-cover"
+            <DGAvatar
               :src="selectedVehicleData?.manufacturer.logoImage ? selectedVehicleData.manufacturer.logoImage : 'https://via.placeholder.com/150?text=%3F&font-size=50'"
               size="lg"
               alt="brand-logo"
+              :ui="{ background: 'bg-transparent' }"
             />
           </div>
           <div class="w-full flex flex-col-reverse items-end sm:flex-row gap-4">
@@ -131,8 +138,8 @@ await refreshVehicleData()
         button-color="amber"
         button-size="xl"
         button-variant="outline"
-        :button-text="diaryRecord ? $t('buttons.rideInsert') : $t('buttons.rideSetting')"
-        @click="navigateTo(diaryRecord ? '/diary/record' : `/diary/${userInfoData.mainVehicleId}`)"
+        :button-text="mainDiaryCount ? $t('buttons.rideInsert') : $t('buttons.rideSetting')"
+        @click="navigateTo(mainDiaryCount ? `/diary/${userInfoData.mainVehicleId}` : `/vehicles/${userInfoData.mainVehicleId}`)"
       />
       <AButton
         button-color="sky"
@@ -242,7 +249,8 @@ await refreshVehicleData()
         class="flex justify-center"
         button-variant="outline"
         button-size="xl"
-        :button-text="$t('main.moreDiary')"
+        :button-text="mainDiaryCount ? $t('main.moreDiary') : $t('buttons.rideSetting')"
+        @click="mainDiaryCount ? navigateTo('/diary') : navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
       />
     </div>
   </div>
