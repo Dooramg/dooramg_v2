@@ -2,23 +2,13 @@
 const user = useSupabaseUser()
 const client = useSupabaseClient<SupabaseDataBase>()
 
+const { refreshVehicleData } = useLoadVehicles()
 const { upsertData, updateData } = useFetchComposable()
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
 const { vehicleData } = storeToRefs(useVehicleStore())
 
 const { generateTempName } = useUi()
 const { url } = useImageStorage()
-
-const { refresh: refreshVehicleData } = useAsyncData('vehicleData', async () => {
-  const { data } = await useFetch('/api/vehicles', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      userId: userCoreId.value,
-    },
-  })
-
-  vehicleData.value = data.value as StoreVehicleData[]
-})
 
 const loadUserData = async () => {
   if (!user.value) {

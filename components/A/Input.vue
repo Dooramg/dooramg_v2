@@ -5,6 +5,7 @@ const props = withDefaults(
   defineProps<{
     inputClass?: string
     inputColor?: string
+    inputType?: string
     inputSize?: InputSize | undefined
     inputPlaceholder?: string
     inputDisabled?: boolean
@@ -19,6 +20,7 @@ const props = withDefaults(
   {
     inputClass: '',
     inputColor: 'amber',
+    inputType: 'text',
     inputSize: 'md',
     inputPlaceholder: '',
     inputDisabled: false,
@@ -32,8 +34,9 @@ const props = withDefaults(
   },
 )
 
-defineEmits([
+const emit = defineEmits([
   'click:trailing',
+  'click:clear',
 ])
 
 const inputData = defineModel('inputData', {
@@ -52,6 +55,11 @@ const switchInputUi = () => {
 
   return trailingUi ? uiConfig : {}
 }
+
+const clickClear = () => {
+  inputData.value = ''
+  emit('click:clear')
+}
 </script>
 
 <template>
@@ -60,6 +68,7 @@ const switchInputUi = () => {
     :class="inputClass"
     :color="inputColor"
     :size="inputSize"
+    :type="inputType"
     :placeholder="inputPlaceholder"
     :disabled="inputDisabled"
     :ui="switchInputUi()"
@@ -78,24 +87,26 @@ const switchInputUi = () => {
       v-if="clearable || useTrailing"
       #trailing
     >
-      <AButton
-        v-if="useTrailing"
-        :button-size="trailingButtonSize"
-        button-variant="ghost"
-        :button-padding="false"
-        use-leading
-        icon-name="i-line-md-search"
-        @click="$emit('click:trailing')"
-      />
-      <AButton
-        v-if="clearable"
-        v-show="inputData"
-        button-variant="ghost"
-        :button-padding="false"
-        use-leading
-        icon-name="line-md:menu-to-close-alt-transition"
-        @click="() => inputData = ''"
-      />
+      <div class="flex gap-2">
+        <AButton
+          v-if="useTrailing"
+          :button-size="trailingButtonSize"
+          button-variant="ghost"
+          :button-padding="false"
+          use-leading
+          icon-name="i-line-md-search"
+          @click="() => $emit('click:trailing')"
+        />
+        <AButton
+          v-if="clearable"
+          v-show="inputData"
+          button-variant="ghost"
+          :button-padding="false"
+          use-leading
+          icon-name="line-md:menu-to-close-alt-transition"
+          @click="clickClear"
+        />
+      </div>
     </template>
   </DGInput>
 </template>

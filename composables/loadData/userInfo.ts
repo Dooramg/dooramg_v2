@@ -13,6 +13,8 @@ export const useLoadUser = () => {
 
     userInfoData.value = data?.value
     userCoreId.value = data?.value?.id ?? ''
+  }, {
+    immediate: true,
   })
 
   return {

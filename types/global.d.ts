@@ -27,8 +27,11 @@ interface NaverResAddr {
 }
 
 interface Code {
+  id: string
   code: string
   codeName: string
+  codeCategory?: string
+  createdAt?: string
 }
 interface UserData {
   address?: string | undefined | null
@@ -50,7 +53,7 @@ interface FuelData {
   code: string
   codeName: string
   opiCode: string
-  createdAt?: string
+  createdAt: string
 }
 
 interface ManufacturerData {

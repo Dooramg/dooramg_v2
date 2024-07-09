@@ -2,9 +2,10 @@
 const toast = useToast()
 const { t } = useLocale()
 const { comma } = useUi()
+const { updateData } = useFetchComposable()
 
 const { refreshUserData } = useLoadUser()
-const { updateData } = useFetchComposable()
+const { refreshVehicleData } = useLoadVehicles()
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
 const { vehicleData, selectedVehicleData, noVehicleData } = storeToRefs(useVehicleStore())
 
@@ -27,6 +28,8 @@ const selectVehicleData = async (vehicleId: string, carNickname: string) => {
 
   navigateTo(`vehicles/${userInfoData.value?.mainVehicleId}`)
 }
+
+refreshVehicleData()
 </script>
 
 <template>
@@ -44,7 +47,7 @@ const selectVehicleData = async (vehicleId: string, carNickname: string) => {
     >
       <template #header>
         <p class="text-lg sm:text-xl font-bold">
-          {{ !noVehicleData ? $t('vehicles.description') : $t('vehicles.nodescription') }}
+          {{ !noVehicleData ? $t('vehicles.description') : $t('vehicles.noDescription') }}
         </p>
       </template>
       <div class="w-full flex justify-end">
@@ -53,17 +56,17 @@ const selectVehicleData = async (vehicleId: string, carNickname: string) => {
           class="flex flex-col items-end gap-1"
         >
           <p class="text-base sm:text-lg font-bold">
-            {{ $t('vehicles.mainVehicle', { nickname: selectedVehicleData?.carNickName }) }}
+            {{ selectedVehicleData?.carNickName ? $t('vehicles.mainVehicle', { nickname: selectedVehicleData.carNickName }) : '로딩중..' }}
           </p>
           <ALicensePlate
-            :head-text="selectedVehicleData?.plateHeadText ?? ''"
-            :middle-text="selectedVehicleData?.plateMiddleText ?? ''"
-            :tail-text="selectedVehicleData?.plateTailText ?? ''"
-            :number-text="parseInt(selectedVehicleData?.plateNumber ?? '')"
+            :head-text="selectedVehicleData?.plateHeadText ?? '서울'"
+            :middle-text="selectedVehicleData?.plateMiddleText ?? '강남'"
+            :tail-text="selectedVehicleData?.plateTailText ?? '차'"
+            :number-text="parseInt(selectedVehicleData?.plateNumber ?? '1004')"
           />
         </div>
         <AButton
-          v-else
+          v-if="noVehicleData"
           button-size="lg"
           :button-text="$t('buttons.vehicleInsert')"
           @click="navigateTo('/vehicles/new')"
@@ -83,11 +86,12 @@ const selectVehicleData = async (vehicleId: string, carNickname: string) => {
       @click="selectVehicleData(vehicle.id, vehicle?.carNickName ?? '')"
     >
       <template #header>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <DGAvatar
             :src="vehicle.manufacturer.logoImage"
             size="lg"
             :alt="vehicle.manufacturer.name"
+            :ui="{ background: 'bg-transparent' }"
           />
           <div class="flex flex-col gap-1">
             <p class="text-lg font-bold">

@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const dateFilter = getQuery(event).dateFilter
   const startDate = getQuery(event).startDate
   const endDate = getQuery(event).endDate
+  const range = Number(getQuery(event).rangeCount)
 
   if (dateFilter) {
     const { data, count, error } = await client
@@ -23,13 +24,26 @@ export default defineEventHandler(async (event) => {
 
     return { serverData: data, count }
   }
+  else if (range) {
+    const { data, count, error } = await client
+      .from('vehicleManagement')
+      .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
+      .eq('vehicleId', id)
+      .order('createdAt', { ascending: false })
+      .range(0, range)
+
+    if (error) {
+      throw createError({ statusMessage: error.message })
+    }
+
+    return { serverData: data, count }
+  }
   else {
     const { data, count, error } = await client
       .from('vehicleManagement')
       .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
       .eq('vehicleId', id)
       .order('createdAt', { ascending: false })
-      .range(0, 2)
 
     if (error) {
       throw createError({ statusMessage: error.message })

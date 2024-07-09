@@ -4,6 +4,7 @@ const { query } = useRoute()
 const router = useRouter()
 
 const { userCoreId } = storeToRefs(useUserInfoStore())
+const { communityArticleCount } = storeToRefs(useBoardStore())
 
 useHead({
   title: t('pageTitle.notice'),
@@ -24,7 +25,6 @@ const searchText = ref('')
 
 const currentPage = ref(1)
 const currentPageSize = ref(10)
-const articleCount = ref(0)
 
 currentPage.value = parseInt(query.page as string) || 1
 currentPageSize.value = parseInt(query.count as string) || 10
@@ -57,7 +57,8 @@ const { data: boardCommunityData, refresh: refreshBoardCommunity, pending: _pend
     createdAt: computed(() => useDateFormat(article.createdAt ?? '', 'YYYY-MM-DD HH:MM:ss').value),
   }))
 
-  articleCount.value = serverData.value.count
+  communityArticleCount.value = serverData.value.count
+
   return transformData
 }, {
   immediate: true,
@@ -163,7 +164,7 @@ const searchCommunity = () => {
         :first-button="{ variant: 'ghost', color: 'amber' }"
         :last-button="{ variant: 'ghost', color: 'amber' }"
         :page-count="currentPageSize"
-        :total="articleCount ?? 0"
+        :total="communityArticleCount"
         show-first
         show-last
       />

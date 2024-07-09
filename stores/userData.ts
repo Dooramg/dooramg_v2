@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useUserInfoStore = defineStore('UserInfoData', () => {
+export const useUserInfoStore = defineStore('userInfoData', () => {
   /**
    * ! Pinia State !
    *

@@ -5,6 +5,7 @@ const { t } = useLocale()
 const { comma, digitsRoundUp } = useUi()
 const { updateData, deleteData } = useFetchComposable()
 
+const { refreshVehicleData } = useLoadVehicles()
 const { userInfoData: userStoreData } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
 
@@ -78,6 +79,8 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
     ? (totalAmount ? digitsRoundUp(totalAmount - amount, 'round', 100) : 0)
     : (totalAmount ? totalAmount - amount : 0)
 }
+
+refreshVehicleData()
 </script>
 
 <template>
@@ -90,6 +93,7 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
       <AButton
         button-size="lg"
         :button-text="$t('buttons.rideInsert')"
+        @click="navigateTo(`/diary/${selectedVehicleData?.id}`)"
       />
     </div>
     <DGDivider />
@@ -141,7 +145,7 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
       :ui="{ base: `border-2 ${diaryDetailColor(diary.manageType.code)}` }"
     >
       <template #header>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <DGBadge
             color="amber"
             size="lg"
@@ -164,7 +168,7 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
           </div>
           <div class="flex-auto" />
           <ANuxtTime
-            custom-class="text-lg font-bold"
+            custom-class="text-base font-bold"
             :date-time="diary.createdAt"
           />
         </div>

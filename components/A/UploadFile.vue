@@ -46,7 +46,7 @@ const uploadFile = (fileList: FileList) => {
   <div class="flex flex-column items-center gap-6">
     <DGFormGroup
       :label="$t('buttons.upload')"
-      :help="props.fileTypeAlarm.concat(', ', props.fileSizeAlarm)"
+      :help="props.fileTypeAlarm.concat(' ', props.fileSizeAlarm)"
     >
       <DGInput
         type="file"

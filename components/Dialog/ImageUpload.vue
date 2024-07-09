@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const toast = useToast()
 const { t } = useLocale()
+const { genUid } = useUi()
 
 const { loadStorage, uploadStorage } = useFetchComposable()
 
@@ -18,10 +19,6 @@ const exportUrl = ref('')
 const hyperLink = ref('')
 const imageHyperLinkTrigger = ref(false)
 const limitType = ['image/jpeg', 'image/jpg', 'image/webp', 'image/png', 'image/svg+xml']
-
-const genUid = () => {
-  return (new Date().getTime() + Math.random().toString(36).substring(2, 16))
-}
 
 const uploadFile = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -45,7 +42,7 @@ const uploadImage = async (file: File) => {
 
   await uploadStorage('notice_board', filePath, file)
 
-  toast.add({ title: t('messages.successImageUpload'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.successImageUpload'), color: 'amber', timeout: 3000 })
   await downloadImage(filePath)
 }
 
@@ -64,7 +61,7 @@ const submitImage = () => {
   }
 
   emits('submit:image', exportUrl.value, imageHyperLinkTrigger.value ? hyperLink.value : '')
-  toast.add({ title: t('messages.successImageUpload'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.successImageUpload'), color: 'amber', timeout: 3000 })
   closeDialog(false)
 }
 

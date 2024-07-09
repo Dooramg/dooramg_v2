@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useVehicleStore = defineStore('vehicleStoreData', () => {
+export const useVehicleStore = defineStore('vehicleStore', () => {
   const { userInfoData } = toRefs(useUserInfoStore())
   /**
    * ! Pinia State !
@@ -9,20 +9,20 @@ export const useVehicleStore = defineStore('vehicleStoreData', () => {
    * @param selectedVehicleData 선택된 차량 정보
    * @param noVehicleData 차량 정보 없음
    * @param exsistDiaryRecord 일지 기록 여부
+   * @param fuelData 연료 타입정보
    *
    */
   const vehicleData = ref<StoreVehicleData[] | null | undefined>()
 
   const selectedVehicleData = computed<StoreVehicleData | null | undefined>(() => {
-    if (!vehicleData.value) {
-      return null
-    }
     return !userInfoData.value?.mainVehicleId
-      ? vehicleData.value[0]
-      : vehicleData.value.filter(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)[0]
+      ? vehicleData.value?.[0]
+      : vehicleData.value?.filter(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)[0]
   })
 
   const noVehicleData = computed<boolean>(() => vehicleData.value?.length === 0)
+
+  const fuelData = ref<FuelData[] | null | undefined>()
 
   const exsistDiaryRecord = ref(false)
 
@@ -30,6 +30,7 @@ export const useVehicleStore = defineStore('vehicleStoreData', () => {
     vehicleData,
     selectedVehicleData,
     noVehicleData,
+    fuelData,
     exsistDiaryRecord,
   }
 }, {

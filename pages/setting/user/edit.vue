@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from '#ui/types'
 
 const toast = useToast()
 const { t } = useLocale()
-const { emailRegex, numberRegex } = useUi()
+const { genUid, emailRegex, numberRegex } = useUi()
 
 const { updateData, loadStorage, uploadStorage, deleteData, logout } = useFetchComposable()
 const { userCoreId, userInfoData } = storeToRefs(useUserInfoStore())
@@ -64,17 +64,13 @@ const initEditUserData = () => {
 
 initEditUserData()
 
-const genUid = () => {
-  return (new Date().getTime() + Math.random().toString(36).substring(2, 16))
-}
-
 const uploadImage = async (file: File) => {
   const fileExt = file.name.split('.').pop()
   const fileName = `${genUid()}.${fileExt}`
 
   await uploadStorage('user_avatar', fileName, file)
 
-  toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'amber', timeout: 3000 })
   await downloadImage(fileName)
 }
 
@@ -180,7 +176,7 @@ watch(userInfoData, () => {
           :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[160px] w-full md:w-[160px]' } }"
         />
         <AUploadFile
-          :file-size-alarm="$t('validate.imageUploadSize')"
+          :file-size-alarm="$t('validate.imageUploadLargeSize')"
           :file-type-alarm="$t('validate.imageUploadFormat')"
           :limit-type="['image/jpeg', 'image/png', 'image/gif']"
           :limit-height="2048"
@@ -232,27 +228,18 @@ watch(userInfoData, () => {
       <DGFormGroup
         :label="$t('labelTexts.address')"
         name="address"
+        :description="$t('placeholder.inputAddress')"
         size="xl"
       >
         <AInput
           v-model:input-data="editUserData.address"
           clearable
+          use-trailing
           :input-placeholder="$t('placeholder.inputAddress')"
           leading-icon-name="i-line-md-map-marker-twotone"
           @keyup.enter="SearchInputAddress"
-        >
-          <template #trailing-slot>
-            <AButton
-              v-if="editUserData.address"
-              custom-class="mr-2"
-              use-leading
-              :button-padding="false"
-              button-variant="ghost"
-              icon-name="line-md:search"
-              @click="SearchInputAddress"
-            />
-          </template>
-        </AInput>
+          @click:trailing="SearchInputAddress"
+        />
       </DGFormGroup>
       <DGFormGroup
         v-if="insertAddressDetail || editUserData.address"

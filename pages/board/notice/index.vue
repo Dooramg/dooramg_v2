@@ -4,6 +4,7 @@ const { query } = useRoute()
 const router = useRouter()
 
 const { userInfoData: userStoreData, userCoreId } = storeToRefs(useUserInfoStore())
+const { noticeArticleCount } = storeToRefs(useBoardStore())
 
 useHead({
   title: t('pageTitle.notice'),
@@ -16,7 +17,6 @@ definePageMeta({
 
 const currentPage = ref(1)
 const currentPageSize = ref(10)
-const articleCount = ref(0)
 
 currentPage.value = parseInt(query.page as string) || 1
 currentPageSize.value = parseInt(query.count as string) || 10
@@ -46,7 +46,7 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
     createdAt: computed(() => useDateFormat(article.createdAt ?? '', 'YYYY-MM-DD HH:MM:ss').value),
   }))
 
-  articleCount.value = serverData.value.count
+  noticeArticleCount.value = serverData.value.count
   return transformData
 }, {
   immediate: true,
@@ -117,7 +117,7 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
         :first-button="{ variant: 'ghost', color: 'amber' }"
         :last-button="{ variant: 'ghost', color: 'amber' }"
         :page-count="currentPageSize"
-        :total="articleCount ?? 0"
+        :total="noticeArticleCount"
         show-first
         show-last
       />

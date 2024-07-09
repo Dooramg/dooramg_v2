@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await client
     .from('code')
-    .select('code, codeName, codeCategory')
+    .select('*')
     .textSearch('codeCategory', String(query))
 
   if (error) {
