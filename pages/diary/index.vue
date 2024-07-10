@@ -6,7 +6,6 @@ const { t } = useLocale()
 const { comma, digitsRoundUp } = useUi()
 const { updateData, deleteData } = useFetchComposable()
 
-const { refreshVehicleData } = useLoadVehicles()
 const { userInfoData } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
 const { mainDiaryCount } = storeToRefs(useDiaryStore())
@@ -82,8 +81,6 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
     ? (totalAmount ? digitsRoundUp(totalAmount - amount, 'round', 100) : 0)
     : (totalAmount ? totalAmount - amount : 0)
 }
-
-refreshVehicleData()
 </script>
 
 <template>
