@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { _backgroundPosition } from '#tailwind-config/theme'
+const user = useSupabaseUser()
 
 const { comma } = useUi()
 const { refreshVehicleData } = useLoadVehicles()
 
-const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
+const { userInfoData } = storeToRefs(useUserInfoStore())
 const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
@@ -57,7 +57,7 @@ const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async ()
   const { data }: SerializeObject = await useFetch('/api/community/myArticle', {
     headers: useRequestHeaders(['cookie']),
     query: {
-      userId: userCoreId.value,
+      userId: user.value?.id,
     },
   })
 
