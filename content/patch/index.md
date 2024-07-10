@@ -30,6 +30,7 @@ head:
 ::
 
 ::content-card{class="content-style leading-relaxed"}
+- #### [패치노트 v2.2.0](/patch/v2.2.0)
 - #### [패치노트 v1.15.0](/patch/v1.15.0)
 - #### [패치노트 v1.14.0](/patch/v1.14.0)
 - #### [패치노트 v1.13.0](/patch/v1.13.0)
