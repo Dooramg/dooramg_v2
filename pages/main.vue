@@ -30,6 +30,7 @@ const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () =
   allDiaryCount.value = data.value.count
 }, {
   immediate: true,
+  watch: [userInfoData],
 })
 
 const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
@@ -49,6 +50,7 @@ const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
   mainDiaryCount.value = data.value.count
 }, {
   immediate: true,
+  watch: [userInfoData],
 })
 
 const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async () => {
@@ -60,6 +62,9 @@ const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async ()
   })
 
   individualArticleCount.value = data.value.count
+}, {
+  immediate: true,
+  watch: [userInfoData],
 })
 
 const diaryDetailColor = (code: string) => {

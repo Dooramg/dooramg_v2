@@ -57,9 +57,9 @@ const saveData = () => {
   }
 }
 
-watch(() => user, () => {
+watch(() => user, async () => {
   if (user.value) {
-    loadUserData()
+    await loadUserData()
   }
 }, { immediate: true })
 </script>
