@@ -78,7 +78,7 @@ const { data: boardNoticeData, refresh: _refreshBoardNotice, pending: _pendingBo
         @click="navigateTo(`/board/notice/${content.id}`)"
       >
         <template #footer>
-          <div class="flex justify-between items-center gap-2">
+          <div class="flex flex-wrap justify-between items-center gap-2">
             <DGBadge
               v-show="index === 0"
               color="orange"
