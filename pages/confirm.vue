@@ -36,7 +36,7 @@ const loadUserData = async () => {
   await updateMainVehicle()
 
   setTimeout(() => {
-    navigateTo('/main')
+    navigateTo('/login')
   }, 100)
 }
 
