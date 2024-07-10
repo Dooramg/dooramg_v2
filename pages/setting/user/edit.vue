@@ -125,6 +125,8 @@ const { refresh: refreshUserInfoData } = useAsyncData('userInfoData', async () =
   })
 
   userInfoData.value = data.value
+}, {
+  immediate: true,
 })
 
 const deleteAccount = async () => {

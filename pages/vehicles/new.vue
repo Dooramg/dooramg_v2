@@ -76,6 +76,8 @@ const { data: manufacturerData } = useAsyncData('manufacturerData', async () => 
   }
 
   return data.value
+}, {
+  immediate: true,
 })
 
 const { data: fuelData } = useAsyncData('fuelData', async () => {
@@ -84,6 +86,8 @@ const { data: fuelData } = useAsyncData('fuelData', async () => {
     return
   }
   return data.value
+}, {
+  immediate: true,
 })
 
 const selectPlateHeadText = async (codeName: string) => {
