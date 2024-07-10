@@ -34,8 +34,9 @@ const loadUserData = async () => {
 
   userCoreId.value = data.id
   userInfoData.value = data
-  refreshVehicleData()
-  updateMainVehicle()
+
+  await refreshVehicleData()
+  await updateMainVehicle()
   navigateTo('/main')
 }
 
