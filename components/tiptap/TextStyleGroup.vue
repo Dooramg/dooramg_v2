@@ -21,7 +21,7 @@ const selectColor = (editor: any) => {
 
 <template>
   <DGPopover
-    mode="hover"
+    mode="click"
     :popper="{ placement: 'top-start', offsetDistance: 0 }"
   >
     <AButton

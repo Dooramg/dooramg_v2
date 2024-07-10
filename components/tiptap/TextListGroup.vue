@@ -15,7 +15,7 @@ withDefaults(
 <template>
   <DGPopover
     v-if="fullOption"
-    mode="hover"
+    mode="click"
     :popper="{ placement: 'top-start', offsetDistance: 0 }"
   >
     <AButton
