@@ -4,8 +4,6 @@ const { meta } = useRoute()
 const { coords, resume } = useGeolocation()
 
 const userLocation = useUserLocation()
-const { refreshVehicleData } = useLoadVehicles()
-const { vehicleData } = storeToRefs(useVehicleStore())
 
 const { refreshKatechCoords } = userLocation
 const { latitude, longitude } = storeToRefs(userLocation)
@@ -34,14 +32,6 @@ watchEffect(() => {
   latitude.value = coords.value.latitude
   longitude.value = coords.value.longitude
   refreshKatechCoords()
-})
-
-watch(() => vehicleData.value, () => {
-  if (!vehicleData.value) {
-    refreshVehicleData()
-  }
-}, {
-  immediate: true,
 })
 
 if (import.meta.server) {
