@@ -2,12 +2,15 @@ import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<SupabaseDataBase>(event)
-  const vehicleId = getQuery(event).vehicleId
+
+  const query = getQuery(event)
 
   const { data, error } = await client
-    .from('vehicles')
-    .select('*')
-    .eq('id', String(vehicleId))
+    .from('boardCommunity')
+    .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)')
+    .order('createdAt', { ascending: false })
+    // .eq('isPublished', true)
+    .eq('id', query.id as string)
     .single()
 
   if (error) {

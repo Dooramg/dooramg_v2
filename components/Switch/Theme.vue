@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import type { ToggleSize } from '#ui/types'
+
 const colorMode = useColorMode()
 
 withDefaults(
   defineProps<{
     customClass?: string
-    switchSize?: 'sm' | 'md' | 'lg'
+    toggleSize?: ToggleSize | undefined
   }>(),
   {
     customClass: '',
-    switchSize: 'md',
+    toggleSize: 'lg',
   },
 )
 
@@ -25,7 +27,7 @@ const isDark = computed({
 <template>
   <DGToggle
     v-model="isDark"
-    :size="switchSize"
+    :size="toggleSize"
     :class="customClass"
     color="amber"
     on-icon="i-tabler-moon"

@@ -2,10 +2,10 @@
 const user = useSupabaseUser()
 const client = useSupabaseClient<SupabaseDataBase>()
 
-const { userCoreId, userInfoData } = storeToRefs(useUserInfoStore())
-
-const { vehicleData: vehicleStoreData } = storeToRefs(useVehicleStore())
-const { refreshVehicleData } = useLoadVehicle()
+const { refreshVehicleData } = useLoadVehicles()
+const { upsertData, updateData } = useFetchComposable()
+const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
+const { vehicleData } = storeToRefs(useVehicleStore())
 
 const { generateTempName } = useUi()
 const { url } = useImageStorage()
@@ -26,10 +26,9 @@ const loadUserData = async () => {
   }
 
   if (!data) {
-    await client
-      .from('userInfo')
-      .upsert(saveData())
+    await upsertData('userInfo', saveData(), '', '')
     userInfoData.value = saveData()
+
     return
   }
 
@@ -41,14 +40,11 @@ const loadUserData = async () => {
 }
 
 const updateMainVehicle = async () => {
-  if (!vehicleStoreData.value) {
+  if (!vehicleData.value) {
     return
   }
 
-  await client
-    .from('userInfo')
-    .update({ mainVehicleId: vehicleStoreData.value[0].id })
-    .eq('id', String(user.value?.id))
+  await updateData('userInfo', { mainVehicleId: vehicleData.value[0].id }, String(user.value?.id))
 }
 
 const saveData = () => {

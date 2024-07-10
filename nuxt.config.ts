@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process'
 import packageJson from './package.json'
+
+const sw = process.env.SW === 'true'
 
 export default defineNuxtConfig({
   devtools: {
@@ -32,6 +35,7 @@ export default defineNuxtConfig({
     '@nuxtjs/stylelint-module',
     '@nuxtjs/i18n',
     'nuxt-icon',
+    'nuxt-time',
     'nuxt-simple-sitemap',
     '@vueuse/nuxt',
     '@vite-pwa/nuxt',
@@ -112,6 +116,9 @@ export default defineNuxtConfig({
   pwa: {
     scope: '/',
     base: '/',
+    strategies: sw ? 'injectManifest' : 'generateSW',
+    srcDir: sw ? 'service-worker' : undefined,
+    filename: sw ? 'sw.ts' : undefined,
     injectRegister: 'auto',
     registerType: 'autoUpdate',
     workbox: {
@@ -178,4 +185,5 @@ export default defineNuxtConfig({
       naverClientId: process.env.NAVER_CLIENT_ID,
     },
   },
+  compatibilityDate: '2024-07-06',
 })

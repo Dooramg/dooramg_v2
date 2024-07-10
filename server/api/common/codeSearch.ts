@@ -6,8 +6,9 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await client
     .from('code')
-    .select('code, codeName, codeCategory')
+    .select('*')
     .textSearch('codeCategory', String(query))
+    .order('codeName', { ascending: true })
 
   if (error) {
     throw createError({ statusMessage: error.message })

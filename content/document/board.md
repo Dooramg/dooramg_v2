@@ -79,7 +79,7 @@ head:
 `위 조항 이외에도 관리자의 주관적인 판단을 요하는 경우에는 이용제제 또는 삭제처리가 될 수 있습니다.`
 ::
 
-::content-card{class="content-style block text-right text-amber-100 border-t pt-3"}
+::content-card{class="content-style block text-amber-100 pt-3"}
 - [두람쥐 홈](/)
 - [이용약관 메인](/document)
 - [서비스 이용약관](/document/service-policy)

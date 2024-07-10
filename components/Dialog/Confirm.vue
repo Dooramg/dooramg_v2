@@ -5,6 +5,7 @@ withDefaults(
     top?: string
     width?: string
     title?: string
+    titleClass?: string
     hideFirstButton?: boolean
     hideSecondButton?: boolean
     firstButtonText?: string
@@ -15,6 +16,7 @@ withDefaults(
     top: '36vh',
     width: '400px',
     title: '',
+    titleClass: '',
     hideFirstButton: false,
     hideSecondButton: false,
     firstButtonText: '',
@@ -39,11 +41,12 @@ const dialogTrigger = defineModel('dialogTrigger', {
     :dialog-trigger="dialogTrigger"
     :custom-class="customClass"
     :title="title"
+    :dialog-title-class="titleClass"
     :double-first-text="firstButtonText"
     :double-second-text="secondButtonText"
-    @click-first-button="emits('click:first-button')"
-    @click-second-button="emits('click:second-button')"
-    @close-dialog="emits('close')"
+    @click:first-button="emits('click:first-button')"
+    @click:second-button="emits('click:second-button')"
+    @close="emits('close')"
   >
     <slot />
   </ADialog>

@@ -1,11 +1,14 @@
 <script setup lang="ts">
+const { t } = useLocale()
 const { meta } = useRoute()
-const { coords } = useGeolocation()
+const { coords, resume } = useGeolocation()
 
 const userLocation = useUserLocation()
-const { latitude, longitude } = storeToRefs(userLocation)
+const { refreshVehicleData } = useLoadVehicles()
+const { vehicleData } = storeToRefs(useVehicleStore())
+
 const { refreshKatechCoords } = userLocation
-const { t } = useLocale()
+const { latitude, longitude } = storeToRefs(userLocation)
 
 const seoTitle = '두람쥐'
 const seoDescription = '이세상 모든 이륜자동차(오토바이)를 위한 두바퀴 차계부 입니다.'
@@ -22,13 +25,23 @@ useHead({
   },
 })
 
-watch(() => coords.value, () => {
+watchEffect(() => {
   if (coords.value.latitude === Infinity) {
+    resume()
     return
   }
+
   latitude.value = coords.value.latitude
   longitude.value = coords.value.longitude
   refreshKatechCoords()
+})
+
+watch(() => vehicleData.value, () => {
+  if (!vehicleData.value) {
+    refreshVehicleData()
+  }
+}, {
+  immediate: true,
 })
 
 if (import.meta.server) {
@@ -38,6 +51,8 @@ if (import.meta.server) {
       lang: 'ko',
     },
     meta: () => [
+      { name: 'msapplication-TileColor', content: '#fff7e9' },
+      { name: 'theme-color', content: '#fff7e9' },
     ],
     link: [
       { rel: 'canonical', href: seoUrl },
@@ -90,6 +105,7 @@ useSeoMeta({
         <DGNotifications />
         <MarkerSvg />
       </div>
+      <InstallPwa />
     </NuxtLayout>
   </div>
 </template>

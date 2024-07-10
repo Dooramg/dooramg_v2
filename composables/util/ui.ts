@@ -1,6 +1,9 @@
 import nameLists from '~/data/tempNames'
 
 export const useUi = () => {
+  const genUid = () => {
+    return (new Date().getTime() + Math.random().toString(36).substring(2, 16))
+  }
   const comma = (value: number) => {
     return String(value).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')
   }
@@ -49,6 +52,10 @@ export const useUi = () => {
     return returnValue
   }
 
+  const checkNumber = (value: string) => {
+    return numberRegex.test(value)
+  }
+
   const checkEmail = (email: string) => {
     const regEmail = /^([0-9a-zA-Z_.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/
     let returnValue = false
@@ -85,6 +92,7 @@ export const useUi = () => {
   }
 
   return {
+    genUid,
     comma,
     uncommaRegex,
     commaRegex,
@@ -96,6 +104,7 @@ export const useUi = () => {
     digitsRoundUp,
     checkHyperLink,
     checkYoutubeLink,
+    checkNumber,
     checkEmail,
     generateTempName,
     diffDate,

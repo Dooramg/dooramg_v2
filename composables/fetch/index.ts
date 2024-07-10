@@ -1,18 +1,31 @@
 export const useFetchComposable = () => {
+  const toast = useToast()
   const client = useSupabaseClient()
 
   /**
    * ! Load Data !
    */
 
-  const insertData = async (insertData: SerializeObject, table: string) => {
-    const { error } = await client
+  const countData = async (table: string) => {
+    const { count } = await client
+      .from(table)
+      .select('id', { count: 'exact' })
+
+    return { count }
+  }
+
+  const insertData = async (table: string, insertData: SerializeObject) => {
+    const { data, error } = await client
       .from(table)
       .insert(insertData)
+      .select('id')
+      .single()
 
     if (error) {
-      return error
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
     }
+
+    return data
   }
 
   const updateData = async (table: string, updateData: SerializeObject | never, id: string) => {
@@ -22,17 +35,31 @@ export const useFetchComposable = () => {
       .eq('id', id)
 
     if (error) {
-      return error
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
     }
   }
 
-  const upsertData = async (upsertData: SerializeObject, table: string) => {
-    const { error } = await client
-      .from(table)
-      .upsert(upsertData)
+  const upsertData = async (table: string, upsertData: SerializeObject, matOpt: string, matOptVal: string) => {
+    if (matOpt) {
+      const { error } = await client
+        .from(table)
+        .upsert(upsertData)
+        .eq(matOpt, matOptVal)
+        .single()
 
-    if (error) {
-      return error
+      if (error) {
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+      }
+    }
+    else {
+      const { error } = await client
+        .from(table)
+        .upsert(upsertData)
+        .single()
+
+      if (error) {
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+      }
     }
   }
 
@@ -54,22 +81,24 @@ export const useFetchComposable = () => {
         upsert: true,
       })
 
-    return error
+    if (error) {
+      toast.add({ title: error.message, color: 'red', timeout: 2000 })
+    }
   }
 
-  const deleteData = async (deleteId: string, table: string, admin: boolean, matOpt: string, matOptVal: string, subMatOpt: string, subMatOptVal: string) => {
+  const deleteData = async (table: string, admin: boolean, idOpt: string, deleteId: string, matOpt: string, matOptVal: string, subMatOpt: string, subMatOptVal: string) => {
     if (admin) {
       const { error } = await client
         .from(table)
         .delete()
-        .eq('id', deleteId)
+        .eq(idOpt, deleteId)
         .eq(matOpt, matOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
-    else if (subMatOpt && subMatOptVal) {
+    else if (matOpt && subMatOpt) {
       const { error } = await client
         .from(table)
         .delete()
@@ -78,7 +107,7 @@ export const useFetchComposable = () => {
         .eq(subMatOpt, subMatOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
     else {
@@ -86,10 +115,9 @@ export const useFetchComposable = () => {
         .from(table)
         .delete()
         .eq('id', deleteId)
-        .eq(matOpt, matOptVal)
 
       if (error) {
-        return error
+        toast.add({ title: error.message, color: 'red', timeout: 2000 })
       }
     }
   }
@@ -99,6 +127,7 @@ export const useFetchComposable = () => {
   }
 
   return {
+    countData,
     insertData,
     updateData,
     upsertData,

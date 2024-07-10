@@ -11,6 +11,11 @@ interface Window {
 
 type SerializeObject = /* unresolved */ any
 
+interface SelectOption {
+  value: string
+  label: string
+}
+
 interface ResWithCount {
   data: any
   count: number
@@ -22,8 +27,11 @@ interface NaverResAddr {
 }
 
 interface Code {
+  id: string
   code: string
   codeName: string
+  codeCategory?: string
+  createdAt?: string
 }
 interface UserData {
   address?: string | undefined | null
@@ -45,7 +53,7 @@ interface FuelData {
   code: string
   codeName: string
   opiCode: string
-  createdAt?: string
+  createdAt: string
 }
 
 interface ManufacturerData {
@@ -142,6 +150,7 @@ interface InsertVehicleData {
   vehicleModelId?: string
   makeYear?: string
   fuelTypeId?: string
+  userId?: string
 }
 
 interface UpdateVehicleData {
@@ -220,6 +229,7 @@ interface DiaryData {
 interface LikeCountData {
   id?: string
   boardId: string
+  userId: string
   likeCount: number | undefined
   createdAt?: string
 }

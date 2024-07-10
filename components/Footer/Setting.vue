@@ -9,7 +9,7 @@
         icon-name="i-line-md-github-twotone"
         :icon-size="18"
         :button-text="$t('setting.contactGithub')"
-        @click="navigateTo('https://github.com/yeonjulee1005/')"
+        @click="navigateTo('https://github.com/yeonjulee1005/', { external: true, open: { target: '_blank' } })"
       />
       <AButton
         use-leading
@@ -19,7 +19,7 @@
         icon-name="i-line-md-email-twotone-alt"
         :icon-size="18"
         :button-text="$t('setting.contactEmail')"
-        @click="navigateTo('mailto:yeonju.lee1005@kakao.com', { external: true })"
+        @click="navigateTo('mailto:yeonju.lee1005@kakao.com', { external: true, open: { target: '_blank' } })"
       />
     </div>
     <p class="text-xs text-center">

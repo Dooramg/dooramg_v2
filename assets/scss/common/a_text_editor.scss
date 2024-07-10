@@ -1,0 +1,180 @@
+@use '../../variables' as *;
+
+/**
+* ! Tiptap Style !
+* *  Common *
+*/
+.tiptap-editor {
+  display: flex;
+  flex-direction: column;
+  max-height: 40rem;
+  width: $space-percent-100;
+  background-color: var(--doo-bg-color);
+  border-radius: $space-8;
+  border: $space-2 solid var(--doo-border-color);
+  border-right: $space-4 solid var(--doo-border-color) !important;
+  border-bottom: $space-4 solid var(--doo-border-color) !important;
+  &__header {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    padding: 0.25rem;
+    border-radius: $space-4;
+    border-bottom: $space-2 solid var(--doo-border-color);
+  }
+  &__content {
+    height: fit-content;
+    padding: 0 1rem;
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/**
+* ?  Floating Menu ?
+*/
+.bubble-menu {
+  display: flex;
+  width: fit-content;
+  background-color: var(--el-bg-color);
+  padding: $space-4 $space-8;
+  border-radius: $space-8;
+  border: $space-2 solid var(--doo-border-color);
+  border-right: $space-4 solid var(--doo-border-color) !important;
+  border-bottom: $space-4 solid var(--doo-border-color) !important;
+  .edit-color-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: $space-32;
+    height: $space-32;
+    margin: 0.25rem calc(0.25rem + $space-12) 0 0;
+    padding: 0;
+    background-color: transparent;
+    border-radius: $space-4;
+    border-right: $space-4 solid var(--doo-border-color) !important;
+    border-bottom: $space-4 solid var(--doo-border-color) !important;
+    cursor: pointer;
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    &::-webkit-color-swatch {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+    }
+    &::-moz-color-swatch {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+.tiptap-menu-item,
+.tiptap-text-menu-item,
+.first-tiptap-menu-item  {
+  svg {
+    fill: currentcolor;
+  }
+}
+
+.tiptap-menu-item {
+  width: $space-40;
+  height: $space-30;
+  margin: 0.15rem 0.15rem 0.15rem 0;
+}
+
+.tiptap-text-menu-item {
+  margin: 0.15rem 0.15rem 0.15rem 0;
+}
+
+.first-tiptap-menu-item {
+  width: $space-40;
+  height: $space-30;
+  margin: 0.15rem 0.15rem 0.15rem $space-12;
+}
+
+.ProseMirror {
+  height: fit-content;
+  margin: $space-50 0 $space-8;
+  padding: $space-default $space-8;
+  outline-color: $doo-primary-color;
+  > * + * {
+    margin-top: 0.75em;
+  }
+  @include tiptap-template;
+}
+
+.has-focus {
+  width: $space-percent-100;
+  border-radius: $space-2;
+  box-shadow: 0 0 0 $space-1 $doo-error-color;
+}
+
+img.has-focus {
+  width: $space-percent-80;
+  padding: $space-20 $space-default
+}
+
+th.has-focus {
+  width: unset;
+}
+
+.character-count {
+  .el-text {
+    margin: $space-default;
+    line-height: 1.2;
+    text-align: right;
+    color: var(--d-text-color);
+    align-self: flex-end;
+  }
+}
+
+/**
+* ?  Tiptap Menu Popper Style ?
+*/
+.tiptap-editor-group-menu {
+  background-color: $doo-opacity-origin-black !important;
+  display: flex;
+  align-items: center;
+  padding: $space-4 $space-8 !important;
+  border-radius: $space-8 !important;
+  border-right: $space-4 solid var(--doo-border-color) !important;
+  border-bottom: $space-4 solid var(--doo-border-color) !important;
+  .edit-color-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: $space-40;
+    height: $space-30;
+    margin: 0.15rem calc(0.15rem + $space-12) 0 $space-12;
+    padding: 0;
+    background-color: transparent;
+    border-radius: $space-4;
+    border-right: $space-4 solid var(--doo-border-color) !important;
+    border-bottom: $space-4 solid var(--doo-border-color) !important;
+    cursor: pointer;
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    &::-webkit-color-swatch {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+    }
+    &::-moz-color-swatch {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+.font-family-group {
+  max-width: $space-340;
+  width: fit-content;
+}
