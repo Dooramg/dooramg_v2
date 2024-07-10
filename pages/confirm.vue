@@ -32,20 +32,19 @@ const loadUserData = async () => {
   userCoreId.value = data.id
   userInfoData.value = data
 
-  await refreshVehicleData()
   await updateMainVehicle()
-
-  setTimeout(() => {
-    navigateTo('/login')
-  }, 100)
 }
 
 const updateMainVehicle = async () => {
   if (!vehicleData.value) {
-    return
+    await refreshVehicleData()
   }
 
-  await updateData('userInfo', { mainVehicleId: vehicleData.value[0].id }, String(user.value?.id))
+  await updateData('userInfo', { mainVehicleId: vehicleData.value?.[0]?.id ?? '' }, String(user.value?.id))
+
+  setTimeout(() => {
+    navigateTo('/login')
+  }, 280)
 }
 
 const saveData = () => {

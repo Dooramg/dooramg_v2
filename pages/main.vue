@@ -2,10 +2,9 @@
 const user = useSupabaseUser()
 
 const { comma } = useUi()
-const { refreshVehicleData } = useLoadVehicles()
 
 const { userInfoData } = storeToRefs(useUserInfoStore())
-const { vehicleData, vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
@@ -14,7 +13,7 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () => {
+useAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -32,7 +31,7 @@ const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () =
   immediate: true,
 })
 
-const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
+useAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -51,7 +50,7 @@ const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
   immediate: true,
 })
 
-const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async () => {
+useAsyncData('myArticleData', async () => {
   const { data }: SerializeObject = await useFetch('/api/community/myArticle', {
     headers: useRequestHeaders(['cookie']),
     query: {
@@ -76,24 +75,6 @@ const diaryDetailColor = (code: string) => {
       return 'border-neutral-400'
   }
 }
-
-watch(() => vehicleData, () => {
-  if (!vehicleData.value) {
-    refreshVehicleData()
-  }
-}, {
-  immediate: true,
-})
-
-watch(() => user, () => {
-  if (user.value?.id) {
-    refreshAllDiaryData()
-    refreshDiaryData()
-    refreshMyArticleData()
-  }
-}, {
-  immediate: true,
-})
 </script>
 
 <template>

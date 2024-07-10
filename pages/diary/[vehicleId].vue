@@ -145,15 +145,11 @@ const selectFuelType = async () => {
     return
   }
 
-  const { data, refresh } = await useFetch('/api/common/opiApi', {
+  const { data } = await useFetch('/api/common/opiApi', {
     params: {
       query: opiAroundQuery('/aroundAll.do', 'json', katechCoords.value.lon, katechCoords.value.lat, 2000, 2, opiFuelCode),
     },
   })
-
-  if (!data.value) {
-    await refresh()
-  }
 
   await loadAroundFuelStation(data.value.RESULT.OIL, vehicleFuelType.value)
 }

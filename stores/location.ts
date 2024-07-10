@@ -33,6 +33,8 @@ export const useUserLocation = defineStore('userLocation', () => {
     }
 
     return data.value?.coordinate
+  }, {
+    immediate: true,
   })
 
   return {
