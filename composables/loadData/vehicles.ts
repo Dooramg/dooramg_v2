@@ -1,4 +1,5 @@
 export const useLoadVehicles = () => {
+  const user = useSupabaseUser()
   const { userCoreId } = storeToRefs(useUserInfoStore())
   const { vehicleData } = storeToRefs(useVehicleStore())
 
@@ -6,7 +7,7 @@ export const useLoadVehicles = () => {
     const { data } = await useFetch('/api/vehicles', {
       headers: useRequestHeaders(['cookie']),
       query: {
-        userId: userCoreId.value,
+        userId: userCoreId.value ?? user.value?.id,
       },
     })
 
