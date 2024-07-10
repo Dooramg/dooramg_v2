@@ -1,70 +1,9 @@
-<template>
-  <ADialog
-    :dialog-trigger="dialogTrigger"
-    :title="$t('tiptap.dialog.imageUploadTitle')"
-    :double-first-text="$t('texts.save')"
-    :double-second-text="$t('texts.close')"
-    @click-first-button="submitImage"
-    @click-second-button="closeDialog(false)"
-    @close-dialog="closeDialog(false)"
-  >
-    <div class="flex flex-column gap-6">
-      <DGFormGroup :label="$t('texts.upload')">
-        <DGInput
-          type="file"
-          @change="uploadFile"
-        >
-          <template #trailing>
-            <Icon name="line-md:cloud-upload-outline-loop" />
-          </template>
-        </DGInput>
-      </DGFormGroup>
-      <NuxtImg
-        v-if="exportUrl"
-        class="image-preview"
-        :src="exportUrl"
-        width="300"
-        height="200"
-        fit="cover"
-        alt="image-prev"
-        :draggable="false"
-        @contextmenu.prevent
-      />
-      <GDInput
-        v-if="imageHyperLinkTrigger"
-        v-model="hyperLink"
-        :placeholder="$t('placeholder.inputLink')"
-        color="violet"
-        size="xl"
-        aria-label="link"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
-      >
-        <template #trailing>
-          <AButton
-            v-show="hyperLink !== ''"
-            button-variant="ghost"
-            use-leading
-            icon-name="line-md:remove"
-            :icon-size="18"
-            @click:button="() => hyperLink = ''"
-          />
-        </template>
-      </GDInput>
-      <DGCheckbox
-        v-model="imageHyperLinkTrigger"
-        color="violet"
-        :label="imageHyperLinkTrigger ? $t('texts.noUse') : $t('texts.insertLink')"
-      />
-    </div>
-  </ADialog>
-</template>
-
 <script setup lang="ts">
+const toast = useToast()
 const { t } = useLocale()
+const { genUid } = useUi()
 
 const { loadStorage, uploadStorage } = useFetchComposable()
-
-const toast = useToast()
 
 const dialogTrigger = defineModel('dialogTrigger', {
   type: Boolean,
@@ -80,10 +19,6 @@ const exportUrl = ref('')
 const hyperLink = ref('')
 const imageHyperLinkTrigger = ref(false)
 const limitType = ['image/jpeg', 'image/jpg', 'image/webp', 'image/png', 'image/svg+xml']
-
-const genUid = () => {
-  return (new Date().getTime() + Math.random().toString(36).substring(2, 16))
-}
 
 const uploadFile = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -105,12 +40,9 @@ const uploadImage = async (file: File) => {
   const fileExt = file.name.split('.').pop()
   const filePath = `${genUid()}.${fileExt}`
 
-  const uploadError = await uploadStorage('tech', filePath, file)
+  await uploadStorage('notice_board', filePath, file)
 
-  if (uploadError) {
-    toast.add({ title: String(uploadError), color: 'red', timeout: 3000 })
-  }
-  toast.add({ title: t('messages.successImageUpload'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.successImageUpload'), color: 'amber', timeout: 3000 })
   await downloadImage(filePath)
 }
 
@@ -119,7 +51,7 @@ const downloadImage = async (imageName: string) => {
     return
   }
 
-  exportUrl.value = await loadStorage('tech', imageName)
+  exportUrl.value = await loadStorage('notice_board', imageName)
 }
 
 const submitImage = () => {
@@ -127,12 +59,66 @@ const submitImage = () => {
     toast.add({ title: t('messages.imageRequire'), color: 'orange', timeout: 3000 })
     return
   }
+
   emits('submit:image', exportUrl.value, imageHyperLinkTrigger.value ? hyperLink.value : '')
-  toast.add({ title: t('messages.successImageUpload'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.successImageUpload'), color: 'amber', timeout: 3000 })
   closeDialog(false)
 }
 
 const closeDialog = (trigger: boolean) => {
+  imageHyperLinkTrigger.value = false
+  hyperLink.value = ''
   emits('close:dialog', trigger)
 }
 </script>
+
+<template>
+  <ADialog
+    :dialog-trigger="dialogTrigger"
+    :title="$t('board.dialog.imageUploadTitle')"
+    :double-first-text="$t('buttons.save')"
+    :double-second-text="$t('buttons.close')"
+    @click:first-button="submitImage"
+    @click:second-button="closeDialog(false)"
+    @close="closeDialog(false)"
+  >
+    <div class="flex flex-col gap-6">
+      <DGFormGroup :label="$t('buttons.upload')">
+        <DGInput
+          type="file"
+          @change="uploadFile"
+        >
+          <template #trailing>
+            <Icon name="line-md:cloud-upload-outline-loop" />
+          </template>
+        </DGInput>
+      </DGFormGroup>
+      <DGFormGroup :label="$t('buttons.insertLink')">
+        <div class="flex flex-col gap-2">
+          <AInput
+            v-if="imageHyperLinkTrigger"
+            v-model:input-data="hyperLink"
+            clearable
+            input-color="amber"
+          />
+          <DGCheckbox
+            v-model="imageHyperLinkTrigger"
+            color="amber"
+            :label="imageHyperLinkTrigger ? $t('buttons.noUse') : $t('buttons.insertLink')"
+          />
+        </div>
+      </DGFormGroup>
+      <NuxtImg
+        v-if="exportUrl"
+        class="image-preview"
+        :src="exportUrl"
+        width="300"
+        height="200"
+        fit="cover"
+        alt="image-prev"
+        :draggable="false"
+        @contextmenu.prevent
+      />
+    </div>
+  </ADialog>
+</template>

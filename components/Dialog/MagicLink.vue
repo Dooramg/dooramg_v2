@@ -71,7 +71,7 @@ const closeDialog = () => {
     :double-second-text="doubleSecondText"
     @click:first-button="submitEmail"
     @click:second-button="closeDialog"
-    @close-dialog="closeDialog"
+    @close="closeDialog"
   >
     <DGForm
       :schema="schema"

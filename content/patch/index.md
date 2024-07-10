@@ -21,16 +21,15 @@ head:
       content: '© 2024 Dooramg'
 ---
 
+::content-title{class="block mb-4 text-3xl font-bold text-amber-500 dark:text-amber-300"}
 # 두람쥐 패치노트
-
-::content-card{class="content-card"}
-> 두람쥐의 패치노트 입니다!
-
 ::
 
----
+::content-title{class="block mb-4 text-xl font-bold text-amber-500 dark:text-amber-300"}
+> 두람쥐의 패치노트 입니다!
+::
 
-::content-card{class="patch-list"}
+::content-card{class="content-style leading-relaxed"}
 - #### [패치노트 v1.15.0](/patch/v1.15.0)
 - #### [패치노트 v1.14.0](/patch/v1.14.0)
 - #### [패치노트 v1.13.0](/patch/v1.13.0)
@@ -57,10 +56,6 @@ head:
 - #### [패치노트 v0.3.15](/patch/v0.3.15)
 ::
 
----
-
-::content-card{class="content-footer"}
-  :::content-card{class="menu-list"}
-  - [두람쥐 홈](/)
-  :::
+::content-card{class="content-style block text-amber-100 pt-3"}
+- [두람쥐 홈](/)
 ::

@@ -1,20 +1,23 @@
 import { defineStore } from 'pinia'
 
-export const useBoardStore = defineStore('BoardData', () => {
+export const useBoardStore = defineStore('boardDataStore', () => {
   /**
    * ! Pinia State !
    *
-   * @param noticeLike 공지 좋아요 데이터
-   * @param communityLike 커뮤니티 좋아요 데이터
+   * @param individualArticleCount 개인 게시글 수
+   * @param communityArticleCount 커뮤니티 게시글 수
+   * @param noticeArticleCount 공지사항 게시글 수
    *
    */
 
-  const noticeLike = ref<LikeCountData[]>([])
-  const communityLike = ref<LikeCountData[]>([])
+  const individualArticleCount = ref(0)
+  const communityArticleCount = ref(0)
+  const noticeArticleCount = ref(0)
 
   return {
-    noticeLike,
-    communityLike,
+    individualArticleCount,
+    communityArticleCount,
+    noticeArticleCount,
   }
 }, {
   persist: {

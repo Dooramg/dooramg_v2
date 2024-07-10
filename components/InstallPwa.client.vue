@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="$pwa?.offlineReady || $pwa?.needRefresh"
-      class="flex flex-col gap-2 fixed right-0 bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg"
+      class="fixed flex flex-col gap-2 right-0 bottom-20 md:bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg bg-zinc-200/80 dark:bg-zinc-700/80"
       role="alert"
     >
       <span>
@@ -24,7 +24,7 @@
     </div>
     <div
       v-if="$pwa?.showInstallPrompt && !$pwa?.offlineReady && !$pwa?.needRefresh"
-      class="fixed right-0 bottom-16 md:bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg"
+      class="fixed right-0 bottom-20 md:bottom-8 m-4 p-2 border-2 rounded-md z-20 text-left shadow-lg bg-zinc-200/80 dark:bg-zinc-700/80"
       role="alert"
     >
       <div class="flex flex-col gap-2">

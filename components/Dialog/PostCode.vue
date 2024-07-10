@@ -30,7 +30,7 @@ const selectAddress = (address: string) => {
     :title="$t('user.searchAddress')"
     dialog-title-class="text-xl font-bold"
     hide-double-button
-    @close-dialog="emits('close')"
+    @close="emits('close')"
   >
     <DaumPostCode
       :search-word="searchKeyword"

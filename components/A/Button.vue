@@ -24,7 +24,7 @@ withDefaults(
     buttonPadding: true,
     buttonBlock: false,
     buttonTruncate: false,
-    buttonColor: 'amber',
+    buttonColor: 'gray',
     buttonSize: 'md',
     buttonVariant: 'solid',
     useLeading: false,

@@ -2,14 +2,13 @@
 import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
-const { updateData, loadStorage, uploadStorage } = useFetchComposable()
-const { emailRegex, numberRegex } = useUi()
 const toast = useToast()
 const { t } = useLocale()
+const { genUid, emailRegex, numberRegex } = useUi()
 
-const client = useSupabaseClient<SupabaseDataBase>()
-
+const { updateData, loadStorage, uploadStorage, deleteData, logout } = useFetchComposable()
 const { userCoreId, userInfoData } = storeToRefs(useUserInfoStore())
+const { vehicleData } = storeToRefs(useVehicleStore())
 
 useHead({
   title: t('pageTitle.user'),
@@ -47,6 +46,7 @@ const editUserData = ref({
 })
 const postCodeTrigger = ref(false)
 const insertAddressDetail = ref(false)
+const deleteConfirmTrigger = ref(false)
 
 const initEditUserData = () => {
   if (!userInfoData.value) {
@@ -64,21 +64,13 @@ const initEditUserData = () => {
 
 initEditUserData()
 
-const genUid = () => {
-  return (new Date().getTime() + Math.random().toString(36).substring(2, 16))
-}
-
 const uploadImage = async (file: File) => {
   const fileExt = file.name.split('.').pop()
   const fileName = `${genUid()}.${fileExt}`
 
-  const uploadError = await uploadStorage('user_avatar', fileName, file)
+  await uploadStorage('user_avatar', fileName, file)
 
-  if (uploadError) {
-    toast.add({ title: String(uploadError), color: 'red', timeout: 3000 })
-  }
-
-  toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'emerald', timeout: 3000 })
+  toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'amber', timeout: 3000 })
   await downloadImage(fileName)
 }
 
@@ -106,7 +98,7 @@ const updateUserInfo = async (event: FormSubmitEvent<Schema>) => {
   await updateData('userInfo', editUserData.value, editUserData.value.id)
 
   toast.add({ title: t('messages.updateSuccess.title'), description: t('messages.updateSuccess.description'), color: 'amber', timeout: 2000 })
-  updateUserData()
+  refreshUserInfoData()
   navigateTo('/setting')
 }
 
@@ -124,18 +116,28 @@ const selectAddress = (address: string) => {
   insertAddressDetail.value = true
 }
 
-const updateUserData = async () => {
-  const { data, error } = await client
-    .from('userInfo')
-    .select('*')
-    .eq('id', userCoreId.value)
-    .single()
+const { refresh: refreshUserInfoData } = useAsyncData('userInfoData', async () => {
+  const { data } = await useFetch('/api/user', {
+    headers: useRequestHeaders(['cookie']),
+    query: {
+      userId: userCoreId.value,
+    },
+  })
 
-  if (error) {
-    toast.add({ title: error.message, color: 'red', timeout: 2000 })
-  }
+  userInfoData.value = data.value
+})
 
-  userInfoData.value = data
+const deleteAccount = async () => {
+  await deleteData('vehicleManagement', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
+  await deleteData('vehicles', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
+  await deleteData('userInfo', false, 'id', userInfoData.value?.id ?? '', '', '', '', '')
+
+  await logout()
+
+  userCoreId.value = ''
+  userInfoData.value = null
+  vehicleData.value = null
+  navigateTo('/login')
 }
 
 watch(userInfoData, () => {
@@ -150,14 +152,14 @@ watch(userInfoData, () => {
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-center gap-8 mt-8">
-    <p class="w-dvw md:w-[500px] text-2xl font-bold px-4">
+  <div class="flex flex-col mt-8">
+    <p class="text-2xl font-bold px-8">
       {{ $t('user.title') }}
     </p>
     <DGForm
       :schema="schema"
       :state="editUserData"
-      class="space-y-2 mt-8 mx-a"
+      class="w-dvw md:w-[500px] space-y-2 mt-8 px-8 gap-4"
       @submit="updateUserInfo"
     >
       <DGFormGroup
@@ -171,9 +173,10 @@ watch(userInfoData, () => {
           :src="editUserData.avatarImage"
           size="3xl"
           :alt="editUserData.nickName"
+          :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[160px] w-full md:w-[160px]' } }"
         />
         <AUploadFile
-          :file-size-alarm="$t('validate.imageUploadSize')"
+          :file-size-alarm="$t('validate.imageUploadLargeSize')"
           :file-type-alarm="$t('validate.imageUploadFormat')"
           :limit-type="['image/jpeg', 'image/png', 'image/gif']"
           :limit-height="2048"
@@ -225,27 +228,18 @@ watch(userInfoData, () => {
       <DGFormGroup
         :label="$t('labelTexts.address')"
         name="address"
+        :description="$t('placeholder.inputAddress')"
         size="xl"
       >
         <AInput
           v-model:input-data="editUserData.address"
           clearable
+          use-trailing
           :input-placeholder="$t('placeholder.inputAddress')"
           leading-icon-name="i-line-md-map-marker-twotone"
           @keyup.enter="SearchInputAddress"
-        >
-          <template #trailing-slot>
-            <AButton
-              v-if="editUserData.address"
-              custom-class="mr-2"
-              use-leading
-              :button-padding="false"
-              button-variant="ghost"
-              icon-name="line-md:search"
-              @click="SearchInputAddress"
-            />
-          </template>
-        </AInput>
+          @click:trailing="SearchInputAddress"
+        />
       </DGFormGroup>
       <DGFormGroup
         v-if="insertAddressDetail || editUserData.address"
@@ -259,26 +253,35 @@ watch(userInfoData, () => {
           :input-placeholder="$t('placeholder.inputAddress')"
         />
       </DGFormGroup>
-      <DGFormGroup class="flex justify-end pt-4">
-        <div class="flex gap-4">
+      <DGFormGroup class="pt-4">
+        <div class="w-full flex flex-wrap gap-4">
           <AButton
-            use-leading
-            button-variant="outline"
-            button-size="md"
-            icon-name="line-md:pencil-twotone"
-            :icon-size="18"
-            :button-text="$t('buttons.save')"
-            @click="updateUserInfo"
+            button-size="xs"
+            button-variant="ghost"
+            :button-text="$t('buttons.deleteAccount')"
+            @click="() => deleteConfirmTrigger = true"
           />
-          <AButton
-            use-leading
-            button-variant="outline"
-            button-size="md"
-            icon-name="line-md:close-circle-twotone"
-            :icon-size="18"
-            :button-text="$t('buttons.cancel')"
-            @click="navigateTo('/setting/user')"
-          />
+          <div class="flex-auto" />
+          <div class="flex gap-4">
+            <AButton
+              use-leading
+              button-variant="outline"
+              button-size="md"
+              icon-name="line-md:pencil-twotone"
+              :icon-size="18"
+              :button-text="$t('buttons.save')"
+              @click="updateUserInfo"
+            />
+            <AButton
+              use-leading
+              button-variant="outline"
+              button-size="md"
+              icon-name="line-md:close-circle-twotone"
+              :icon-size="18"
+              :button-text="$t('buttons.cancel')"
+              @click="navigateTo('/setting/user')"
+            />
+          </div>
         </div>
       </DGFormGroup>
     </DGForm>
@@ -288,5 +291,26 @@ watch(userInfoData, () => {
       @address:select="selectAddress"
       @close="() => postCodeTrigger = false"
     />
+    <DialogConfirm
+      :dialog-trigger="deleteConfirmTrigger"
+      title-class="text-2xl font-bold"
+      :full-screen="false"
+      :title="$t('setting.deleteDialog.title')"
+      :first-button-text="$t('setting.deleteDialog.confirm')"
+      :second-button-text="$t('setting.deleteDialog.reject')"
+      @click:first-button="deleteAccount"
+      @click:second-button="() => deleteConfirmTrigger = false"
+      @close="() => deleteConfirmTrigger = false"
+    >
+      <div
+        v-for="(text, index) in $tm('setting.deleteDialog.description')"
+        :key="index"
+        class="ml-16"
+      >
+        <p class="text-lg">
+          {{ $rt(text) }}
+        </p>
+      </div>
+    </DialogConfirm>
   </div>
 </template>
