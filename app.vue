@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const { t } = useLocale()
 const { meta } = useRoute()
-const { coords } = useGeolocation()
+const { coords, resume } = useGeolocation()
 
 const userLocation = useUserLocation()
 const { refreshVehicleData } = useLoadVehicles()
 const { vehicleData } = storeToRefs(useVehicleStore())
 
-const { latitude, longitude } = storeToRefs(userLocation)
 const { refreshKatechCoords } = userLocation
+const { latitude, longitude } = storeToRefs(userLocation)
 
 const seoTitle = '두람쥐'
 const seoDescription = '이세상 모든 이륜자동차(오토바이)를 위한 두바퀴 차계부 입니다.'
@@ -25,10 +25,12 @@ useHead({
   },
 })
 
-watch(() => coords.value, () => {
+watchEffect(() => {
   if (coords.value.latitude === Infinity) {
+    resume()
     return
   }
+
   latitude.value = coords.value.latitude
   longitude.value = coords.value.longitude
   refreshKatechCoords()

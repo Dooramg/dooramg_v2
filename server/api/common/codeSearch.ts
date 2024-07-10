@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
     .from('code')
     .select('*')
     .textSearch('codeCategory', String(query))
+    .order('codeName', { ascending: true })
 
   if (error) {
     throw createError({ statusMessage: error.message })

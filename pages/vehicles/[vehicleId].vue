@@ -7,7 +7,7 @@ const { comma, genUid, checkNumber, digitsRoundUp } = useUi()
 const { loadCodeList } = useLoadCode()
 const { refreshUserData } = useLoadUser()
 const { refreshVehicleData } = useLoadVehicles()
-const { updateData, deleteData, loadStorage, uploadStorage } = useFetchComposable()
+const { updateData, upsertData, deleteData, loadStorage, uploadStorage } = useFetchComposable()
 
 const { headTextList, middleTextList, tailTextList } = storeToRefs(usePlateStore())
 const { userCoreId } = storeToRefs(useUserInfoStore())
@@ -52,6 +52,17 @@ const { data: fuelData } = useAsyncData('fuelData', async () => {
   if (!data.value) {
     return
   }
+  return data.value
+})
+
+const { data: diaryTypeData } = useAsyncData('diaryType', async () => {
+  const { data }: SerializeObject = await useFetch('/api/management/type', {
+    headers: useRequestHeaders(['cookie']),
+    query: {
+      queryString: 'MTC003',
+    },
+  })
+
   return data.value
 })
 
@@ -152,9 +163,24 @@ const validatePlateNumber = (value: string) => {
   validateEditTrigger.value = true
 }
 
-const clickSaveButton = async () => {
+const updateVehicle = async () => {
   updatedVehicleData.value.totalEfficient = await calculateTotalEfficient(updatedVehicleData.value.totalDistance, updatedVehicleData.value.totalFuelAmount)
-  updateData('vehicles', updatedVehicleData.value, manageVehicleId)
+  if (!selectedVehicleData.value?.totalDistance) {
+    const initDiaryData = {
+      vehicleId: manageVehicleId,
+      manageTypeId: diaryTypeData.value?.id,
+      userId: userCoreId.value,
+      title: t('vehicleDetail.initialTitle'),
+      driveDistance: updatedVehicleData.value.totalDistance,
+      totalDistance: updatedVehicleData.value.totalDistance,
+      fuelAmount: updatedVehicleData.value.totalFuelAmount ?? 0,
+      paidAmount: updatedVehicleData.value.totalPaidAmount,
+      efficient: digitsRoundUp((updatedVehicleData.value.totalDistance / (updatedVehicleData.value.totalFuelAmount ?? 1)), 'round', 100),
+    }
+    await upsertData('vehicleManagement', initDiaryData, '', '')
+  }
+
+  await updateData('vehicles', updatedVehicleData.value, manageVehicleId)
 
   toast.add({ title: t('messages.updateSuccess.title'), description: t('messages.updateSuccess.description'), color: 'amber', timeout: 3000 })
   navigateTo('/vehicles')
@@ -649,7 +675,7 @@ await loadCodeList('CTM')
       <AButton
         :button-text="$t('buttons.save')"
         button-color="amber"
-        @click="clickSaveButton"
+        @click="updateVehicle"
       />
     </div>
     <DialogConfirm

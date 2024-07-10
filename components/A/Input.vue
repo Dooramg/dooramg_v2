@@ -12,10 +12,12 @@ const props = withDefaults(
     useLeading?: boolean
     clearable?: boolean
     useTrailing?: boolean
+    useTrailingText?: boolean
     leadingIconName?: string
     iconSize?: number
     trailingButtonSize?: ButtonSize | undefined
     trailingButtonVariant?: ButtonVariant | undefined
+    trailingText?: string
   }>(),
   {
     inputClass: '',
@@ -27,10 +29,12 @@ const props = withDefaults(
     useLeading: false,
     clearable: false,
     useTrailing: false,
+    useTrailingText: false,
     leadingIconName: '',
     iconSize: 24,
     trailingButtonSize: 'sm',
     trailingButtonVariant: 'soft',
+    trailingText: '',
   },
 )
 
@@ -84,28 +88,33 @@ const clickClear = () => {
       />
     </template>
     <template
-      v-if="clearable || useTrailing"
+      v-if="clearable || useTrailing || useTrailingText"
       #trailing
     >
       <div class="flex gap-2">
-        <AButton
-          v-if="useTrailing"
-          :button-size="trailingButtonSize"
-          button-variant="ghost"
-          :button-padding="false"
-          use-leading
-          icon-name="i-line-md-search"
-          @click="() => $emit('click:trailing')"
-        />
-        <AButton
-          v-if="clearable"
-          v-show="inputData"
-          button-variant="ghost"
-          :button-padding="false"
-          use-leading
-          icon-name="line-md:menu-to-close-alt-transition"
-          @click="clickClear"
-        />
+        <div class="flex items-center gap-2">
+          <AButton
+            v-if="useTrailing"
+            :button-size="trailingButtonSize"
+            button-variant="ghost"
+            :button-padding="false"
+            use-leading
+            icon-name="i-line-md-search"
+            @click="() => $emit('click:trailing')"
+          />
+          <span class="text-lg text-neutral-500 dark:text-neutral-400">
+            {{ trailingText }}
+          </span>
+          <AButton
+            v-if="clearable"
+            v-show="inputData"
+            button-variant="ghost"
+            :button-padding="false"
+            use-leading
+            icon-name="line-md:menu-to-close-alt-transition"
+            @click="clickClear"
+          />
+        </div>
       </div>
     </template>
   </DGInput>

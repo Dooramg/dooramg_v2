@@ -5,7 +5,7 @@ const { comma } = useUi()
 const { refreshVehicleData } = useLoadVehicles()
 
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
-const { selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
@@ -44,8 +44,6 @@ const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
       rangeCount: 2,
     },
   })
-
-  console.log(data.value.count)
 
   mainDiaryData.value = data.value.serverData
   mainDiaryCount.value = data.value.count
@@ -86,36 +84,41 @@ await refreshVehicleData()
 <template>
   <div class="w-dvw md:w-[500px] flex flex-col mt-8 px-8 pb-28 gap-4">
     <div
-      class="relative w-full h-[300px] sm:h-[200px] flex flex-col rounded-xl cursor-pointer"
+      class="relative w-full h-fit flex flex-col rounded-xl cursor-pointer"
       @click="navigateTo(`/vehicles/${selectedVehicleData?.id}`)"
     >
       <div
-        class="w-full h-full inset-0 bg-cover bg-center rounded-xl opacity-50"
-        :style="selectedVehicleData?.bikeImage ? { backgroundImage: `url(${selectedVehicleData?.bikeImage})` } : ''"
+        class="w-full h-[380px] inset-0 bg-cover bg-center rounded-xl opacity-50"
+        :style="{ backgroundImage: `url(${selectedVehicleData?.bikeImage ? selectedVehicleData.bikeImage : 'https://api.dooramg.com/storage/v1/object/public/assets/no_bike_image.jpg'})` }"
       />
       <div class="absolute h-[180px] w-full px-4 py-2">
-        <div class="flex flex-col flex-wrap gap-4">
-          <div class="flex items-center gap-4">
-            <p class="text-3xl font-bold break-keep">
-              {{ $t('main.hi', { carNickName: selectedVehicleData?.carNickName }) }}
-            </p>
-            <div class="flex-auto" />
-            <DGAvatar
-              :src="selectedVehicleData?.manufacturer.logoImage ? selectedVehicleData.manufacturer.logoImage : 'https://via.placeholder.com/150?text=%3F&font-size=50'"
-              size="lg"
-              alt="brand-logo"
-              :ui="{ background: 'bg-transparent' }"
-            />
-          </div>
-          <div class="w-full flex flex-col-reverse items-end sm:flex-row gap-4">
-            <div class="flex flex-col gap-2">
-              <p class="text-md font-bold truncate">
-                {{ $t('main.model', { model: selectedVehicleData?.vehicleModel.name === '직접입력' ? selectedVehicleData.manualModelName : selectedVehicleData?.vehicleModel.name, makeYear: selectedVehicleData?.makeYear }) }}
+        <div class="flex flex-col flex-wrap gap-3">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-4">
+              <p class="text-3xl font-bold break-keep">
+                {{ $t('main.hi', { carNickName: selectedVehicleData?.carNickName }) }}
               </p>
-              <p class="text-md font-bold truncate">
+              <div class="flex-auto" />
+              <DGAvatar
+                :src="selectedVehicleData?.manufacturer.logoImage ? selectedVehicleData.manufacturer.logoImage : 'https://via.placeholder.com/150?text=%3F&font-size=50'"
+                size="lg"
+                alt="brand-logo"
+                :ui="{ background: 'bg-transparent' }"
+              />
+            </div>
+            <p class="text-md font-bold">
+              {{ $t('main.model', { model: selectedVehicleData?.vehicleModel.name === '직접입력' ? selectedVehicleData.manualModelName : selectedVehicleData?.vehicleModel.name, makeYear: selectedVehicleData?.makeYear }) }}
+            </p>
+          </div>
+          <div class="w-full flex flex-col-reverse items-end gap-3">
+            <div class="w-full flex flex-col gap-2">
+              <p class="text-md font-bold">
+                {{ !selectedVehicleData?.currentFuelAmount ? $t('main.noEfficient') : $t('main.currentFuel', { fuel: comma(selectedVehicleData?.currentFuelAmount) }) }}
+              </p>
+              <p class="text-md font-bold">
                 {{ $t('main.efficient', { efficient: comma(selectedVehicleData?.totalEfficient ?? 0) }) }}
               </p>
-              <p class="text-md font-bold truncate">
+              <p class="text-md font-bold">
                 {{ $t('main.distance', { distance: comma(selectedVehicleData?.totalDistance ?? 0) }) }}
               </p>
             </div>
@@ -151,7 +154,7 @@ await refreshVehicleData()
     </div>
     <DGMeterGroup
       size="lg"
-      :max="allDiaryCount + individualArticleCount"
+      :max="allDiaryCount + individualArticleCount + vehicleCount"
     >
       <template #indicator>
         <div class="flex flex-wrap gap-1.5 justify-between text-sm">
@@ -164,26 +167,32 @@ await refreshVehicleData()
         </div>
       </template>
       <DGMeter
-        :value="registrationCount"
+        :value="vehicleCount"
         color="red"
+        :label="$t('main.vehiclesPoint', { count: vehicleCount })"
+        icon="i-tabler-pencil-plus"
+      />
+      <DGMeter
+        :value="registrationCount"
+        color="yellow"
         :label="$t('main.registrationPoint', { count: registrationCount })"
         icon="i-tabler-pencil-plus"
       />
       <DGMeter
         :value="fuelCount"
-        color="yellow"
+        color="emerald"
         :label="$t('main.fuelPoint', { count: fuelCount })"
         icon="i-tabler-gas-station"
       />
       <DGMeter
         :value="tripCount"
-        color="emerald"
+        color="sky"
         :label="$t('main.tripPoint', { count: tripCount })"
         icon="i-tabler-map"
       />
       <DGMeter
         :value="individualArticleCount"
-        color="sky"
+        color="violet"
         :label="$t('main.communityPoint', { count: individualArticleCount })"
         icon="i-tabler-article"
       />
@@ -231,16 +240,16 @@ await refreshVehicleData()
           <p v-if="diary.manageType.code === 'MTC002'">
             {{ $t('diary.summary.destination', { destination: diary.destination }) }}
           </p>
-          <p v-if="diary.manageType.code === 'MTC001'">
+          <p v-if="diary.efficient">
             {{ $t('diary.summary.sectionEfficient', { efficient: comma(diary.efficient) }) }}
           </p>
-          <p v-if="diary.manageType.code === 'MTC001'">
+          <p v-if="diary.fuelAmount">
             {{ $t('diary.summary.fuel', { fuel: comma(diary.fuelAmount) }) }}
           </p>
           <p>
             {{ $t('diary.summary.paidAmount', { paidAmount: comma(diary.paidAmount) }) }}
           </p>
-          <p v-if="diary.manageType.code === 'MTC002'">
+          <p v-if="diary.driveDistance">
             {{ $t('diary.summary.distance', { distance: comma(diary.driveDistance) }) }}
           </p>
         </div>

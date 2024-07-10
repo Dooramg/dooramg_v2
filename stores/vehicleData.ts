@@ -6,6 +6,7 @@ export const useVehicleStore = defineStore('vehicleStore', () => {
    * ! Pinia State !
    *
    * @param vehicleData 차량 정보
+   * @param vehicleCount 보유 차량 개수
    * @param selectedVehicleData 선택된 차량 정보
    * @param noVehicleData 차량 정보 없음
    * @param exsistDiaryRecord 일지 기록 여부
@@ -13,6 +14,10 @@ export const useVehicleStore = defineStore('vehicleStore', () => {
    *
    */
   const vehicleData = ref<StoreVehicleData[] | null | undefined>()
+
+  const vehicleCount = computed(() => {
+    return Number(vehicleData.value?.length)
+  })
 
   const selectedVehicleData = computed<StoreVehicleData | null | undefined>(() => {
     return !userInfoData.value?.mainVehicleId
@@ -28,6 +33,7 @@ export const useVehicleStore = defineStore('vehicleStore', () => {
 
   return {
     vehicleData,
+    vehicleCount,
     selectedVehicleData,
     noVehicleData,
     fuelData,

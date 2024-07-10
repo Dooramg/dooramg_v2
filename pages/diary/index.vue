@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { sub } from 'date-fns'
 
+const toast = useToast()
 const { t } = useLocale()
 const { comma, digitsRoundUp } = useUi()
 const { updateData, deleteData } = useFetchComposable()
@@ -60,6 +61,7 @@ const deleteProcess = async (diaryData: DiaryData) => {
     totalEfficient: recoverTotalEfficient(selectedVehicleData.value?.totalDistance ?? 0, selectedVehicleData.value?.totalFuelAmount ?? 0, diaryData.driveDistance, diaryData.fuelAmount),
   }
 
+  toast.add({ title: t('messages.deleteDiarySuccess.title'), description: t('messages.deleteDiarySuccess.description'), color: 'amber', timeout: 3000 })
   await updateData('vehicles', recoverData, diaryData.vehicleId)
   await deleteData('vehicleManagement', false, '', diaryData.id, '', '', '', '')
   await refreshDiaryData()

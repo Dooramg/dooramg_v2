@@ -21,12 +21,13 @@ definePageMeta({
 const selectVehicleData = async (vehicleId: string, carNickname: string) => {
   if (userInfoData.value?.mainVehicleId !== vehicleId) {
     await updateData('userInfo', { mainVehicleId: vehicleId }, userCoreId.value)
-    refreshUserData()
+    await refreshUserData()
+
     toast.add({ title: t('messages.vehicleSelect.title', { nickname: carNickname }), description: t('messages.vehicleSelect.description'), color: 'amber', timeout: 2000 })
     return
   }
 
-  navigateTo(`vehicles/${userInfoData.value?.mainVehicleId}`)
+  await navigateTo(`/vehicles/${userInfoData.value.mainVehicleId}`)
 }
 
 refreshVehicleData()

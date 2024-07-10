@@ -143,7 +143,7 @@ await loadCodeList('CTM')
       @submit="addVehicle"
     >
       <DGFormGroup
-        :label="t('labelTexts.vehicleNickName')"
+        :label="$t('labelTexts.vehicleNickName')"
         name="carNickName"
         size="xl"
         eager-validation
@@ -159,7 +159,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-if="vehicleData.carNickName"
-        :label="t('labelTexts.vehicleHead')"
+        :label="$t('labelTexts.vehicleHead')"
         name="plateHeadText"
         size="xl"
         :help="$t('addVehicle.notify.carHead')"
@@ -176,7 +176,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.plateHeadText"
-        :label="t('labelTexts.vehicleMiddle')"
+        :label="$t('labelTexts.vehicleMiddle')"
         name="plateMiddleText"
         size="xl"
         :help="$t('addVehicle.notify.carMiddle')"
@@ -192,7 +192,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.plateMiddleText"
-        :label="t('labelTexts.vehicleTail')"
+        :label="$t('labelTexts.vehicleTail')"
         name="plateTailText"
         size="xl"
         :help="$t('addVehicle.notify.carTail')"
@@ -208,7 +208,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.plateTailText"
-        :label="t('labelTexts.vehicleNumber')"
+        :label="$t('labelTexts.vehicleNumber')"
         name="plateNumber"
         size="xl"
         eager-validation
@@ -216,7 +216,7 @@ await loadCodeList('CTM')
       >
         <AInput
           v-model:input-data="vehicleData.plateNumber"
-          :placeholder="t('validate.plateNumber')"
+          :placeholder="$t('validate.plateNumber')"
           input-size="xl"
           clearable
           @update:model-value="combinationCarNumber"
@@ -231,7 +231,7 @@ await loadCodeList('CTM')
       />
       <DGFormGroup
         v-show="vehicleData.plateNumber?.length === 4 && checkNumber(vehicleData.plateNumber)"
-        :label="t('labelTexts.manufacturer')"
+        :label="$t('labelTexts.manufacturer')"
         name="manufacturerId"
         size="xl"
         :help="$t('addVehicle.notify.manufacturer')"
@@ -248,7 +248,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.manufacturerId"
-        :label="t('labelTexts.vehicleModel')"
+        :label="$t('labelTexts.vehicleModel')"
         name="plateHeadText"
         size="xl"
         :help="!selectManualModelTrigger ? $t('addVehicle.notify.models') : $t('addVehicle.notify.manualVehicleModel')"
@@ -274,7 +274,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.vehicleModelId"
-        :label="t('labelTexts.makeYear')"
+        :label="$t('labelTexts.makeYear')"
         name="makeYear"
         size="xl"
         required
@@ -283,7 +283,7 @@ await loadCodeList('CTM')
       </DGFormGroup>
       <DGFormGroup
         v-show="vehicleData.vehicleModelId && vehicleData.makeYear"
-        :label="t('labelTexts.fuelType')"
+        :label="$t('labelTexts.fuelType')"
         name="fuelTypeId"
         size="xl"
         :help="$t('addVehicle.notify.fuel')"
