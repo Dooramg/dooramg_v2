@@ -5,7 +5,7 @@ const { comma } = useUi()
 const { refreshVehicleData } = useLoadVehicles()
 
 const { userInfoData } = storeToRefs(useUserInfoStore())
-const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleData, vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
@@ -30,7 +30,6 @@ const { refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () =
   allDiaryCount.value = data.value.count
 }, {
   immediate: true,
-  watch: [userInfoData],
 })
 
 const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
@@ -50,7 +49,6 @@ const { refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
   mainDiaryCount.value = data.value.count
 }, {
   immediate: true,
-  watch: [userInfoData],
 })
 
 const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async () => {
@@ -64,7 +62,6 @@ const { refresh: refreshMyArticleData } = useAsyncData('myArticleData', async ()
   individualArticleCount.value = data.value.count
 }, {
   immediate: true,
-  watch: [userInfoData],
 })
 
 const diaryDetailColor = (code: string) => {
@@ -80,10 +77,23 @@ const diaryDetailColor = (code: string) => {
   }
 }
 
-refreshAllDiaryData()
-refreshDiaryData()
-refreshMyArticleData()
-refreshVehicleData()
+watch(() => vehicleData, () => {
+  if (!vehicleData.value) {
+    refreshVehicleData()
+  }
+}, {
+  immediate: true,
+})
+
+watch(() => user, () => {
+  if (user.value?.id) {
+    refreshAllDiaryData()
+    refreshDiaryData()
+    refreshMyArticleData()
+  }
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
