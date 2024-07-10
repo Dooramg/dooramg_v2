@@ -53,6 +53,8 @@ const { data: fuelData } = useAsyncData('fuelData', async () => {
     return
   }
   return data.value
+}, {
+  immediate: true,
 })
 
 const { data: diaryTypeData } = useAsyncData('diaryType', async () => {
@@ -64,6 +66,8 @@ const { data: diaryTypeData } = useAsyncData('diaryType', async () => {
   })
 
   return data.value
+}, {
+  immediate: true,
 })
 
 const uploadImage = async (file: File) => {

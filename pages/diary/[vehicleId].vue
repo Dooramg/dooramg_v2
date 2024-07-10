@@ -90,6 +90,8 @@ const { data: fuelDataList } = useAsyncData('fuelDataList', async () => {
     headers: useRequestHeaders(['cookie']),
   })
   return data.value
+}, {
+  immediate: true,
 })
 
 const { data: totalStationList } = useAsyncData('totalStationList', async () => {
@@ -98,6 +100,8 @@ const { data: totalStationList } = useAsyncData('totalStationList', async () => 
   })
 
   return data.value
+}, {
+  immediate: true,
 })
 
 const loadManageType = async (code: string) => {
