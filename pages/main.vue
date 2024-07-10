@@ -80,10 +80,10 @@ const diaryDetailColor = (code: string) => {
   }
 }
 
-await refreshAllDiaryData()
-await refreshDiaryData()
-await refreshMyArticleData()
-await refreshVehicleData()
+refreshAllDiaryData()
+refreshDiaryData()
+refreshMyArticleData()
+refreshVehicleData()
 </script>
 
 <template>
