@@ -168,7 +168,7 @@ const deleteNoticeArticle = async () => {
           <p class="text-xl font-bold">
             {{ noticeDetailData.title }}
           </p>
-          <div class="flex items-center mt-2 gap-2">
+          <div class="flex flex-wrap items-center mt-2 gap-2">
             <DGBadge
               v-show="noticeDetailData.userId === userStoreData?.id"
               color="amber"
