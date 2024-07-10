@@ -206,7 +206,7 @@ onUnmounted(() => {
           <p class="text-xl font-bold">
             {{ communityDetailData.title }}
           </p>
-          <div class="flex items-center mt-2 gap-2">
+          <div class="flex flex-wrap items-center mt-2 gap-2">
             <DGBadge
               v-show="communityDetailData.userId === userCoreId"
               color="amber"
