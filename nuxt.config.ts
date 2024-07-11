@@ -106,11 +106,11 @@ export default defineNuxtConfig({
       sourcemap: true,
       cssMinify: true,
       minify: 'terser',
-      // terserOptions: {
-      //   compress: {
-      //     drop_console: true,
-      //   },
-      // },
+      terserOptions: {
+        compress: {
+          drop_console: true,
+        },
+      },
     },
   },
   pwa: {

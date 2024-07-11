@@ -3,19 +3,16 @@ import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
 const { t } = useLocale()
-const { width } = useWindowSize()
 
 const { emailRegex } = useUi()
 
 withDefaults(
   defineProps<{
-    customClass?: string
     title?: string
     doubleFirstText?: string
     doubleSecondText?: string
   }>(),
   {
-    customClass: '',
     title: '',
     doubleFirstText: '',
     doubleSecondText: '',
@@ -23,12 +20,12 @@ withDefaults(
 )
 
 const emits = defineEmits([
-  'close',
-  'submit-email',
+  'submit:email',
+  'close:dialog',
 ])
 
 const schema = object({
-  password: string()
+  email: string()
     .required(t('validate.inputEmail'))
     .matches(emailRegex, t('validate.inputFormat')),
 })
@@ -44,56 +41,61 @@ const dialogTrigger = defineModel('dialogTrigger', {
   default: false,
 })
 
-const submitEmail = (event: FormSubmitEvent<Schema>) => {
+const submitEmail = async (event: FormSubmitEvent<Schema>) => {
   if (!event.isTrusted) {
     return
   }
 
-  emits('submit-email', magicLinkForm.email)
+  emits('submit:email', magicLinkForm.email)
   closeDialog()
 }
 
 const closeDialog = () => {
   magicLinkForm.email = ''
-  emits('close')
+  emits('close:dialog')
 }
 </script>
 
 <template>
   <ADialog
     :dialog-trigger="dialogTrigger"
-    :custom-class="customClass"
-    :draggable="false"
     :title="title"
-    :width="width < 700 ? '90dvw' : '500px'"
-    hide-single-button
-    :double-first-text="doubleFirstText"
-    :double-second-text="doubleSecondText"
-    @click:first-button="submitEmail"
-    @click:second-button="closeDialog"
+    dialog-title-class="text-xl font-bold"
+    hide-double-button
     @close="closeDialog"
   >
     <DGForm
       :schema="schema"
       :state="magicLinkForm"
-      class="space-y-2"
+      class="flex flex-col items-end space-y-4"
       @submit="submitEmail"
     >
       <DGFormGroup
         :label="$t('texts.magicEmail')"
-        name="magicLink"
+        name="email"
+        class="w-full"
         size="xl"
         required
       >
-        <DGInput
-          v-model="magicLinkForm.email"
-          color="amber"
-          :placeholder="$t('placeholder.inputEmail')"
-          type="email"
-          aria-label="email"
+        <AInput
+          v-model:input-data="magicLinkForm.email"
+          input-color="amber"
+          :input-placeholder="$t('placeholder.inputEmail')"
+          input-type="email"
           clearable
-          @keyup.enter="submitEmail"
         />
+      </DGFormGroup>
+      <DGFormGroup>
+        <div class="flex gap-4">
+          <AButton
+            button-type="submit"
+            :button-text="doubleFirstText"
+          />
+          <AButton
+            :button-text="doubleSecondText"
+            @click="closeDialog"
+          />
+        </div>
       </DGFormGroup>
     </DGForm>
   </ADialog>

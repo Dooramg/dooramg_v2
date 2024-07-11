@@ -307,8 +307,8 @@ await loadCodeList('CTM')
           v-show="vehicleData.fuelTypeId"
           button-size="xl"
           button-variant="outline"
+          button-type="submit"
           :button-text="$t('buttons.save')"
-          @click="addVehicle"
         />
       </DGFormGroup>
     </DGform>
