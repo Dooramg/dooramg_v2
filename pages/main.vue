@@ -6,7 +6,7 @@ const toast = useToast()
 const { comma } = useUi()
 
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
-const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleData, vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
@@ -126,6 +126,13 @@ const diaryDetailColor = (code: string) => {
       return 'border-neutral-400'
   }
 }
+
+console.log('userinfoData in main', userInfoData.value)
+console.log('userCoreId in main', userCoreId.value)
+
+console.log('vehicleData in main', vehicleData.value)
+console.log('vehicleCount in main', vehicleCount.value)
+console.log('selectedVehicleData in main', selectedVehicleData.value)
 </script>
 
 <template>
