@@ -82,13 +82,6 @@ useSeoMeta({
 })
 
 const initUserInfoData = async () => {
-  console.log('🏓userInfoData in app.vue', userInfoData.value)
-  console.log('🏓userCoreId in app.vue', userCoreId.value)
-
-  console.log('🏓vehicleData in app.vue', vehicleData.value)
-  console.log('🏓vehicleCount in app.vue', vehicleCount.value)
-  console.log('🏓selectedVehicleData in app.vue', selectedVehicleData.value)
-
   const { data, error } = await client
     .from('userInfo')
     .select('*')
@@ -100,10 +93,14 @@ const initUserInfoData = async () => {
     console.warn('error Login: ', error)
   }
 
+  console.log('🏓data in app.vue', data)
+
   if (!data) {
     await upsertData('userInfo', saveData(), '', '')
     userInfoData.value = saveData()
 
+    console.log('🏓userInfoData in app.vue / upsertData', userInfoData.value)
+    console.log('🏓userCoreId in app.vue / upsertData', userCoreId.value)
     return
   }
 
@@ -119,6 +116,13 @@ const updateMainVehicle = async () => {
   }
 
   await updateData('userInfo', { mainVehicleId: vehicleData.value?.[0]?.id ?? '' }, String(user.value?.id))
+
+  console.log('🏓userInfoData in app.vue', userInfoData.value)
+  console.log('🏓userCoreId in app.vue', userCoreId.value)
+
+  console.log('🏓vehicleData in app.vue', vehicleData.value)
+  console.log('🏓vehicleCount in app.vue', vehicleCount.value)
+  console.log('🏓selectedVehicleData in app.vue', selectedVehicleData.value)
 }
 
 const saveData = () => {
