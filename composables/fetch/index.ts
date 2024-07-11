@@ -22,7 +22,7 @@ export const useFetchComposable = () => {
       .single()
 
     if (error) {
-      toast.add({ title: error.message, color: 'red', timeout: 2000 })
+      toast.add({ title: error.message, description: 'at insertData', color: 'red', timeout: 2000 })
     }
 
     return data
@@ -35,7 +35,7 @@ export const useFetchComposable = () => {
       .eq('id', id)
 
     if (error) {
-      toast.add({ title: error.message, color: 'red', timeout: 2000 })
+      toast.add({ title: error.message, description: 'at updateData', color: 'red', timeout: 2000 })
     }
   }
 
@@ -48,7 +48,7 @@ export const useFetchComposable = () => {
         .single()
 
       if (error) {
-        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+        toast.add({ title: error.message, description: 'at upsertData using match option', color: 'red', timeout: 2000 })
       }
     }
     else {
@@ -58,7 +58,7 @@ export const useFetchComposable = () => {
         .single()
 
       if (error) {
-        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+        toast.add({ title: error.message, description: 'at upsertData without match option', color: 'red', timeout: 2000 })
       }
     }
   }
@@ -82,7 +82,7 @@ export const useFetchComposable = () => {
       })
 
     if (error) {
-      toast.add({ title: error.message, color: 'red', timeout: 2000 })
+      toast.add({ title: error.message, description: 'at uploadStorage', color: 'red', timeout: 2000 })
     }
   }
 
@@ -95,7 +95,7 @@ export const useFetchComposable = () => {
         .eq(matOpt, matOptVal)
 
       if (error) {
-        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+        toast.add({ title: error.message, description: 'at deleteData using match option', color: 'red', timeout: 2000 })
       }
     }
     else if (matOpt && subMatOpt) {
@@ -107,7 +107,7 @@ export const useFetchComposable = () => {
         .eq(subMatOpt, subMatOptVal)
 
       if (error) {
-        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+        toast.add({ title: error.message, description: 'at deleteData using match option and sub match option', color: 'red', timeout: 2000 })
       }
     }
     else {
@@ -117,7 +117,7 @@ export const useFetchComposable = () => {
         .eq('id', deleteId)
 
       if (error) {
-        toast.add({ title: error.message, color: 'red', timeout: 2000 })
+        toast.add({ title: error.message, description: 'at deleteData without match option', color: 'red', timeout: 2000 })
       }
     }
   }

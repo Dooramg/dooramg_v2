@@ -47,7 +47,7 @@ const editableTrigger = ref(false)
 const validateEditTrigger = ref(true)
 const deleteConfirmTrigger = ref(false)
 
-const { data: fuelData } = useAsyncData('fuelData', async () => {
+const { data: fuelDataList } = useAsyncData('fuelDataList', async () => {
   const { data } = await useFetch('/api/addVehicle/fuelData', { headers: useRequestHeaders(['cookie']) })
   if (!data.value) {
     return
@@ -488,7 +488,7 @@ await loadCodeList('CTM')
               v-else
               v-model="updatedVehicleData.fuelTypeId"
               class="w-1/2"
-              :options="fuelData"
+              :options="fuelDataList"
               color="amber"
               value-attribute="id"
               option-attribute="codeName"
