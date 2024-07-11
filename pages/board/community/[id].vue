@@ -63,8 +63,11 @@ const insertCommentData = ref<CommentForm>({
 const likeCount = ref(0)
 const editCommunityTrigger = ref(false)
 const deleteConfirmTrigger = ref(false)
-const reportConfirmTrigger = ref(false)
+const reportArticleConfirmTrigger = ref(false)
+const reportCommentConfirmTrigger = ref(false)
 const naverMapsLoadTrigger = ref(false)
+
+const reportCommentId = ref('')
 
 const { data: communityDetailData, refresh: communityDetailRefresh } = useAsyncData('communityDetail', async () => {
   const { data }: SerializeObject = await useFetch('/api/community/detail', {
@@ -123,7 +126,7 @@ const reportCommunityArticle = async () => {
   }, '', '')
 
   toast.add({ title: t('messages.communityReportSuccess.title'), description: t('messages.communityReportSuccess.description'), color: 'amber', timeout: 2000 })
-  reportConfirmTrigger.value = false
+  reportArticleConfirmTrigger.value = false
 }
 
 const upsertLikeCount = async (count: number) => {
@@ -137,6 +140,32 @@ const upsertLikeCount = async (count: number) => {
 
   likeCount.value = count
   toast.add({ title: t('messages.countUpLike.title'), description: t('messages.countUpLike.description'), color: 'amber', timeout: 2000 })
+}
+
+const openReportCommentDialog = (commentId: string) => {
+  reportCommentId.value = commentId
+  reportCommentConfirmTrigger.value = true
+}
+
+const reportCommunityComment = async () => {
+  const { data }: SerializeObject = await client
+    .from('communityCommentReport')
+    .select('*, userInfo(id), boardCommunity(id)')
+    .eq('reportUserId', userCoreId.value)
+    .eq('commentId', reportCommentId.value)
+
+  if (data.length) {
+    toast.add({ title: t('messages.alreadyCommunityCommentReport.title'), description: t('messages.alreadyCommunityCommentReport.description'), color: 'amber', timeout: 2000 })
+    return
+  }
+
+  await upsertData('communityCommentReport', {
+    boardId: boardId.value,
+    reportUserId: userCoreId.value,
+  }, '', '')
+
+  toast.add({ title: t('messages.communityCommentReportSuccess.title'), description: t('messages.communityCommentReportSuccess.description'), color: 'amber', timeout: 2000 })
+  reportCommentConfirmTrigger.value = false
 }
 
 const initEditingCommunityDetailData = () => {
@@ -304,14 +333,14 @@ onUnmounted(() => {
               @click="countUpLike"
             />
             <AButton
-              v-show="!editCommunityTrigger"
+              v-show="!editCommunityTrigger && communityDetailData.userId !== userCoreId"
               use-leading
               button-size="md"
               button-color="red"
               button-variant="outline"
               icon-name="i-line-md-bell"
               :icon-size="14"
-              @click="() => reportConfirmTrigger = true"
+              @click="() => reportArticleConfirmTrigger = true"
             />
           </div>
         </div>
@@ -418,6 +447,16 @@ onUnmounted(() => {
                 />
                 <div class="flex-auto" />
                 <AButton
+                  v-show="!editCommunityTrigger && commentList.userId !== userCoreId"
+                  use-leading
+                  button-size="md"
+                  button-color="red"
+                  button-variant="outline"
+                  icon-name="i-line-md-bell"
+                  :icon-size="14"
+                  @click="openReportCommentDialog(commentList.id)"
+                />
+                <AButton
                   v-show="commentList.userId === userCoreId || userStoreData?.isAdmin"
                   button-size="xs"
                   :button-text="$t('buttons.delete')"
@@ -480,20 +519,39 @@ onUnmounted(() => {
       @click:second-button="() => deleteConfirmTrigger = false"
       @close="() => deleteConfirmTrigger = false"
     >
-      {{ $t('board.dialog.deleteTitle') }}
+      <p class="break-keep">
+        {{ $t('board.dialog.deleteTitle') }}
+      </p>
     </DialogConfirm>
     <DialogConfirm
-      :dialog-trigger="reportConfirmTrigger"
+      :dialog-trigger="reportArticleConfirmTrigger"
       title-class="text-2xl font-bold"
       :full-screen="false"
       :title="$t('board.dialog.reportTitle')"
       :first-button-text="$t('board.dialog.confirm')"
       :second-button-text="$t('board.dialog.reject')"
       @click:first-button="reportCommunityArticle"
-      @click:second-button="() => reportConfirmTrigger = false"
-      @close="() => reportConfirmTrigger = false"
+      @click:second-button="() => reportArticleConfirmTrigger = false"
+      @close="() => reportArticleConfirmTrigger = false"
     >
-      {{ $t('board.dialog.reportDescription') }}
+      <p class="break-keep">
+        {{ $t('board.dialog.reportDescription') }}
+      </p>
+    </DialogConfirm>
+    <DialogConfirm
+      :dialog-trigger="reportCommentConfirmTrigger"
+      title-class="text-2xl font-bold"
+      :full-screen="false"
+      :title="$t('board.dialog.reportTitle')"
+      :first-button-text="$t('board.dialog.confirm')"
+      :second-button-text="$t('board.dialog.reject')"
+      @click:first-button="reportCommunityComment"
+      @click:second-button="() => reportCommentConfirmTrigger = false"
+      @close="() => reportCommentConfirmTrigger = false"
+    >
+      <p class="break-keep">
+        {{ $t('board.dialog.reportTitle') }}
+      </p>
     </DialogConfirm>
   </div>
 </template>

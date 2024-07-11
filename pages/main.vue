@@ -70,7 +70,7 @@ const checkSelectVehicleData = () => {
     : vehicleData.value?.[0]
 }
 
-const { data: mainDiaryData, refresh: refreshMainDiaryData }: SerializeObject = await useAsyncData('diaryData', async () => {
+const { data: mainDiaryData, refresh: refreshMainDiaryData }: SerializeObject = useAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -93,7 +93,7 @@ const { data: mainDiaryData, refresh: refreshMainDiaryData }: SerializeObject = 
   immediate: true,
 })
 
-await useAsyncData('myArticleData', async () => {
+useAsyncData('myArticleData', async () => {
   if (!user.value?.id) {
     return
   }

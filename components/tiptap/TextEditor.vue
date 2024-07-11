@@ -67,6 +67,7 @@ onMounted(() => {
     extensions: [
       starterKit,
       placeholder.configure({
+        emptyEditorClass: 'p-2',
         placeholder: t('validate.inputContent'),
       }),
       characterCount.configure({
@@ -138,9 +139,9 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
 <template>
   <div
     v-if="editor"
-    class="flex flex-col w-full bg-zinc-800 dark:bg-zinc-400 border-2 rounded-md border-zinc-600 dark:border-zinc-300"
+    class="flex flex-col w-full border-2 rounded-md border-neutral-600 dark:border-neutral-300"
   >
-    <div class="flex gap-1.5 p-1 flex-wrap bg-zinc-800 dark:bg-zinc-400 border-b-2 border-zinc-600 dark:border-zinc-300">
+    <div class="flex items-center gap-2 p-2 flex-wrap border-b-2 border-neutral-600 dark:border-neutral-300">
       <TiptapFontFamilyGroup
         :tiptap-editor="editor"
         :full-option="fullOption"
@@ -192,9 +193,22 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
         icon-type="ri:close-circle-line"
         :tooltip-text="$t('tiptap.clear')"
       />
+      <div class="flex-auto" />
+      <DGTooltip
+        :text="$t('validate.inputContentWarning')"
+        placement="top"
+        :ui="{ base: 'whitespace-normal h-fit' }"
+      >
+        <Icon
+          name="i-line-md-alert-loop"
+          color="orange"
+          :width="28"
+          :height="28"
+        />
+      </DGTooltip>
     </div>
     <bubble-menu
-      class="bubble-menu flex gap-1.5 w-fit bg-zinc-800 dark:bg-zinc-400 border-2 rounded-md border-zinc-600 dark:border-zinc-300"
+      class="bubble-menu flex gap-2 w-fit border-2 rounded-md bg-neutral-200 dark:bg-neutral-800 border-neutral-600 dark:border-neutral-300"
       :tippy-options="{ duration: 100 }"
       :editor="editor"
     >
@@ -236,7 +250,7 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
       />
     </bubble-menu>
     <editor-content
-      class="tiptap-editor__content min-h-24 p-3"
+      class="p-2 m-3"
       :editor="editor"
     />
     <div class="flex flex-col items-end p-2">
@@ -261,3 +275,13 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
     />
   </div>
 </template>
+
+<style lang="scss">
+.tiptap p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+</style>

@@ -189,7 +189,7 @@ export default {
   diary: {
     title: '{carNickName} 다이어리 📜',
     noVehicle: '아직 두바퀴가 없으신가요?',
-    noDiary: '최근 두바퀴 관리를 안하셨네요?',
+    noDiary: '아직 두바퀴 관리를 안하셨네요?',
     noDiaryMonth: '선택하신 달은 관리하지 않았어요 🥲',
     summaryDate: '{year}년 {month}월 기록들 📒',
     summary: {
@@ -293,7 +293,7 @@ export default {
       imageUploadTitle: '이미지를 선택해주세요!',
       deleteTitle: '정말 지울거에요?',
       reportTitle: '정말 신고할거에요?',
-      reportDescription: '불공정한 신고는 신고한 당사자에게 불이익이 있어요 🚨',
+      reportDescription: '게시판 이용약관에 따른 신고사유에 맞지 않을 경우 처리되지 않으며, 게시글, 댓글 신고 완료 후 팝업에 "신고 내용은 24시간 이내 조치됩니다. 🚨',
       confirm: '응!',
       reject: '아니!',
     },
@@ -405,7 +405,8 @@ export default {
   validate: {
     input: '입력해주세요!',
     inputTitle: '제목을 입력해주세요!',
-    inputContent: '내용을 입력해주세요!',
+    inputContent: '🚨 부적절하거나 불쾌감을 줄 수 있는 컨텐츠를 게시할 경우 제재를 받을 수 있습니다.',
+    inputContentWarning: '🚨 신고 이후 처리 결과는 24시간 이내 반영되요. 🚨 처리가 완료되면 글이 보여지지 않아요.',
     inputComment: '댓글을 입력해주세요!',
     inputNumber: '숫자를 입력해요!',
     input4Digits: '4자리에요!',
@@ -540,6 +541,14 @@ export default {
     },
     communityReportSuccess: {
       title: '커뮤니티 글 신고 성공!',
+      description: '신고해주셔서 감사해요!',
+    },
+    alreadyCommunityCommentReport: {
+      title: '이미 신고한 댓글이에요!',
+      description: '신고한 댓글은 중복으로 신고할 수 없어요 😢',
+    },
+    communityCommentReportSuccess: {
+      title: '커뮤니티 댓글 신고 성공!',
       description: '신고해주셔서 감사해요!',
     },
     countUpLike: {

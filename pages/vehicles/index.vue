@@ -20,6 +20,7 @@ definePageMeta({
 
 const selectVehicleData = async (vehicleId: string, carNickname: string) => {
   if (userInfoData.value?.mainVehicleId !== vehicleId) {
+    changeVehicleData(vehicleId)
     await updateData('userInfo', { mainVehicleId: vehicleId }, userCoreId.value)
     await refreshUserData()
 
@@ -27,7 +28,11 @@ const selectVehicleData = async (vehicleId: string, carNickname: string) => {
     return
   }
 
-  await navigateTo(`/vehicles/${userInfoData.value.mainVehicleId}`)
+  await navigateTo(`/vehicles/${vehicleId}`)
+}
+
+const changeVehicleData = (vehicleId: string) => {
+  selectedVehicleData.value = vehicleData.value?.find(vehicle => vehicle.id === vehicleId)
 }
 
 refreshVehicleData()
@@ -82,7 +87,7 @@ refreshVehicleData()
       :key="index"
       :ui="{
         base: 'cursor-pointer hover:text-sky-800 hover:dark:text-sky-200',
-        background: selectedVehicleData?.id === vehicle.id ? 'bg-amber-100 dark:bg-amber-900' : 'bg-neutral-100 dark:bg-neutral-900',
+        background: userInfoData?.mainVehicleId === vehicle.id ? 'bg-amber-100 dark:bg-amber-900' : 'bg-neutral-100 dark:bg-neutral-900',
         header: { padding: 'px-4 py-2 sm:p-4' },
         body: { padding: 'px-4 py-2 sm:p-4' },
       }"

@@ -81,7 +81,7 @@ const searchCommunity = () => {
 <template>
   <div class="w-dvw md:w-[500px] flex flex-col mt-8 px-8 gap-4">
     <p class="text-2xl font-bold">
-      {{ $t('board.notice.title') }}
+      {{ $t('board.community.title') }}
     </p>
     <div class="w-full flex flex-col items-end mt-4 gap-4">
       <AVerticalFlicking
