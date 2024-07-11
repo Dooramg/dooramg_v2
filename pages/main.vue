@@ -15,6 +15,10 @@ definePageMeta({
   middleware: 'auth',
 })
 
+const megerGroupCount = computed(() => {
+  return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
+})
+
 useAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
@@ -152,7 +156,7 @@ const diaryDetailColor = (code: string) => {
     </div>
     <DGMeterGroup
       size="lg"
-      :max="allDiaryCount + individualArticleCount + vehicleCount"
+      :max="megerGroupCount"
     >
       <template #indicator>
         <div class="flex flex-wrap gap-1.5 justify-between text-sm">
@@ -160,38 +164,38 @@ const diaryDetailColor = (code: string) => {
             {{ $t('main.manageTitle') }}
           </p>
           <p class="text-xs md:text-base text-neutral-600 dark:text-neutral-300">
-            {{ $t('main.totalPoint', { point: allDiaryCount + individualArticleCount }) }}
+            {{ $t('main.totalPoint', { point: megerGroupCount }) }}
           </p>
         </div>
       </template>
       <DGMeter
         :value="vehicleCount"
         color="red"
-        :label="$t('main.vehiclesPoint', { count: vehicleCount })"
+        :label="$t('main.vehiclesPoint', { count: vehicleCount ?? 0 })"
         icon="i-tabler-pencil-plus"
       />
       <DGMeter
         :value="registrationCount"
         color="yellow"
-        :label="$t('main.registrationPoint', { count: registrationCount })"
+        :label="$t('main.registrationPoint', { count: registrationCount ?? 0 })"
         icon="i-tabler-pencil-plus"
       />
       <DGMeter
         :value="fuelCount"
         color="emerald"
-        :label="$t('main.fuelPoint', { count: fuelCount })"
+        :label="$t('main.fuelPoint', { count: fuelCount ?? 0 })"
         icon="i-tabler-gas-station"
       />
       <DGMeter
         :value="tripCount"
         color="sky"
-        :label="$t('main.tripPoint', { count: tripCount })"
+        :label="$t('main.tripPoint', { count: tripCount ?? 0 })"
         icon="i-tabler-map"
       />
       <DGMeter
         :value="individualArticleCount"
         color="violet"
-        :label="$t('main.communityPoint', { count: individualArticleCount })"
+        :label="$t('main.communityPoint', { count: individualArticleCount ?? 0 })"
         icon="i-tabler-article"
       />
     </DGMeterGroup>
