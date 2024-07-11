@@ -693,7 +693,9 @@ await loadCodeList('CTM')
       @click:second-button="() => deleteConfirmTrigger = false"
       @close="() => deleteConfirmTrigger = false"
     >
-      {{ $t('vehicleDetail.deleteDialog.title') }}
+      <p class="break-keep">
+        {{ $t('vehicleDetail.deleteDialog.description') }}
+      </p>
     </DialogConfirm>
   </div>
 </template>

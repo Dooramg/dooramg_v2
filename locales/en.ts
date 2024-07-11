@@ -189,7 +189,7 @@ export default {
   diary: {
     title: '{carNickName} Diary 📜',
     noVehicle: 'No car yet?',
-    noDiary: 'Not care this month?',
+    noDiary: 'Please care this vehicle!',
     noDiaryMonth: 'No care this month',
     summaryDate: '{year}.{month} records 📒',
     summary: {
@@ -293,7 +293,7 @@ export default {
       imageUploadTitle: 'Upload image!',
       deleteTitle: 'Are you sure delete?',
       reportTitle: 'Are you sure report?',
-      reportDescription: 'Inappropriate reporting may result in unfavorable consequences to the reporter! 🚨',
+      reportDescription: 'If the reason for the report does not comply with the bulletin board terms of use, it will not be processed. After reporting the post or comment, a popup will appear saying "The report will be processed within 24 hours. 🚨',
       confirm: 'Yes!',
       reject: 'No!',
     },
@@ -405,7 +405,8 @@ export default {
   validate: {
     input: 'Input!',
     inputTitle: 'Input title!',
-    inputContent: 'Input content!',
+    inputContent: '🚨 Posting inappropriate or offensive content may result in sanctions.',
+    inputContentWarning: '🚨 The processing result after reporting will be reflected within 24 hours. 🚨 The post will not be displayed after processing.',
     inputComment: 'Input comment!',
     inputNumber: 'Number...',
     input4Digits: '4 Digits...',
@@ -535,11 +536,19 @@ export default {
       description: 'Please write again! 😜',
     },
     alreadyCommunityReport: {
-      title: 'Already report!',
+      title: 'Already report article!',
       description: 'Can not report twice!',
     },
     communityReportSuccess: {
       title: 'Community article report success!',
+      description: 'Thank you!',
+    },
+    alreadyCommunityCommentReport: {
+      title: 'Already report comment!',
+      description: 'Can not report twice!',
+    },
+    communityCommentReportSuccess: {
+      title: 'Community comment report success!',
       description: 'Thank you!',
     },
     countUpLike: {

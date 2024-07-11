@@ -169,6 +169,45 @@ interface SupabaseDataBase {
           },
         ]
       }
+      communityCommentReport: {
+        Row: {
+          commentId: string | null
+          createdAt: string
+          id: string
+          reportUserId: string | null
+          resolved: boolean | null
+        }
+        Insert: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Update: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'communityCommentReport_commentId_fkey'
+            columns: ['commentId']
+            isOneToOne: false
+            referencedRelation: 'communityCommentList'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'communityCommentReport_reportUserId_fkey'
+            columns: ['reportUserId']
+            isOneToOne: false
+            referencedRelation: 'userInfo'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       communityLikeCount: {
         Row: {
           boardId: string | null

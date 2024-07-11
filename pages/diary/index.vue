@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { sub } from 'date-fns'
 
+const client = useSupabaseClient()
+
 const toast = useToast()
 const { t } = useLocale()
 const { comma, digitsRoundUp } = useUi()
+
 const { updateData, deleteData } = useFetchComposable()
+const { refreshVehicleData } = useLoadVehicles()
 
 const { userInfoData } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
-const { allDiaryCount } = storeToRefs(useDiaryStore())
 
 useHead({
   title: t('pageTitle.diary'),
@@ -20,26 +23,51 @@ definePageMeta({
 })
 
 const searchMonth = ref({ start: sub(new Date(), { days: 30 }), end: new Date() })
+const diaryDataCount = ref(0)
 
-const { data: diaryData, refresh: refreshDiaryData } = await useAsyncData('diaryData', async () => {
+const { data: diaryData, refresh: refreshDiaryData } = useAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return null
   }
 
-  const { data }: SerializeObject = await useFetch('/api/management', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      vehicleId: userInfoData.value?.mainVehicleId,
-      dateFilter: true,
-      startDate: searchMonth.value.start,
-      endDate: searchMonth.value.end,
-    },
-  })
+  const { data, count, error } = await client
+    .from('vehicleManagement')
+    .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
+    .eq('vehicleId', userInfoData.value?.mainVehicleId)
+    .gt('createdAt', useDateFormat(searchMonth.value.start, 'YYYY-MM-DD').value)
+    .lt('createdAt', useDateFormat(searchMonth.value.end, 'YYYY-MM-DD').value)
+    .order('createdAt', { ascending: false })
 
-  return data.value
+  if (error) {
+    throw createError({ statusMessage: error.message })
+  }
+
+  diaryDataCount.value = count ?? 0
+
+  return { fetchData: data, count }
 }, {
   immediate: true,
   watch: [searchMonth],
+})
+
+const { data: allDiaryDataCount, refresh: refreshAllDiaryData } = useAsyncData('allDiaryData', async () => {
+  if (!userInfoData.value?.mainVehicleId) {
+    return
+  }
+
+  const { count, error } = await client
+    .from('vehicleManagement')
+    .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
+    .eq('vehicleId', userInfoData.value?.mainVehicleId)
+    .order('createdAt', { ascending: false })
+
+  if (error) {
+    throw createError({ statusMessage: error.message })
+  }
+
+  return count
+}, {
+  immediate: true,
 })
 
 const deleteProcess = async (diaryData: DiaryData) => {
@@ -72,6 +100,9 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
     ? (totalAmount ? digitsRoundUp(totalAmount - amount, 'round', 100) : 0)
     : (totalAmount ? totalAmount - amount : 0)
 }
+
+await refreshVehicleData()
+await refreshAllDiaryData()
 </script>
 
 <template>
@@ -82,15 +113,15 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
       </p>
       <div class="flex-auto" />
       <AButton
-        v-if="allDiaryCount !== 0"
+        v-if="allDiaryDataCount !== 0"
         button-size="lg"
         :button-text="$t('buttons.rideInsert')"
         @click="navigateTo(`/diary/${selectedVehicleData?.id}`)"
       />
     </div>
-    <DGDivider v-if="allDiaryCount !== 0" />
+    <DGDivider v-if="allDiaryDataCount !== 0" />
     <DGCard
-      v-if="allDiaryCount !== 0"
+      v-if="allDiaryDataCount !== 0"
       :ui="{ base: 'cursor-pointer hover:text-sky-800 hover:dark:text-sky-200' }"
       @click="navigateTo(`/vehicles/${selectedVehicleData?.id}`)"
     >
@@ -124,51 +155,55 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
     </DGCard>
     <DGDivider />
     <ADataRangePicker
-      v-if="userInfoData?.mainVehicleId && allDiaryCount !== 0"
+      v-if="userInfoData?.mainVehicleId && allDiaryDataCount !== 0"
       v-model:search-month="searchMonth"
       class="w-fit"
     />
     <div
-      v-if="!diaryData || allDiaryCount === 0"
+      v-if="!userInfoData?.mainVehicleId && allDiaryDataCount === 0"
       class="flex flex-col justify-center mt-40 gap-4"
     >
-      <div
-        v-if="userInfoData?.mainVehicleId && allDiaryCount === 0"
-        class="flex flex-col gap-4"
+      <p class="text-2xl font-bold text-center">
+        {{ $t('diary.noVehicle') }}
+      </p>
+      <AButton
+        button-color="sky"
+        button-size="xl"
+        button-variant="outline"
+        button-block
+        :button-text="$t('buttons.vehicleInsert')"
+        @click="navigateTo('/vehicles/new')"
+      />
+    </div>
+    <div
+      v-if="userInfoData?.mainVehicleId"
+      class="flex flex-col justify-center gap-4"
+    >
+      <p
+        v-if="allDiaryDataCount === 0"
+        class="text-2xl font-bold text-center mt-40"
       >
-        <p class="text-2xl font-bold text-center">
-          {{ $t('diary.noDiary') }}
-        </p>
-        <AButton
-          v-if="allDiaryCount === 0"
-          class="flex justify-center"
-          button-variant="outline"
-          button-size="xl"
-          button-block
-          :button-text="$t('buttons.rideSetting')"
-          @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
-        />
-      </div>
-      <div
-        v-if="!userInfoData?.mainVehicleId && allDiaryCount === 0"
-        class="flex flex-col gap-4"
+        {{ $t('diary.noDiary') }}
+      </p>
+      <p
+        v-if="allDiaryDataCount !== 0 && diaryData?.count === 0"
+        class="text-2xl font-bold text-center mt-40"
       >
-        <p class="text-2xl font-bold text-center">
-          {{ $t('diary.noVehicle') }}
-        </p>
-        <AButton
-          button-color="sky"
-          button-size="xl"
-          button-variant="outline"
-          button-block
-          :button-text="$t('buttons.vehicleInsert')"
-          @click="navigateTo('/vehicles/new')"
-        />
-      </div>
+        {{ $t('diary.noDiaryMonth') }}
+      </p>
+      <AButton
+        v-if="allDiaryDataCount === 0"
+        class="flex justify-center"
+        button-variant="outline"
+        button-size="xl"
+        button-block
+        :button-text="$t('buttons.rideSetting')"
+        @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
+      />
     </div>
     <DiaryListCard
       v-if="diaryData"
-      v-model:diary-data="diaryData.serverData"
+      v-model:diary-data="diaryData.fetchData"
       :is-main-diary="false"
       @delete:diary="(diary: DiaryData) => deleteProcess(diary)"
     />
