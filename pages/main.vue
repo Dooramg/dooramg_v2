@@ -8,6 +8,8 @@ const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
 
+console.log('main', userInfoData.value)
+
 definePageMeta({
   layout: 'main',
   middleware: 'auth',
