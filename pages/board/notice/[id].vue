@@ -374,7 +374,9 @@ const deleteNoticeArticle = async () => {
       @click:second-button="() => deleteConfirmTrigger = false"
       @close="() => deleteConfirmTrigger = false"
     >
-      {{ $t('board.dialog.deleteTitle') }}
+      <p class="break-keep">
+        {{ $t('board.dialog.deleteTitle') }}
+      </p>
     </DialogConfirm>
   </div>
 </template>

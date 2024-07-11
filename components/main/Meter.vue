@@ -4,13 +4,12 @@ const client = useSupabaseClient()
 const { vehicleCount } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { userInfoData } = storeToRefs(useUserInfoStore())
-const { allDiaryCount } = storeToRefs(useDiaryStore())
 
 const fuelCount = ref(0)
 const tripCount = ref(0)
 const registrationCount = ref(0)
 
-const { refresh: refreshAllDiaryDta }: SerializeObject = await useAsyncData('allDiaryData', async () => {
+const { data: allDiaryDataCount, refresh: refreshAllDiaryDta }: SerializeObject = useAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -26,15 +25,14 @@ const { refresh: refreshAllDiaryDta }: SerializeObject = await useAsyncData('all
   }
 
   calculateCounts(data)
-  allDiaryCount.value = count ?? 0
 
-  return data
+  return count
 }, {
   immediate: true,
 })
 
 const mergeGroupCount = computed(() => {
-  return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
+  return allDiaryDataCount.value + individualArticleCount.value + vehicleCount.value
 })
 
 const calculateCounts = (data: DiaryData[]) => {
