@@ -28,10 +28,11 @@ const formData = reactive({
   hyperLink: '',
 })
 
-const onSubmit = (event: FormSubmitEvent<Schema>) => {
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   if (!event.isTrusted) {
     return
   }
+
   emits('submit:link', formData.hyperLink)
   closeDialog(false)
 }

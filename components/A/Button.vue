@@ -10,6 +10,7 @@ withDefaults(
     buttonBlock?: boolean
     buttonTruncate?: boolean
     buttonColor?: string
+    buttonType?: 'button' | 'submit' | 'reset'
     buttonSize?: ButtonSize | undefined
     buttonVariant?: ButtonVariant | undefined
     useLeading?: boolean
@@ -26,6 +27,7 @@ withDefaults(
     buttonTruncate: false,
     buttonColor: 'gray',
     buttonSize: 'md',
+    buttonType: 'button',
     buttonVariant: 'solid',
     useLeading: false,
     iconName: '',
@@ -50,6 +52,7 @@ defineEmits([
     :padded="buttonPadding"
     :color="buttonColor"
     :size="buttonSize"
+    :type="buttonType"
     :variant="buttonVariant"
     :label="buttonText"
     :aria-label="buttonText"

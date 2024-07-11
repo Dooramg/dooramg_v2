@@ -2,6 +2,8 @@
 import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
+const client = useSupabaseClient()
+
 const toast = useToast()
 const { t } = useLocale()
 const { params } = useRoute()
@@ -61,6 +63,7 @@ const insertCommentData = ref<CommentForm>({
 const likeCount = ref(0)
 const editCommunityTrigger = ref(false)
 const deleteConfirmTrigger = ref(false)
+const reportConfirmTrigger = ref(false)
 const naverMapsLoadTrigger = ref(false)
 
 const { data: communityDetailData, refresh: communityDetailRefresh } = useAsyncData('communityDetail', async () => {
@@ -100,6 +103,27 @@ const countUpLike = () => {
   }
 
   upsertLikeCount(communityDetailData.value?.communityLikeCount?.length ?? 1)
+}
+
+const reportCommunityArticle = async () => {
+  const { data }: SerializeObject = await client
+    .from('communityReport')
+    .select('*, userInfo(id), boardCommunity(id)')
+    .eq('reportUserId', userCoreId.value)
+    .eq('boardId', boardId.value)
+
+  if (data.length) {
+    toast.add({ title: t('messages.alreadyCommunityReport.title'), description: t('messages.alreadyCommunityReport.description'), color: 'amber', timeout: 2000 })
+    return
+  }
+
+  await upsertData('communityReport', {
+    boardId: boardId.value,
+    reportUserId: userCoreId.value,
+  }, '', '')
+
+  toast.add({ title: t('messages.communityReportSuccess.title'), description: t('messages.communityReportSuccess.description'), color: 'amber', timeout: 2000 })
+  reportConfirmTrigger.value = false
 }
 
 const upsertLikeCount = async (count: number) => {
@@ -157,7 +181,7 @@ const updateCommunityArticle = async () => {
 }
 
 const insertComment = async (event: FormSubmitEvent<Schema>) => {
-  if (!event.isTrusted) {
+  if (!event.isTrusted || insertCommentData.value.comment === '') {
     return
   }
 
@@ -271,13 +295,23 @@ onUnmounted(() => {
             <AButton
               v-show="!editCommunityTrigger"
               use-leading
-              button-size="xs"
+              button-size="sm"
               button-color="amber"
               button-variant="outline"
               icon-name="i-line-md-thumbs-up"
               :icon-size="14"
               :button-text="String(likeCount)"
               @click="countUpLike"
+            />
+            <AButton
+              v-show="!editCommunityTrigger"
+              use-leading
+              button-size="md"
+              button-color="red"
+              button-variant="outline"
+              icon-name="i-line-md-bell"
+              :icon-size="14"
+              @click="() => reportConfirmTrigger = true"
             />
           </div>
         </div>
@@ -415,7 +449,10 @@ onUnmounted(() => {
             :state="insertCommentData"
             @submit="insertComment"
           >
-            <DGFormGroup>
+            <DGFormGroup
+              name="comment"
+              required
+            >
               <TiptapTextEditor
                 :text-data="insertCommentData.comment"
                 comment-option
@@ -424,8 +461,8 @@ onUnmounted(() => {
             </DGFormGroup>
             <DGFormGroup class="flex justify-end mt-4">
               <AButton
+                button-type="submit"
                 :button-text="$t('buttons.save')"
-                @click="insertComment"
               />
             </DGFormGroup>
           </DGForm>
@@ -444,6 +481,19 @@ onUnmounted(() => {
       @close="() => deleteConfirmTrigger = false"
     >
       {{ $t('board.dialog.deleteTitle') }}
+    </DialogConfirm>
+    <DialogConfirm
+      :dialog-trigger="reportConfirmTrigger"
+      title-class="text-2xl font-bold"
+      :full-screen="false"
+      :title="$t('board.dialog.reportTitle')"
+      :first-button-text="$t('board.dialog.confirm')"
+      :second-button-text="$t('board.dialog.reject')"
+      @click:first-button="reportCommunityArticle"
+      @click:second-button="() => reportConfirmTrigger = false"
+      @close="() => reportConfirmTrigger = false"
+    >
+      {{ $t('board.dialog.reportDescription') }}
     </DialogConfirm>
   </div>
 </template>

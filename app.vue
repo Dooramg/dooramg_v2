@@ -35,7 +35,7 @@ if (import.meta.server) {
     ],
     link: [
       { rel: 'canonical', href: seoUrl },
-      { rel: 'icon', type: 'image/png', href: '/image/logo-non-text.png' },
+      { rel: 'icon', type: 'image/png', href: '/image/logo.png' },
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'apple-touch-icon', sizes: '180x180', href: '/image/apple-touch-icon.png' },
       { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/image/favicon-32x32.png' },

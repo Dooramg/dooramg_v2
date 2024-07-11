@@ -48,12 +48,12 @@ refreshVehicleData()
     >
       <template #header>
         <p class="text-lg sm:text-xl font-bold">
-          {{ !vehicleCount ? $t('vehicles.description') : $t('vehicles.noDescription') }}
+          {{ vehicleCount !== 0 ? $t('vehicles.description') : $t('vehicles.noDescription') }}
         </p>
       </template>
       <div class="w-full flex justify-end">
         <div
-          v-if="!vehicleCount"
+          v-if="vehicleCount !== 0"
           class="flex flex-col items-end gap-1"
         >
           <p class="text-base sm:text-lg font-bold">
@@ -67,8 +67,10 @@ refreshVehicleData()
           />
         </div>
         <AButton
-          v-if="vehicleCount"
-          button-size="lg"
+          v-else
+          button-color="sky"
+          button-size="xl"
+          button-variant="outline"
           :button-text="$t('buttons.vehicleInsert')"
           @click="navigateTo('/vehicles/new')"
         />
@@ -79,7 +81,7 @@ refreshVehicleData()
       v-for="(vehicle, index) in vehicleData"
       :key="index"
       :ui="{
-        base: 'cursor-pointer',
+        base: 'cursor-pointer hover:text-sky-800 hover:dark:text-sky-200',
         background: selectedVehicleData?.id === vehicle.id ? 'bg-amber-100 dark:bg-amber-900' : 'bg-neutral-100 dark:bg-neutral-900',
         header: { padding: 'px-4 py-2 sm:p-4' },
         body: { padding: 'px-4 py-2 sm:p-4' },

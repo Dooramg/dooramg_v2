@@ -8,7 +8,7 @@ const { updateData, deleteData } = useFetchComposable()
 
 const { userInfoData } = storeToRefs(useUserInfoStore())
 const { selectedVehicleData } = storeToRefs(useVehicleStore())
-const { mainDiaryCount } = storeToRefs(useDiaryStore())
+const { allDiaryCount } = storeToRefs(useDiaryStore())
 
 useHead({
   title: t('pageTitle.diary'),
@@ -22,6 +22,10 @@ definePageMeta({
 const searchMonth = ref({ start: sub(new Date(), { days: 30 }), end: new Date() })
 
 const { data: diaryData, refresh: refreshDiaryData } = await useAsyncData('diaryData', async () => {
+  if (!userInfoData.value?.mainVehicleId) {
+    return null
+  }
+
   const { data }: SerializeObject = await useFetch('/api/management', {
     headers: useRequestHeaders(['cookie']),
     query: {
@@ -78,13 +82,18 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
       </p>
       <div class="flex-auto" />
       <AButton
+        v-if="allDiaryCount !== 0"
         button-size="lg"
         :button-text="$t('buttons.rideInsert')"
         @click="navigateTo(`/diary/${selectedVehicleData?.id}`)"
       />
     </div>
-    <DGDivider />
-    <DGCard>
+    <DGDivider v-if="allDiaryCount !== 0" />
+    <DGCard
+      v-if="allDiaryCount !== 0"
+      :ui="{ base: 'cursor-pointer hover:text-sky-800 hover:dark:text-sky-200' }"
+      @click="navigateTo(`/vehicles/${selectedVehicleData?.id}`)"
+    >
       <div class="w-full flex flex-col gap-4">
         <DGAvatar
           img-class="object-cover"
@@ -115,27 +124,47 @@ const recoverAmount = (totalAmount: number, amount: number, roundUp: boolean) =>
     </DGCard>
     <DGDivider />
     <ADataRangePicker
+      v-if="userInfoData?.mainVehicleId && allDiaryCount !== 0"
       v-model:search-month="searchMonth"
       class="w-fit"
     />
     <div
-      v-if="!diaryData || !diaryData.count"
-      class="flex justify-center mt-40"
+      v-if="!diaryData || allDiaryCount === 0"
+      class="flex flex-col justify-center mt-40 gap-4"
     >
-      <p
-        v-if="mainDiaryCount"
-        class="text-2xl font-bold"
+      <div
+        v-if="userInfoData?.mainVehicleId && allDiaryCount === 0"
+        class="flex flex-col gap-4"
       >
-        {{ $t('diary.noDiary') }}
-      </p>
-      <AButton
-        v-else
-        class="flex justify-center"
-        button-variant="outline"
-        button-size="xl"
-        :button-text="$t('buttons.rideSetting')"
-        @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
-      />
+        <p class="text-2xl font-bold text-center">
+          {{ $t('diary.noDiary') }}
+        </p>
+        <AButton
+          v-if="allDiaryCount === 0"
+          class="flex justify-center"
+          button-variant="outline"
+          button-size="xl"
+          button-block
+          :button-text="$t('buttons.rideSetting')"
+          @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
+        />
+      </div>
+      <div
+        v-if="!userInfoData?.mainVehicleId && allDiaryCount === 0"
+        class="flex flex-col gap-4"
+      >
+        <p class="text-2xl font-bold text-center">
+          {{ $t('diary.noVehicle') }}
+        </p>
+        <AButton
+          button-color="sky"
+          button-size="xl"
+          button-variant="outline"
+          button-block
+          :button-text="$t('buttons.vehicleInsert')"
+          @click="navigateTo('/vehicles/new')"
+        />
+      </div>
     </div>
     <DiaryListCard
       v-if="diaryData"
