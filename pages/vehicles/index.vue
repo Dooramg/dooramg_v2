@@ -7,7 +7,7 @@ const { updateData } = useFetchComposable()
 const { refreshUserData } = useLoadUser()
 const { refreshVehicleData } = useLoadVehicles()
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
-const { vehicleData, selectedVehicleData, noVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleData, selectedVehicleData, vehicleCount } = storeToRefs(useVehicleStore())
 
 useHead({
   title: t('pageTitle.vehicles'),
@@ -48,12 +48,12 @@ refreshVehicleData()
     >
       <template #header>
         <p class="text-lg sm:text-xl font-bold">
-          {{ !noVehicleData ? $t('vehicles.description') : $t('vehicles.noDescription') }}
+          {{ !vehicleCount ? $t('vehicles.description') : $t('vehicles.noDescription') }}
         </p>
       </template>
       <div class="w-full flex justify-end">
         <div
-          v-if="!noVehicleData"
+          v-if="!vehicleCount"
           class="flex flex-col items-end gap-1"
         >
           <p class="text-base sm:text-lg font-bold">
@@ -67,7 +67,7 @@ refreshVehicleData()
           />
         </div>
         <AButton
-          v-if="noVehicleData"
+          v-if="vehicleCount"
           button-size="lg"
           :button-text="$t('buttons.vehicleInsert')"
           @click="navigateTo('/vehicles/new')"

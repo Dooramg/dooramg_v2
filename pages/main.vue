@@ -2,59 +2,73 @@
 const user = useSupabaseUser()
 const client = useSupabaseClient()
 
-const toast = useToast()
 const { comma } = useUi()
+const { generateTempName } = useUi()
+const { url } = useImageStorage()
+
+const { refreshVehicleData } = useLoadVehicles()
+const { upsertData, updateData } = useFetchComposable()
 
 const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
-const { vehicleData, vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
+const { vehicleData, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
-const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
+const { mainDiaryCount } = storeToRefs(useDiaryStore())
 
 definePageMeta({
   layout: 'main',
   middleware: 'auth',
 })
 
-const megerGroupCount = computed(() => {
-  return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
-})
+const initUserInfoData = async () => {
+  const { data, error } = await client
+    .from('userInfo')
+    .select('*')
+    .eq('id', String(user.value?.id))
+    .single()
+
+  if (error) {
+    console.warn('error Login: ', error)
+  }
+
+  if (!data) {
+    await upsertData('userInfo', saveData(), '', '')
+    userInfoData.value = saveData()
+
+    return
+  }
+
+  userCoreId.value = user.value?.id ?? ''
+  userInfoData.value = data
+
+  await updateMainVehicle()
+}
+
+const updateMainVehicle = async () => {
+  if (!vehicleData.value) {
+    await refreshVehicleData()
+  }
+
+  const initMainVehicleId = vehicleData.value?.[0]?.id ?? ''
+  await updateData('userInfo', { mainVehicleId: userInfoData.value?.mainVehicleId ?? initMainVehicleId }, String(user.value?.id))
+}
+
+const saveData = () => {
+  return {
+    id: user.value?.id ?? userCoreId.value,
+    nickName: user.value?.user_metadata.full_name ? user.value?.user_metadata.full_name : generateTempName(),
+    email: user.value?.email,
+    avatarImage: user.value?.user_metadata.avatar_url ? user.value?.user_metadata.avatar_url : url(true, '/assets/logo-non-text.png'),
+    signInAt: user.value?.created_at,
+  }
+}
 
 const checkSelectVehicleData = () => {
   selectedVehicleData.value = userInfoData.value?.mainVehicleId
     ? vehicleData.value?.find(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)
     : vehicleData.value?.[0]
-
-  console.log('userinfoData in main', userInfoData.value)
-  console.log('userCoreId in main', userCoreId.value)
-
-  console.log('vehicleData in main', vehicleData.value)
-  console.log('vehicleCount in main', vehicleCount.value)
-  console.log('selectedVehicleData in main', selectedVehicleData.value)
 }
 
-await useAsyncData('allDiaryData', async () => {
-  if (!userInfoData.value?.mainVehicleId) {
-    return
-  }
-
-  const { data, count, error } = await client
-    .from('vehicleManagement')
-    .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
-    .eq('vehicleId', userInfoData.value?.mainVehicleId)
-    .order('createdAt', { ascending: false })
-
-  if (error) {
-    toast.add({ title: error.message, description: 'at allDiaryData', color: 'red', timeout: 3000 })
-    throw createError({ statusMessage: error.message })
-  }
-
-  allDiaryData.value = data
-  allDiaryCount.value = count ?? 0
-}, {
-  immediate: true,
-})
-
-await useAsyncData('diaryData', async () => {
+const { data: mainDiaryData, refresh: refreshMainDiaryData }: SerializeObject = await useAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -67,12 +81,12 @@ await useAsyncData('diaryData', async () => {
     .range(0, 2)
 
   if (error) {
-    toast.add({ title: error.message, description: 'at diaryData', color: 'red', timeout: 3000 })
     throw createError({ statusMessage: error.message })
   }
 
-  mainDiaryData.value = data
   mainDiaryCount.value = count ?? 0
+
+  return data
 }, {
   immediate: true,
 })
@@ -89,7 +103,6 @@ await useAsyncData('myArticleData', async () => {
     .eq('userId', user.value?.id)
 
   if (error) {
-    toast.add({ title: error.message, description: 'at myArticleData', color: 'red', timeout: 3000 })
     throw createError({ statusMessage: error.message })
   }
 
@@ -99,20 +112,15 @@ await useAsyncData('myArticleData', async () => {
   watch: [user],
 })
 
-const diaryDetailColor = (code: string) => {
-  switch (code) {
-    case 'MTC001':
-      return 'border-yellow-400'
-    case 'MTC002':
-      return 'border-teal-400'
-    case 'MTC003':
-      return 'border-rose-400'
-    default:
-      return 'border-neutral-400'
+watch(user, async () => {
+  if (user.value) {
+    await initUserInfoData()
+    checkSelectVehicleData()
+    refreshMainDiaryData()
   }
-}
-
-checkSelectVehicleData()
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
@@ -186,108 +194,17 @@ checkSelectVehicleData()
         @click="navigateTo('/vehicles/new')"
       />
     </div>
-    <DGMeterGroup
-      size="lg"
-      :max="megerGroupCount"
-    >
-      <template #indicator>
-        <div class="flex flex-wrap gap-1.5 justify-between text-sm">
-          <p class="text-md md:text-xl font-bold">
-            {{ $t('main.manageTitle') }}
-          </p>
-          <p class="text-xs md:text-base text-neutral-600 dark:text-neutral-300">
-            {{ $t('main.totalPoint', { point: megerGroupCount }) }}
-          </p>
-        </div>
-      </template>
-      <DGMeter
-        :value="vehicleCount ?? 0"
-        color="red"
-        :label="$t('main.vehiclesPoint', { count: vehicleCount ?? 0 })"
-        icon="i-tabler-pencil-plus"
-      />
-      <DGMeter
-        :value="registrationCount ?? 0"
-        color="yellow"
-        :label="$t('main.registrationPoint', { count: registrationCount ?? 0 })"
-        icon="i-tabler-pencil-plus"
-      />
-      <DGMeter
-        :value="fuelCount ?? 0"
-        color="emerald"
-        :label="$t('main.fuelPoint', { count: fuelCount ?? 0 })"
-        icon="i-tabler-gas-station"
-      />
-      <DGMeter
-        :value="tripCount ?? 0"
-        color="sky"
-        :label="$t('main.tripPoint', { count: tripCount ?? 0 })"
-        icon="i-tabler-map"
-      />
-      <DGMeter
-        :value="individualArticleCount ?? 0"
-        color="violet"
-        :label="$t('main.communityPoint', { count: individualArticleCount ?? 0 })"
-        icon="i-tabler-article"
-      />
-    </DGMeterGroup>
+    <LazyMainMeter />
     <DGDivider />
     <div class="w-full flex flex-col gap-4">
       <p class="text-2xl font-bold">
         {{ $t('main.latestDiary') }}
       </p>
-      <DGCard
-        v-for="(diary, index) in mainDiaryData"
-        :key="index"
-        :ui="{ base: `border-2 ${diaryDetailColor(diary.manageType.code)}` }"
-      >
-        <template #header>
-          <div class="flex flex-wrap items-center gap-2">
-            <DGBadge
-              color="amber"
-              size="lg"
-              variant="soft"
-              :label="diary.manageType.codeName"
-            />
-            <div
-              v-if="diary.manageType.code === 'MTC001'"
-              class="flex items-center gap-2"
-            >
-              <DGAvatar
-                img-class="object-cover"
-                :src="diary.stationImage ? diary.stationImage : 'https://via.placeholder.com/150?text=%3F&font-size=50'"
-                size="md"
-                :alt="diary?.stationImage"
-              />
-              <p class="text-lg font-bold">
-                {{ diary.fuelStationName }}
-              </p>
-            </div>
-            <div class="flex-auto" />
-            <ANuxtTime
-              custom-class="text-base font-bold"
-              :date-time="diary.createdAt"
-            />
-          </div>
-        </template>
-        <div class="text-md md:text-lg font-bold flex flex-col gap-2">
-          <p v-if="diary.manageType.code === 'MTC002'">
-            {{ $t('diary.summary.destination', { destination: diary.destination }) }}
-          </p>
-          <p v-if="diary.efficient">
-            {{ $t('diary.summary.sectionEfficient', { efficient: comma(diary.efficient) }) }}
-          </p>
-          <p v-if="diary.fuelAmount">
-            {{ $t('diary.summary.fuel', { fuel: comma(diary.fuelAmount) }) }}
-          </p>
-          <p>
-            {{ $t('diary.summary.paidAmount', { paidAmount: comma(diary.paidAmount) }) }}
-          </p>
-          <p v-if="diary.driveDistance">
-            {{ $t('diary.summary.distance', { distance: comma(diary.driveDistance) }) }}
-          </p>
-        </div>
-      </DGCard>
+      <LazyDiaryListCard
+        v-if="mainDiaryData"
+        :diary-data="mainDiaryData"
+        is-main-diary
+      />
       <AButton
         class="flex justify-center"
         button-variant="outline"
