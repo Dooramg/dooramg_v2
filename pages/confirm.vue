@@ -42,9 +42,7 @@ const updateMainVehicle = async () => {
 
   await updateData('userInfo', { mainVehicleId: vehicleData.value?.[0]?.id ?? '' }, String(user.value?.id))
 
-  setTimeout(() => {
-    navigateTo('/login')
-  }, 380)
+  navigateTo('/login')
 }
 
 const saveData = () => {
