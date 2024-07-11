@@ -9,7 +9,7 @@ export const useUserInfoStore = defineStore('userInfoData', () => {
    *
    */
 
-  const userCoreId = ref<string>('')
+  const userCoreId = ref('')
   const userInfoData = ref<UserData>()
 
   return {

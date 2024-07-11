@@ -1,7 +1,7 @@
 export const useLoadVehicles = () => {
   const user = useSupabaseUser()
 
-  const { vehicleData } = storeToRefs(useVehicleStore())
+  const { vehicleData, vehicleCount } = storeToRefs(useVehicleStore())
 
   const { refresh: refreshVehicleData } = useAsyncData('userData', async () => {
     const { data } = await useFetch('/api/vehicles', {
@@ -12,6 +12,7 @@ export const useLoadVehicles = () => {
     })
 
     vehicleData.value = data?.value as StoreVehicleData[]
+    vehicleCount.value = data?.value?.length ?? 0
   }, {
     immediate: true,
   })
