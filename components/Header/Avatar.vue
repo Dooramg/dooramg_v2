@@ -1,7 +1,5 @@
 <script setup lang="ts">
 const { userInfoData } = storeToRefs(useUserInfoStore())
-
-console.log('header', userInfoData.value)
 </script>
 
 <template>

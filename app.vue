@@ -51,7 +51,7 @@ if (import.meta.server) {
       { rel: 'apple-touch-icon', sizes: '180x180', href: '/image/apple-touch-icon.png' },
       { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/image/favicon-32x32.png' },
       { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/image/favicon-16x16.png' },
-      { rel: 'manifest', href: '/dooramg.webmanifest' },
+      { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'mask-icon', href: '/image/safari-pinned-tab.svg', color: '#5bbad5' },
     ],
   })
