@@ -169,31 +169,31 @@ const diaryDetailColor = (code: string) => {
         </div>
       </template>
       <DGMeter
-        :value="vehicleCount"
+        :value="vehicleCount ?? 0"
         color="red"
         :label="$t('main.vehiclesPoint', { count: vehicleCount ?? 0 })"
         icon="i-tabler-pencil-plus"
       />
       <DGMeter
-        :value="registrationCount"
+        :value="registrationCount ?? 0"
         color="yellow"
         :label="$t('main.registrationPoint', { count: registrationCount ?? 0 })"
         icon="i-tabler-pencil-plus"
       />
       <DGMeter
-        :value="fuelCount"
+        :value="fuelCount ?? 0"
         color="emerald"
         :label="$t('main.fuelPoint', { count: fuelCount ?? 0 })"
         icon="i-tabler-gas-station"
       />
       <DGMeter
-        :value="tripCount"
+        :value="tripCount ?? 0"
         color="sky"
         :label="$t('main.tripPoint', { count: tripCount ?? 0 })"
         icon="i-tabler-map"
       />
       <DGMeter
-        :value="individualArticleCount"
+        :value="individualArticleCount ?? 0"
         color="violet"
         :label="$t('main.communityPoint', { count: individualArticleCount ?? 0 })"
         icon="i-tabler-article"
