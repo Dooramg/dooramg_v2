@@ -19,7 +19,7 @@ const megerGroupCount = computed(() => {
   return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
 })
 
-useAsyncData('allDiaryData', async () => {
+useLazyAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -37,7 +37,7 @@ useAsyncData('allDiaryData', async () => {
   immediate: true,
 })
 
-useAsyncData('diaryData', async () => {
+useLazyAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
@@ -56,7 +56,7 @@ useAsyncData('diaryData', async () => {
   immediate: true,
 })
 
-useAsyncData('myArticleData', async () => {
+useLazyAsyncData('myArticleData', async () => {
   const { data }: SerializeObject = await useFetch('/api/community/myArticle', {
     headers: useRequestHeaders(['cookie']),
     query: {
