@@ -1,63 +1,9 @@
 <script setup lang="ts">
 const user = useSupabaseUser()
-const client = useSupabaseClient<SupabaseDataBase>()
-
-const { refreshVehicleData } = useLoadVehicles()
-const { upsertData, updateData } = useFetchComposable()
-
-const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
-const { vehicleData } = storeToRefs(useVehicleStore())
-
-const { generateTempName } = useUi()
-const { url } = useImageStorage()
-
-const loadUserData = async () => {
-  const { data, error } = await client
-    .from('userInfo')
-    .select('*')
-    .eq('id', String(user.value?.id))
-    .single()
-
-  if (error) {
-    console.warn('error Login: ', error)
-  }
-
-  if (!data) {
-    await upsertData('userInfo', saveData(), '', '')
-    userInfoData.value = saveData()
-
-    return
-  }
-
-  userCoreId.value = data.id
-  userInfoData.value = data
-
-  await updateMainVehicle()
-}
-
-const updateMainVehicle = async () => {
-  if (!vehicleData.value) {
-    await refreshVehicleData()
-  }
-
-  await updateData('userInfo', { mainVehicleId: vehicleData.value?.[0]?.id ?? '' }, String(user.value?.id))
-
-  navigateTo('/login')
-}
-
-const saveData = () => {
-  return {
-    id: user.value?.id ?? userCoreId.value,
-    nickName: user.value?.user_metadata.full_name ? user.value?.user_metadata.full_name : generateTempName(),
-    email: user.value?.email,
-    avatarImage: user.value?.user_metadata.avatar_url ? user.value?.user_metadata.avatar_url : url(true, '/assets/logo-non-text.png'),
-    signInAt: user.value?.created_at,
-  }
-}
 
 watch(() => user, async () => {
   if (user.value) {
-    await loadUserData()
+    navigateTo('/main')
   }
 }, { immediate: true })
 </script>

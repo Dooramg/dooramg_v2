@@ -1,12 +1,23 @@
 <script setup lang="ts">
+const user = useSupabaseUser()
+const client = useSupabaseClient<SupabaseDataBase>()
+
+const toast = useToast()
 const { t } = useLocale()
 const { meta } = useRoute()
 const { coords, resume } = useGeolocation()
+const { generateTempName } = useUi()
+const { url } = useImageStorage()
 
 const userLocation = useUserLocation()
 
+const { refreshVehicleData } = useLoadVehicles()
+const { upsertData, updateData } = useFetchComposable()
 const { refreshKatechCoords } = userLocation
 const { latitude, longitude } = storeToRefs(userLocation)
+
+const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
+const { vehicleData, vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 
 const seoTitle = '두람쥐'
 const seoDescription = '이세상 모든 이륜자동차(오토바이)를 위한 두바퀴 차계부 입니다.'
@@ -21,17 +32,6 @@ useHead({
       : returnTitle = null
     return returnTitle
   },
-})
-
-watchEffect(() => {
-  if (coords.value.latitude === Infinity) {
-    resume()
-    return
-  }
-
-  latitude.value = coords.value.latitude
-  longitude.value = coords.value.longitude
-  refreshKatechCoords()
 })
 
 if (import.meta.server) {
@@ -79,6 +79,76 @@ useSeoMeta({
   twitterTitle: seoTitle,
   twitterDescription: seoDescription,
   twitterImage: seoImage,
+})
+
+const initUserInfoData = async () => {
+  console.log('🏓userInfoData in app.vue', userInfoData.value)
+  console.log('🏓userCoreId in app.vue', userCoreId.value)
+
+  console.log('🏓vehicleData in app.vue', vehicleData.value)
+  console.log('🏓vehicleCount in app.vue', vehicleCount.value)
+  console.log('🏓selectedVehicleData in app.vue', selectedVehicleData.value)
+
+  const { data, error } = await client
+    .from('userInfo')
+    .select('*')
+    .eq('id', String(user.value?.id))
+    .single()
+
+  if (error) {
+    toast.add({ title: error.message, description: 'at initUserInfo', color: 'red', timeout: 3000 })
+    console.warn('error Login: ', error)
+  }
+
+  if (!data) {
+    await upsertData('userInfo', saveData(), '', '')
+    userInfoData.value = saveData()
+
+    return
+  }
+
+  userCoreId.value = data.id
+  userInfoData.value = data
+
+  await updateMainVehicle()
+}
+
+const updateMainVehicle = async () => {
+  if (!vehicleData.value) {
+    await refreshVehicleData()
+  }
+
+  await updateData('userInfo', { mainVehicleId: vehicleData.value?.[0]?.id ?? '' }, String(user.value?.id))
+}
+
+const saveData = () => {
+  return {
+    id: user.value?.id ?? userCoreId.value,
+    nickName: user.value?.user_metadata.full_name ? user.value?.user_metadata.full_name : generateTempName(),
+    email: user.value?.email,
+    avatarImage: user.value?.user_metadata.avatar_url ? user.value?.user_metadata.avatar_url : url(true, '/assets/logo-non-text.png'),
+    signInAt: user.value?.created_at,
+  }
+}
+
+watch(user, () => {
+  console.log('user.value', user.value)
+  if (user.value) {
+    initUserInfoData()
+  }
+}, {
+  immediate: true,
+})
+
+watchEffect(() => {
+  if (coords.value.latitude === Infinity) {
+    resume()
+    return
+  }
+
+  latitude.value = coords.value.latitude
+  longitude.value = coords.value.longitude
+  refreshKatechCoords()
 })
 </script>
 

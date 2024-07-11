@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 
 export const useVehicleStore = defineStore('vehicleStore', () => {
-  const { userInfoData } = toRefs(useUserInfoStore())
   /**
    * ! Pinia State !
    *
