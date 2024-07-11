@@ -57,7 +57,6 @@ useAsyncData('initUserInfo', async () => {
   return data
 }, {
   immediate: true,
-  watch: [user],
 })
 
 await useAsyncData('allDiaryData', async () => {
