@@ -44,7 +44,7 @@ const updateMainVehicle = async () => {
 
   setTimeout(() => {
     navigateTo('/login')
-  }, 280)
+  }, 380)
 }
 
 const saveData = () => {
