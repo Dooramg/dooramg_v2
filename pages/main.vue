@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const user = useSupabaseUser()
+const client = useSupabaseClient()
 
+const toast = useToast()
 const { comma } = useUi()
 
-const { userInfoData } = storeToRefs(useUserInfoStore())
+const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
 const { vehicleCount, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { individualArticleCount } = storeToRefs(useBoardStore())
 const { allDiaryData, mainDiaryData, allDiaryCount, mainDiaryCount, fuelCount, tripCount, registrationCount } = storeToRefs(useDiaryStore())
-
-console.log('main', userInfoData.value)
 
 definePageMeta({
   layout: 'main',
@@ -19,54 +19,99 @@ const megerGroupCount = computed(() => {
   return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
 })
 
-useLazyAsyncData('allDiaryData', async () => {
+useAsyncData('initUserInfo', async () => {
+  if (!user.value?.id) {
+    return
+  }
+
+  const { data, error } = await client
+    .from('userInfo')
+    .select('*')
+    .eq('id', user.value?.id)
+    .single()
+
+  if (!data && error) {
+    toast.add({ title: error.message, description: 'at initUserInfo', color: 'red', timeout: 3000 })
+    throw createError({ statusMessage: error.message })
+  }
+
+  userInfoData.value = data
+
+  if (data) {
+    userCoreId.value = (data as any).id as string
+  }
+
+  return data
+}, {
+  immediate: true,
+  watch: [user],
+})
+
+await useAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
 
-  const { data }: SerializeObject = await useFetch('/api/management', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      vehicleId: userInfoData.value?.mainVehicleId,
-    },
-  })
+  const { data, count, error } = await client
+    .from('vehicleManagement')
+    .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
+    .eq('vehicleId', userInfoData.value?.mainVehicleId)
+    .order('createdAt', { ascending: false })
 
-  allDiaryData.value = data.value.serverData
-  allDiaryCount.value = data.value.count
+  if (error) {
+    toast.add({ title: error.message, description: 'at allDiaryData', color: 'red', timeout: 3000 })
+    throw createError({ statusMessage: error.message })
+  }
+
+  allDiaryData.value = data
+  allDiaryCount.value = count ?? 0
 }, {
   immediate: true,
 })
 
-useLazyAsyncData('diaryData', async () => {
+await useAsyncData('diaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
   }
 
-  const { data }: SerializeObject = await useFetch('/api/management', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      vehicleId: userInfoData.value?.mainVehicleId,
-      rangeCount: 2,
-    },
-  })
+  const { data, count, error } = await client
+    .from('vehicleManagement')
+    .select('*, manageType(codeName, code), vehicles(carNickName)', { count: 'exact' })
+    .eq('vehicleId', userInfoData.value?.mainVehicleId)
+    .order('createdAt', { ascending: false })
+    .range(0, 2)
 
-  mainDiaryData.value = data.value.serverData
-  mainDiaryCount.value = data.value.count
+  if (error) {
+    toast.add({ title: error.message, description: 'at diaryData', color: 'red', timeout: 3000 })
+    throw createError({ statusMessage: error.message })
+  }
+
+  mainDiaryData.value = data
+  mainDiaryCount.value = count ?? 0
 }, {
   immediate: true,
 })
 
-useLazyAsyncData('myArticleData', async () => {
-  const { data }: SerializeObject = await useFetch('/api/community/myArticle', {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      userId: user.value?.id,
-    },
-  })
+await useAsyncData('myArticleData', async () => {
+  if (!user.value?.id) {
+    return
+  }
 
-  individualArticleCount.value = data.value.count
+  const { count, error } = await client
+    .from('boardCommunity')
+    .select('*, communityLikeCount(*), userInfo(nickName, isAdmin)', { count: 'exact' })
+    .order('createdAt', { ascending: false })
+    .eq('userId', user.value?.id)
+
+  if (error) {
+    toast.add({ title: error.message, description: 'at myArticleData', color: 'red', timeout: 3000 })
+    throw createError({ statusMessage: error.message })
+  }
+
+  individualArticleCount.value = count ?? 0
 }, {
   immediate: true,
+  watch: [user],
 })
 
 const diaryDetailColor = (code: string) => {
@@ -102,7 +147,7 @@ const diaryDetailColor = (code: string) => {
               </p>
               <div class="flex-auto" />
               <DGAvatar
-                :src="selectedVehicleData?.manufacturer.logoImage ? selectedVehicleData.manufacturer.logoImage : 'https://via.placeholder.com/150?text=%3F&font-size=50'"
+                :src="selectedVehicleData?.manufacturer.logoImage"
                 size="lg"
                 alt="brand-logo"
                 :ui="{ background: 'bg-transparent' }"
