@@ -84,8 +84,8 @@ const diaryDetailColor = (code: string) => {
       <p>
         {{ $t('diary.summary.distance', { distance: comma(diary.driveDistance) }) }}
       </p>
-      <p v-if="!isMainDiary">
-        {{ $t('diary.summary.memo', { memo: diary.memo }) }}
+      <p v-if="!isMainDiary && diary.memo">
+        {{ $t('diary.summary.memo', { memo: diary.memo ? diary.memo : $t('placeholder.memo') }) }}
       </p>
     </div>
     <template

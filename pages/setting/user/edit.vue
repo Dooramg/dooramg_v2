@@ -117,7 +117,7 @@ const selectAddress = (address: string) => {
 }
 
 const { refresh: refreshUserInfoData } = useAsyncData('userInfoData', async () => {
-  const { data } = await useFetch('/api/user', {
+  const { data }: SerializeObject = await useFetch('/api/user', {
     headers: useRequestHeaders(['cookie']),
     query: {
       userId: userCoreId.value,
@@ -269,10 +269,10 @@ watch(userInfoData, () => {
               use-leading
               button-variant="outline"
               button-size="md"
+              button-type="submit"
               icon-name="line-md:pencil-twotone"
               :icon-size="18"
               :button-text="$t('buttons.save')"
-              @click="updateUserInfo"
             />
             <AButton
               use-leading

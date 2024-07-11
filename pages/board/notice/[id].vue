@@ -127,7 +127,7 @@ const updateNoticeArticle = async () => {
 }
 
 const insertComment = async (event: FormSubmitEvent<Schema>) => {
-  if (!event.isTrusted) {
+  if (!event.isTrusted || insertCommentData.value.comment === '') {
     return
   }
 
@@ -346,7 +346,7 @@ const deleteNoticeArticle = async () => {
             :state="insertCommentData"
             @submit="insertComment"
           >
-            <DGFormGroup>
+            <DGFormGroup name="comment" required>
               <TiptapTextEditor
                 :text-data="insertCommentData.comment"
                 comment-option
@@ -355,8 +355,8 @@ const deleteNoticeArticle = async () => {
             </DGFormGroup>
             <DGFormGroup class="flex justify-end mt-4">
               <AButton
+                button-type="submit"
                 :button-text="$t('buttons.save')"
-                @click="insertComment"
               />
             </DGFormGroup>
           </DGForm>

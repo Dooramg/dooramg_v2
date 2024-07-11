@@ -208,6 +208,45 @@ interface SupabaseDataBase {
           },
         ]
       }
+      communityReport: {
+        Row: {
+          boardId: string | null
+          createdAt: string
+          id: string
+          reportUserId: string | null
+          resolved: boolean | null
+        }
+        Insert: {
+          boardId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Update: {
+          boardId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'communityReport_boardId_fkey'
+            columns: ['boardId']
+            isOneToOne: false
+            referencedRelation: 'boardCommunity'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'communityReport_reportUserId_fkey'
+            columns: ['reportUserId']
+            isOneToOne: false
+            referencedRelation: 'userInfo'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       fuelData: {
         Row: {
           code: string | null

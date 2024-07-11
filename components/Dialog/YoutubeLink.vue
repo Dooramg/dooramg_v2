@@ -18,8 +18,8 @@ const emits = defineEmits([
 
 const schema = object({
   youtube: string()
-    .required(t('messages.youtubeRequire'))
-    .matches(youtubeRegex, t('messages.youtubeFormat')),
+    .required(t('validate.inputLink'))
+    .matches(youtubeRegex, t('validate.youtubeFormat')),
 })
 
 type Schema = InferType<typeof schema>
@@ -28,10 +28,11 @@ const formData = reactive({
   youtube: '',
 })
 
-const onSubmit = (event: FormSubmitEvent<Schema>) => {
+const submitYoutubeLink = async (event: FormSubmitEvent<Schema>) => {
   if (!event.isTrusted) {
     return
   }
+
   emits('submit:link', formData.youtube)
   closeDialog(false)
 }
@@ -46,36 +47,42 @@ const closeDialog = (trigger: boolean) => {
   <ADialog
     :dialog-trigger="dialogTrigger"
     :title="$t('board.dialog.youtubeLinkTitle')"
-    :double-second-text="$t('buttons.close')"
-    hide-first-button
-    @click:second-button="closeDialog(false)"
+    dialog-title-class="text-xl font-bold"
+    hide-double-button
     @close="closeDialog(false)"
   >
     <DGForm
       :schema="schema"
       :state="formData"
-      class="mt-2 space-y-2"
-      @submit="onSubmit"
+      class="flex flex-col items-end space-y-4"
+      @submit="submitYoutubeLink"
     >
       <DGFormGroup
         :label="$t('tiptap.youtube')"
         name="youtube"
+        class="w-full"
+        size="xl"
         required
       >
-        <DGInput
-          v-model="formData.youtube"
-          color="amber"
-          :placeholder="$t('board.dialog.youtubeLinkTitle')"
-          aria-label="youtube"
+        <AInput
+          v-model:input-data="formData.youtube"
+          input-color="amber"
+          :input-placeholder="$t('board.dialog.youtubeLinkTitle')"
+          clearable
         />
       </DGFormGroup>
-      <AButton
-        custom-class="submit-button"
-        button-size="md"
-        :icon-size="18"
-        :button-text="$t('buttons.save')"
-        type="submit"
-      />
+      <DGFormGroup>
+        <div class="flex gap-4">
+          <AButton
+            button-type="submit"
+            :button-text="$t('buttons.save')"
+          />
+          <AButton
+            :button-text="$t('buttons.close')"
+            @click="closeDialog(false)"
+          />
+        </div>
+      </DGFormGroup>
     </DGForm>
   </ADialog>
 </template>

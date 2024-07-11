@@ -457,8 +457,8 @@ const addDiary = async (event: FormSubmitEvent<Schema>) => {
         <AButton
           button-block
           button-size="xl"
+          button-type="submit"
           :button-text="$t('buttons.save')"
-          @click="addDiary"
         />
       </DGFormGroup>
     </DGForm>

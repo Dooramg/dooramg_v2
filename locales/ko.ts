@@ -133,6 +133,7 @@ export default {
     vehiclesPoint: '보유 두바퀴 포인트: {count}점',
     registrationPoint: '일기장 포인트: {count}점',
     communityPoint: '두뮤니티 포인트: {count}점',
+    noVehicle: '두바퀴가 없어요 🥲',
     hi: '{carNickName} 안녕?',
     model: '{model} ({makeYear})',
     efficient: '너의 효율은 🤎 {efficient} km/l',
@@ -291,6 +292,8 @@ export default {
       youtubeLinkTitle: '유튜브 링크를 입력해주세요!',
       imageUploadTitle: '이미지를 선택해주세요!',
       deleteTitle: '정말 지울거에요?',
+      reportTitle: '정말 신고할거에요?',
+      reportDescription: '불공정한 신고는 신고한 당사자에게 불이익이 있어요 🚨',
       confirm: '응!',
       reject: '아니!',
     },
@@ -373,7 +376,7 @@ export default {
     select: '선택',
     selectDate: '날짜를 선택해주세요!',
     selectAddress: '주소에서 핀을 클릭해주세요',
-    inputAddress: '주소를 입력후 엔터를 눌러요!',
+    inputAddress: '주소를 입력후 검색버튼을 눌러요!',
     inputTitle: '제목을 입력하세요!',
     vehicleNumber: 'ex) 3333',
     vehicleName: '두바퀴 이름을 입력해주세요!',
@@ -530,6 +533,14 @@ export default {
     commentDeleteSuccess: {
       title: '댓글삭제 성공!',
       description: '제발 다시써줘요! 😜',
+    },
+    alreadyCommunityReport: {
+      title: '이미 신고한 글이에요!',
+      description: '신고한 글은 중복으로 신고할 수 없어요 😢',
+    },
+    communityReportSuccess: {
+      title: '커뮤니티 글 신고 성공!',
+      description: '신고해주셔서 감사해요!',
     },
     countUpLike: {
       title: '좋아요를 눌렀어요!',

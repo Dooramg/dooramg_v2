@@ -133,6 +133,7 @@ export default {
     vehiclesPoint: 'My vehicle point: {count}pt',
     registrationPoint: 'Diary point: {count}pt',
     communityPoint: 'Community point: {count}pt',
+    noVehicle: 'No vehicle yet 🥲',
     hi: '{carNickName} Hi?',
     model: '{model} ({makeYear})',
     efficient: 'Tot.Efficiency {efficient} km/l',
@@ -291,6 +292,8 @@ export default {
       youtubeLinkTitle: 'Input youtube link!',
       imageUploadTitle: 'Upload image!',
       deleteTitle: 'Are you sure delete?',
+      reportTitle: 'Are you sure report?',
+      reportDescription: 'Inappropriate reporting may result in unfavorable consequences to the reporter! 🚨',
       confirm: 'Yes!',
       reject: 'No!',
     },
@@ -373,7 +376,7 @@ export default {
     select: 'Select',
     selectDate: 'Select date',
     selectAddress: 'Click pin on the map!',
-    inputAddress: 'Input email and press enter!',
+    inputAddress: 'Input email and press search button!',
     inputTitle: 'Input title!',
     vehicleNumber: 'ex) 3333',
     vehicleName: 'Input vehicle name!',
@@ -530,6 +533,14 @@ export default {
     commentDeleteSuccess: {
       title: 'Delete success!',
       description: 'Please write again! 😜',
+    },
+    alreadyCommunityReport: {
+      title: 'Already report!',
+      description: 'Can not report twice!',
+    },
+    communityReportSuccess: {
+      title: 'Community article report success!',
+      description: 'Thank you!',
     },
     countUpLike: {
       title: 'Like success!',

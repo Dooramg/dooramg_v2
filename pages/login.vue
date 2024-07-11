@@ -150,8 +150,8 @@ const loginMagicLink = async (email: string) => {
       :title="$t('login.magicLinkDialogTitle')"
       :double-first-text="$t('buttons.send')"
       :double-second-text="$t('buttons.close')"
-      @submit-email="loginMagicLink"
-      @close="() => magicLinkDialogTrigger = false"
+      @submit:email="loginMagicLink"
+      @close:dialog="() => magicLinkDialogTrigger = false"
     />
   </div>
 </template>
