@@ -19,14 +19,7 @@ export const useVehicleStore = defineStore('vehicleStore', () => {
     return Number(vehicleData.value?.length)
   })
 
-  const selectedVehicleData = computed<StoreVehicleData | null | undefined>(() => {
-    console.log('userInfoData.value?.mainVehicleId in selectedVehicleData computed', userInfoData.value?.mainVehicleId)
-    console.log('vehicleData.value in selectedVehicleData computed', vehicleData.value)
-
-    return !userInfoData.value?.mainVehicleId
-      ? vehicleData.value?.[0]
-      : vehicleData.value?.filter(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)[0]
-  })
+  const selectedVehicleData = ref<StoreVehicleData>()
 
   const noVehicleData = computed<boolean>(() => vehicleData.value?.length === 0)
 

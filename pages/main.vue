@@ -19,6 +19,19 @@ const megerGroupCount = computed(() => {
   return allDiaryCount.value + individualArticleCount.value + vehicleCount.value
 })
 
+const checkSelectVehicleData = () => {
+  selectedVehicleData.value = userInfoData.value?.mainVehicleId
+    ? vehicleData.value?.find(vehicle => vehicle.id === userInfoData.value?.mainVehicleId)
+    : vehicleData.value?.[0]
+
+  console.log('userinfoData in main', userInfoData.value)
+  console.log('userCoreId in main', userCoreId.value)
+
+  console.log('vehicleData in main', vehicleData.value)
+  console.log('vehicleCount in main', vehicleCount.value)
+  console.log('selectedVehicleData in main', selectedVehicleData.value)
+}
+
 useAsyncData('initUserInfo', async () => {
   if (!user.value?.id) {
     return
@@ -127,12 +140,7 @@ const diaryDetailColor = (code: string) => {
   }
 }
 
-console.log('userinfoData in main', userInfoData.value)
-console.log('userCoreId in main', userCoreId.value)
-
-console.log('vehicleData in main', vehicleData.value)
-console.log('vehicleCount in main', vehicleCount.value)
-console.log('selectedVehicleData in main', selectedVehicleData.value)
+await checkSelectVehicleData()
 </script>
 
 <template>
