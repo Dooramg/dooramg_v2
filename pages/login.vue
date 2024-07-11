@@ -91,6 +91,7 @@ const loginMagicLink = async (email: string) => {
       {{ $t('login.title') }}
     </div>
     <AButton
+      v-if="!isApp || (isApp && !isApple)"
       custom-class="w-full flex justify-center"
       button-size="lg"
       use-leading
