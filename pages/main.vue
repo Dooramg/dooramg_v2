@@ -32,33 +32,6 @@ const checkSelectVehicleData = () => {
   console.log('selectedVehicleData in main', selectedVehicleData.value)
 }
 
-useAsyncData('initUserInfo', async () => {
-  if (!user.value?.id) {
-    return
-  }
-
-  const { data, error } = await client
-    .from('userInfo')
-    .select('*')
-    .eq('id', user.value?.id)
-    .single()
-
-  if (!data && error) {
-    toast.add({ title: error.message, description: 'at initUserInfo', color: 'red', timeout: 3000 })
-    throw createError({ statusMessage: error.message })
-  }
-
-  userInfoData.value = data
-
-  if (data) {
-    userCoreId.value = (data as any).id as string
-  }
-
-  return data
-}, {
-  immediate: true,
-})
-
 await useAsyncData('allDiaryData', async () => {
   if (!userInfoData.value?.mainVehicleId) {
     return
@@ -139,7 +112,7 @@ const diaryDetailColor = (code: string) => {
   }
 }
 
-await checkSelectVehicleData()
+checkSelectVehicleData()
 </script>
 
 <template>
