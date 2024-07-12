@@ -17,6 +17,7 @@ withDefaults(
     iconName?: string
     iconSize?: number
     buttonText?: string
+    shortcutsText?: Array<string>
   }>(),
   {
     customClass: '',
@@ -33,6 +34,7 @@ withDefaults(
     iconName: '',
     iconSize: 24,
     buttonText: '',
+    shortcutsText: () => [],
   },
 )
 
@@ -43,32 +45,38 @@ defineEmits([
 </script>
 
 <template>
-  <DGButton
-    :class="customClass"
-    :ui="roundButton ? { rounded: 'rounded-full' } : {}"
-    :disabled="buttonDisabled"
-    :block="buttonBlock"
-    :truncate="buttonTruncate"
-    :padded="buttonPadding"
-    :color="buttonColor"
-    :size="buttonSize"
-    :type="buttonType"
-    :variant="buttonVariant"
-    :label="buttonText"
-    :aria-label="buttonText"
-    @mouseenter="$emit('mouseenter:button')"
-    @mouseleave="$emit('mouseleave:button')"
+  <DGTooltip
+    :text="buttonText"
+    :shortcuts="shortcutsText"
+    :ui="{ wrapper: customClass, base: !buttonText ? 'hidden' : '[@media(pointer:coarse)]:hidden h-6 px-2 py-1 text-xs font-normal truncate relative' }"
   >
-    <template
-      v-if="useLeading"
-      #leading
+    <DGButton
+      :class="customClass"
+      :ui="roundButton ? { rounded: 'rounded-full' } : {}"
+      :disabled="buttonDisabled"
+      :block="buttonBlock"
+      :truncate="buttonTruncate"
+      :padded="buttonPadding"
+      :color="buttonColor"
+      :size="buttonSize"
+      :type="buttonType"
+      :variant="buttonVariant"
+      :label="buttonText"
+      :aria-label="buttonText"
+      @mouseenter="$emit('mouseenter:button')"
+      @mouseleave="$emit('mouseleave:button')"
     >
-      <Icon
-        v-if="iconName"
-        :name="iconName"
-        :width="iconSize"
-        :height="iconSize"
-      />
-    </template>
-  </DGButton>
+      <template
+        v-if="useLeading"
+        #leading
+      >
+        <Icon
+          v-if="iconName"
+          :name="iconName"
+          :width="iconSize"
+          :height="iconSize"
+        />
+      </template>
+    </DGButton>
+  </DGTooltip>
 </template>

@@ -194,10 +194,9 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
         :tooltip-text="$t('tiptap.clear')"
       />
       <div class="flex-auto" />
-      <DGTooltip
-        :text="$t('validate.inputContentWarning')"
-        placement="top"
-        :ui="{ base: 'whitespace-normal h-fit' }"
+      <DGPopover
+        mode="hover"
+        :popper="{ arrow: true, placement: 'top' }"
       >
         <Icon
           name="i-line-md-alert-loop"
@@ -205,7 +204,17 @@ const submitImage = (imageUrl: string, hyperLink: string) => {
           :width="28"
           :height="28"
         />
-      </DGTooltip>
+        <template #panel>
+          <div class="w-[200px] sm:w-fit break-keep px-2 py-1">
+            <p
+              v-for="(text, index) in $tm('validate.inputContentWarning')"
+              :key="index"
+            >
+              {{ $rt(text) }}
+            </p>
+          </div>
+        </template>
+      </DGPopover>
     </div>
     <bubble-menu
       class="bubble-menu flex gap-2 w-fit border-2 rounded-md bg-neutral-200 dark:bg-neutral-800 border-neutral-600 dark:border-neutral-300"

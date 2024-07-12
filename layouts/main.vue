@@ -14,10 +14,10 @@ const { go } = useRouter()
       />
       <div class="flex-auto" />
       <Icon
-        class="cursor-pointer"
+        class="cursor-pointer hover:text-red-200"
         name="line-md:rotate-270"
-        :width="36"
-        :height="36"
+        :width="48"
+        :height="48"
         @click="go(0)"
       />
       <NuxtLink

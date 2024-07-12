@@ -25,7 +25,7 @@ withDefaults(
       :icon-size="14"
     />
     <template #panel>
-      <div class="flex gap-1 p-0.5">
+      <div class="flex flex-wrap gap-1 p-0.5">
         <TiptapEditTextButtons
           :is-active="tiptapEditor.isActive('textStyle', { fontFamily: 'Pretendard' })"
           :action="() => tiptapEditor ? tiptapEditor.chain().focus().setFontFamily('Pretendard').run() : null"
