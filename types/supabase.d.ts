@@ -9,6 +9,27 @@ type Json =
 interface SupabaseDataBase {
   public: {
     Tables: {
+      block: {
+        Row: {
+          blockedUserId: string | null
+          blockerUserId: string | null
+          createdAt: string
+          id: string
+        }
+        Insert: {
+          blockedUserId?: string | null
+          blockerUserId?: string | null
+          createdAt?: string
+          id?: string
+        }
+        Update: {
+          blockedUserId?: string | null
+          blockerUserId?: string | null
+          createdAt?: string
+          id?: string
+        }
+        Relationships: []
+      }
       boardCommunity: {
         Row: {
           content: string | null

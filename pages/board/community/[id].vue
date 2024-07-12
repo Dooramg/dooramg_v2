@@ -60,14 +60,31 @@ const insertCommentData = ref<CommentForm>({
   comment: '',
 })
 
+const blockUserId = ref('')
 const likeCount = ref(0)
 const editCommunityTrigger = ref(false)
 const deleteConfirmTrigger = ref(false)
 const reportArticleConfirmTrigger = ref(false)
 const reportCommentConfirmTrigger = ref(false)
+const blockUserConfirmTrigger = ref(false)
 const naverMapsLoadTrigger = ref(false)
 
 const reportCommentId = ref('')
+
+const { data: blockData } = useAsyncData('blockData', async () => {
+  const { data } = await client
+    .from('block')
+    .select('*')
+    .eq('blockerUserId', userCoreId.value)
+
+  if (!data) {
+    return null
+  }
+
+  return data
+}, {
+  immediate: true,
+})
 
 const { data: communityDetailData, refresh: communityDetailRefresh } = useAsyncData('communityDetail', async () => {
   const { data }: SerializeObject = await useFetch('/api/community/detail', {
@@ -168,6 +185,25 @@ const reportCommunityComment = async () => {
   reportCommentConfirmTrigger.value = false
 }
 
+const openBlockConfirmDialog = (writeUserId: string) => {
+  if (userCoreId.value === writeUserId) {
+    return
+  }
+
+  blockUserId.value = writeUserId
+  blockUserConfirmTrigger.value = true
+}
+
+const blockUser = async () => {
+  await upsertData('block', {
+    blockerUserId: userCoreId.value,
+    blockedUserId: blockUserId.value,
+  }, '', '')
+
+  toast.add({ title: t('messages.blockUserSuccess.title', { nickName: communityDetailData.value?.userInfo?.nickName }), description: t('messages.blockUserSuccess.description', { nickName: communityDetailData.value?.userInfo?.nickName }), color: 'amber', timeout: 2000 })
+  navigateTo('/board/community')
+}
+
 const initEditingCommunityDetailData = () => {
   editCommunityDetailData.value.title = communityDetailData.value?.title ?? ''
   editCommunityDetailData.value.content = communityDetailData.value?.content ?? ''
@@ -236,6 +272,12 @@ const deleteCommunityArticle = async () => {
   navigateTo('/board/community')
 }
 
+const hideBlockedComment = (writeUserId: string) => {
+  const isBlockArticle = blockData.value?.find((block: SupabaseDataBase['public']['Tables']['block']['Row']) => block.blockedUserId === writeUserId)
+
+  return !isBlockArticle
+}
+
 setTimeout(() => {
   naverMapsLoadTrigger.value = true
 }, 300)
@@ -295,13 +337,20 @@ onUnmounted(() => {
               size="3xl"
               color="amber"
               position="top-left"
+              :ui="{ wrapper: 'cursor-pointer' }"
             >
-              <DGBadge
-                :label="communityDetailData.userInfo?.nickName"
-                color="amber"
-                size="md"
-                variant="soft"
-              />
+              <DGTooltip
+                :text="userCoreId === communityDetailData?.userId ? communityDetailData?.userInfo?.nickName : $t('buttons.userBlock', { user: communityDetailData.userInfo?.nickName })"
+                :ui="{ wrapper: 'cursor-pointer' }"
+              >
+                <DGBadge
+                  :label="communityDetailData.userInfo?.nickName"
+                  color="amber"
+                  size="md"
+                  variant="soft"
+                  @click="openBlockConfirmDialog(communityDetailData.userId)"
+                />
+              </DGTooltip>
               <template #content>
                 <Icon name="fluent-emoji-flat:crown" />
               </template>
@@ -342,10 +391,33 @@ onUnmounted(() => {
               button-size="md"
               button-color="red"
               button-variant="outline"
+              :tooltip-text="$t('buttons.articleReport')"
               icon-name="i-line-md-bell"
               :icon-size="14"
               @click="() => reportArticleConfirmTrigger = true"
             />
+            <DGPopover
+              mode="hover"
+              :popper="{ arrow: true, placement: 'top' }"
+              :ui="{ wrapper: 'flex items-center justify-center' }"
+            >
+              <Icon
+                name="i-line-md-alert-loop"
+                color="orange"
+                :width="24"
+                :height="24"
+              />
+              <template #panel>
+                <div class="w-[200px] sm:w-fit break-keep px-2 py-1">
+                  <p
+                    v-for="(text, index) in $tm('validate.inputContentWarning')"
+                    :key="index"
+                  >
+                    {{ $rt(text) }}
+                  </p>
+                </div>
+              </template>
+            </DGPopover>
           </div>
         </div>
       </template>
@@ -415,6 +487,7 @@ onUnmounted(() => {
         </p>
         <div
           v-for="commentList in commentData"
+          v-show="hideBlockedComment(commentList.userId)"
           :key="commentList.id"
         >
           <DGCard
@@ -434,12 +507,18 @@ onUnmounted(() => {
                   color="amber"
                   position="top-left"
                 >
-                  <DGBadge
-                    :label="commentList.userInfo.nickName"
-                    color="amber"
-                    size="md"
-                    variant="soft"
-                  />
+                  <DGTooltip
+                    :text="userCoreId === commentList?.userId ? commentList?.userInfo?.nickName : $t('buttons.userBlock', { user: commentList.userInfo?.nickName })"
+                    :ui="{ wrapper: 'cursor-pointer' }"
+                  >
+                    <DGBadge
+                      :label="commentList.userInfo?.nickName"
+                      color="amber"
+                      size="md"
+                      variant="soft"
+                      @click="openBlockConfirmDialog(commentList?.userId)"
+                    />
+                  </DGTooltip>
                   <template #content>
                     <Icon name="fluent-emoji-flat:crown" />
                   </template>
@@ -458,6 +537,7 @@ onUnmounted(() => {
                   button-size="md"
                   button-color="red"
                   button-variant="outline"
+                  :tooltip-text="$t('buttons.commentReport')"
                   icon-name="i-line-md-bell"
                   :icon-size="14"
                   @click="openReportCommentDialog(commentList.id)"
@@ -557,6 +637,21 @@ onUnmounted(() => {
     >
       <p class="break-keep">
         {{ $t('board.dialog.reportTitle') }}
+      </p>
+    </DialogConfirm>
+    <DialogConfirm
+      :dialog-trigger="blockUserConfirmTrigger"
+      title-class="text-2xl font-bold"
+      :full-screen="false"
+      :title="$t('board.dialog.blockTitle')"
+      :first-button-text="$t('board.dialog.confirm')"
+      :second-button-text="$t('board.dialog.reject')"
+      @click:first-button="blockUser"
+      @click:second-button="() => blockUserConfirmTrigger = false"
+      @close="() => blockUserConfirmTrigger = false"
+    >
+      <p class="break-keep">
+        {{ $t('board.dialog.blockDescription') }}
       </p>
     </DialogConfirm>
   </div>
