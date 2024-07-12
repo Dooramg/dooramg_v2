@@ -23,6 +23,7 @@ defineEmits([
     </template>
     <div class="w-full flex flex-wrap justify-between gap-4">
       <DGAvatar
+        v-if="selectedVehicleData?.bikeImage"
         img-class="object-cover"
         :src="selectedVehicleData?.bikeImage ? selectedVehicleData.bikeImage : '/image/no_bike_image.jpg'"
         size="3xl"

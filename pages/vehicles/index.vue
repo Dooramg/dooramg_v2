@@ -18,8 +18,9 @@ definePageMeta({
 })
 
 const selectVehicleData = async (vehicleId: string, carNickname: string) => {
+  changeVehicleData(vehicleId)
+
   if (userInfoData.value?.mainVehicleId !== vehicleId) {
-    changeVehicleData(vehicleId)
     await updateData('userInfo', { mainVehicleId: vehicleId }, userCoreId.value)
     await refreshUserData()
 
@@ -34,7 +35,7 @@ const changeVehicleData = (vehicleId: string) => {
   selectedVehicleData.value = vehicleData.value?.find(vehicle => vehicle.id === vehicleId)
 }
 
-refreshVehicleData()
+await refreshVehicleData()
 </script>
 
 <template>
@@ -43,7 +44,7 @@ refreshVehicleData()
       {{ $t('vehicles.title') }}
     </p>
     <DGDivider />
-    <VehiclesSelectCard @click:card="selectVehicleData" />
+    <VehiclesSelectionCard @click:card="selectVehicleData" />
     <DGDivider />
     <VehiclesCard @click:card="selectVehicleData" />
   </div>

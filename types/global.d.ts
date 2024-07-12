@@ -235,6 +235,7 @@ interface LikeCountData {
 }
 
 interface BoardUserInfo {
+  id?: string
   nickName: string
   isAdmin: boolean
 }
