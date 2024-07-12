@@ -442,6 +442,45 @@ interface SupabaseDataBase {
           },
         ]
       }
+      noticeCommentReport: {
+        Row: {
+          commentId: string | null
+          createdAt: string
+          id: string
+          reportUserId: string | null
+          resolved: boolean | null
+        }
+        Insert: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Update: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          reportUserId?: string | null
+          resolved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'noticeCommentReport_commentId_fkey'
+            columns: ['commentId']
+            isOneToOne: false
+            referencedRelation: 'noticeCommentList'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'noticeCommentReport_reportUserId_fkey'
+            columns: ['reportUserId']
+            isOneToOne: false
+            referencedRelation: 'userInfo'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       noticeLikeCount: {
         Row: {
           boardId: string | null

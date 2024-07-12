@@ -5,7 +5,7 @@ const client = useSupabaseClient()
 
 const toast = useToast()
 const { t } = useLocale()
-const { comma, digitsRoundUp } = useUi()
+const { digitsRoundUp } = useUi()
 
 const { updateData, deleteData } = useFetchComposable()
 const { refreshVehicleData } = useLoadVehicles()
@@ -73,7 +73,9 @@ const { data: allDiaryDataCount, refresh: refreshAllDiaryData } = useAsyncData('
 const deleteProcess = async (diaryData: DiaryData) => {
   const recoverData = {
     currentFuelAmount: recoverCurrentFuel(selectedVehicleData.value?.currentFuelAmount ?? 0, selectedVehicleData.value?.officialFuelEfficient ?? 0, diaryData.driveDistance, diaryData.fuelAmount),
-    totalFuelAmount: diaryData.manageType.code === 'MTC002' ? selectedVehicleData.value?.totalFuelAmount ?? 0 : recoverAmount(selectedVehicleData.value?.totalFuelAmount ?? 0, diaryData.fuelAmount, true),
+    totalFuelAmount: diaryData.manageType.code === 'MTC002'
+      ? selectedVehicleData.value?.totalFuelAmount ?? 0
+      : recoverAmount(selectedVehicleData.value?.totalFuelAmount ?? 0, diaryData.fuelAmount, true),
     totalDistance: recoverAmount(selectedVehicleData.value?.totalDistance ?? 0, diaryData.driveDistance, true),
     totalPaidAmount: recoverAmount(selectedVehicleData.value?.totalPaidAmount ?? 0, diaryData.paidAmount, false),
     totalEfficient: recoverTotalEfficient(selectedVehicleData.value?.totalDistance ?? 0, selectedVehicleData.value?.totalFuelAmount ?? 0, diaryData.driveDistance, diaryData.fuelAmount),
@@ -119,88 +121,18 @@ await refreshAllDiaryData()
         @click="navigateTo(`/diary/${selectedVehicleData?.id}`)"
       />
     </div>
-    <DGDivider v-if="allDiaryDataCount !== 0" />
-    <DGCard
-      v-if="allDiaryDataCount !== 0"
-      :ui="{ base: 'cursor-pointer hover:text-sky-800 hover:dark:text-sky-200' }"
-      @click="navigateTo(`/vehicles/${selectedVehicleData?.id}`)"
-    >
-      <div class="w-full flex flex-col gap-4">
-        <DGAvatar
-          img-class="object-cover"
-          :src="selectedVehicleData?.bikeImage ? selectedVehicleData?.bikeImage : '/image/no_bike_image.jpg'"
-          size="3xl"
-          :alt="selectedVehicleData?.bikeImage ?? ''"
-          :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[180px] w-full md:w-[180px]' } }"
-        />
-        <div class="flex-auto" />
-        <div class="text-md md:text-lg font-bold flex flex-col gap-2">
-          <p>
-            {{ $t('diary.summary.label.distance', { distance: comma(selectedVehicleData?.totalDistance ?? 0) }) }}
-          </p>
-          <p>
-            {{ $t('diary.summary.label.efficient', { efficient: comma(selectedVehicleData?.totalEfficient ?? 0) }) }}
-          </p>
-          <p>
-            {{ $t('diary.summary.label.totalFuel', { totalFuel: comma(selectedVehicleData?.totalFuelAmount ?? 0) }) }}
-          </p>
-          <p>
-            {{ $t('diary.summary.label.paidAmount', { paidAmount: comma(selectedVehicleData?.totalPaidAmount ?? 0) }) }}
-          </p>
-          <p>
-            {{ !selectedVehicleData?.currentFuelAmount ? $t('diary.summary.expectNoFuel') : $t('diary.summary.label.fuel', { fuel: comma(selectedVehicleData?.currentFuelAmount) }) }}
-          </p>
-        </div>
-      </div>
-    </DGCard>
+    <DiaryVehicleCard :all-diary-data-count="allDiaryDataCount" />
     <DGDivider />
     <ADataRangePicker
       v-if="userInfoData?.mainVehicleId && allDiaryDataCount !== 0"
       v-model:search-month="searchMonth"
       class="w-fit"
     />
-    <div
-      v-if="!userInfoData?.mainVehicleId && allDiaryDataCount === 0"
-      class="flex flex-col justify-center mt-40 gap-4"
-    >
-      <p class="text-2xl font-bold text-center">
-        {{ $t('diary.noVehicle') }}
-      </p>
-      <AButton
-        button-color="sky"
-        button-size="xl"
-        button-variant="outline"
-        button-block
-        :button-text="$t('buttons.vehicleInsert')"
-        @click="navigateTo('/vehicles/new')"
-      />
-    </div>
-    <div
-      v-if="userInfoData?.mainVehicleId"
-      class="flex flex-col justify-center gap-4"
-    >
-      <p
-        v-if="allDiaryDataCount === 0"
-        class="text-2xl font-bold text-center mt-40"
-      >
-        {{ $t('diary.noDiary') }}
-      </p>
-      <p
-        v-if="allDiaryDataCount !== 0 && diaryData?.count === 0"
-        class="text-2xl font-bold text-center mt-40"
-      >
-        {{ $t('diary.noDiaryMonth') }}
-      </p>
-      <AButton
-        v-if="allDiaryDataCount === 0"
-        class="flex justify-center"
-        button-variant="outline"
-        button-size="xl"
-        button-block
-        :button-text="$t('buttons.rideSetting')"
-        @click="navigateTo(`/vehicles/${userInfoData?.mainVehicleId}`)"
-      />
-    </div>
+    <DiaryEmptyVehicle :all-diary-data-count="allDiaryDataCount" />
+    <DiaryEmpty
+      :diary-data="diaryData"
+      :all-diary-data-count="allDiaryDataCount"
+    />
     <DiaryListCard
       v-if="diaryData"
       v-model:diary-data="diaryData.fetchData"

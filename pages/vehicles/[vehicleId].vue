@@ -2,12 +2,12 @@
 const toast = useToast()
 const { t } = useLocale()
 const { params } = useRoute()
-const { comma, genUid, checkNumber, digitsRoundUp } = useUi()
+const { checkNumber, digitsRoundUp } = useUi()
 
 const { loadCodeList } = useLoadCode()
 const { refreshUserData } = useLoadUser()
 const { refreshVehicleData } = useLoadVehicles()
-const { updateData, upsertData, deleteData, loadStorage, uploadStorage } = useFetchComposable()
+const { updateData, upsertData, deleteData } = useFetchComposable()
 
 const { headTextList, middleTextList, tailTextList } = storeToRefs(usePlateStore())
 const { userCoreId } = storeToRefs(useUserInfoStore())
@@ -34,6 +34,8 @@ const updatedVehicleData = ref({
   tankSize: 0,
   officialFuelEfficient: 0,
   memo: '',
+  bikeImage: '',
+  bikeImageName: '',
   plateHeadText: '',
   plateMiddleText: '',
   plateTailText: '',
@@ -47,15 +49,15 @@ const editableTrigger = ref(false)
 const validateEditTrigger = ref(true)
 const deleteConfirmTrigger = ref(false)
 
-const { data: fuelDataList } = useAsyncData('fuelDataList', async () => {
-  const { data } = await useFetch('/api/addVehicle/fuelData', { headers: useRequestHeaders(['cookie']) })
-  if (!data.value) {
-    return
-  }
-  return data.value
-}, {
-  immediate: true,
-})
+// const { data: fuelDataList } = useAsyncData('fuelDataList', async () => {
+//   const { data } = await useFetch('/api/addVehicle/fuelData', { headers: useRequestHeaders(['cookie']) })
+//   if (!data.value) {
+//     return
+//   }
+//   return data.value
+// }, {
+//   immediate: true,
+// })
 
 const { data: diaryTypeData } = useAsyncData('diaryType', async () => {
   const { data }: SerializeObject = await useFetch('/api/management/type', {
@@ -69,26 +71,6 @@ const { data: diaryTypeData } = useAsyncData('diaryType', async () => {
 }, {
   immediate: true,
 })
-
-const uploadImage = async (file: File) => {
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${genUid()}.${fileExt}`
-
-  await uploadStorage('vehicle_image', fileName, file)
-  await updateData('vehicles', { bikeImageName: fileName, bikeImage: await downloadImage(fileName) }, manageVehicleId)
-
-  toast.add({ title: t('messages.uploadSuccess.title'), description: t('messages.uploadSuccess.description'), color: 'amber', timeout: 3000 })
-  await refreshVehicleData()
-  editableTrigger.value = false
-}
-
-const downloadImage = async (imageName: string) => {
-  if (!imageName) {
-    return
-  }
-
-  return await loadStorage('vehicle_image', imageName)
-}
 
 const clickEditButton = () => {
   editableTrigger.value = !editableTrigger.value
@@ -104,6 +86,8 @@ const clickEditButton = () => {
       tankSize: selectedVehicleData.value?.tankSize ?? 0,
       officialFuelEfficient: selectedVehicleData.value?.officialFuelEfficient ?? 0,
       memo: selectedVehicleData.value?.memo ?? '',
+      bikeImage: selectedVehicleData.value?.bikeImage ?? '',
+      bikeImageName: selectedVehicleData.value?.bikeImageName ?? '',
       plateHeadText: selectedVehicleData.value?.plateHeadText ?? '',
       plateMiddleText: selectedVehicleData.value?.plateMiddleText ?? '',
       plateTailText: selectedVehicleData.value?.plateTailText ?? '',
@@ -167,6 +151,12 @@ const validatePlateNumber = (value: string) => {
   validateEditTrigger.value = true
 }
 
+const updateImage = async (imageUrl: string) => {
+  updatedVehicleData.value.bikeImage = imageUrl
+  await refreshVehicleData()
+  changeVehicleData(manageVehicleId)
+}
+
 const updateVehicle = async () => {
   updatedVehicleData.value.totalEfficient = await calculateTotalEfficient(updatedVehicleData.value.totalDistance, updatedVehicleData.value.totalFuelAmount)
   if (!selectedVehicleData.value?.totalDistance) {
@@ -208,6 +198,10 @@ const calculateTotalEfficient = (totalDistance: number, totalFuelAmount: number)
     : 0
 }
 
+const changeVehicleData = (vehicleId: string) => {
+  selectedVehicleData.value = vehicleData.value?.find(vehicle => vehicle.id === vehicleId)
+}
+
 await loadCodeList('CMA')
 await loadCodeList('CTM')
 </script>
@@ -223,449 +217,41 @@ await loadCodeList('CTM')
         @click="clickEditButton"
       />
     </div>
-    <DGCard>
-      <div class="w-full flex flex-col gap-4">
-        <div class="flex flex-wrap gap-4">
-          <DGAvatar
-            :src="selectedVehicleData?.manufacturer.logoImage"
-            size="2xl"
-            :alt="selectedVehicleData?.manufacturer.name"
-            :ui="{ background: 'bg-transparent' }"
-          />
-          <div class="flex-auto" />
-          <div class="w-full md:w-2/3 flex flex-col justify-end items-end gap-2">
-            <div class="flex flex-col gap-1">
-              <p
-                v-if="selectedVehicleData?.manufacturer.name"
-                class="text-xl font-bold text-right"
-              >
-                {{ selectedVehicleData?.manufacturer.name }}
-              </p>
-              <p
-                v-if="selectedVehicleData?.vehicleModel.name"
-                class="text-sm text-right"
-              >
-                {{ selectedVehicleData?.vehicleModel.name }}
-              </p>
-            </div>
-            <DGDivider class="w-full" />
-            <div class="flex flex-col gap-1">
-              <p
-                v-if="selectedVehicleData?.makeYear"
-                class="text-xl font-bold text-right"
-              >
-                {{ $t('unit.makeYear', { makeYear: selectedVehicleData?.makeYear }) }}
-              </p>
-              <div class="w-fit flex flex-col gap-1">
-                <p
-                  v-if="selectedVehicleData?.displacement"
-                  class="text-sm text-right"
-                >
-                  {{ $t('unit.displacement', { displacement: comma(selectedVehicleData?.displacement || 0) }) }}
-                </p>
-                <div
-                  v-if="!selectedVehicleData?.displacement"
-                  class="flex flex-col items-end gap-1"
-                >
-                  <AInput
-                    v-if="editableTrigger"
-                    v-model:input-data="updatedVehicleData.displacement"
-                    :input-placeholder="$t('placeholder.displacement')"
-                    input-type="number"
-                    clearable
-                    @click:clear="() => validateEditTrigger = false"
-                    @update:model-value="() => validateInput(updatedVehicleData.displacement < 1)"
-                  />
-                  <p class="text-xs text-rose-400 dark:text-rose-6000">
-                    {{ $t('placeholder.displacement') }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <DGAvatar
-              img-class="object-cover"
-              :src="selectedVehicleData?.bikeImage ? selectedVehicleData?.bikeImage : '/image/no_bike_image.jpg'"
-              size="3xl"
-              alt="bike-image"
-              :ui="{ rounded: 'rounded-2xl', size: { '3xl': 'h-[200px] w-full' } }"
-            />
-            <AUploadFile
-              v-if="editableTrigger"
-              :file-size-alarm="$t('validate.imageUploadLargeSize')"
-              :file-type-alarm="$t('validate.imageUploadFormat')"
-              :limit-type="['image/jpeg', 'image/png', 'image/gif']"
-              :limit-height="2048"
-              :limit-width="2048"
-              :limit-size="10"
-              @upload:file="(file: File) => uploadImage(file)"
-            />
-          </div>
-        </div>
-      </div>
-    </DGCard>
-    <DGCard>
-      <div class="flex flex-col gap-4">
-        <div class="w-full flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            <p
-              v-if="selectedVehicleData?.totalDistance"
-              class="text-md font-bold text-pretty"
-            >
-              {{ $t('labelTexts.totalDistance') }}
-            </p>
-            <p
-              v-else
-              class="text-xs text-rose-400 dark:text-rose-600"
-            >
-              {{ $t('placeholder.totalDistance') }}
-            </p>
-            <DGTooltip
-              v-if="editableTrigger"
-              :text="$t('vehicleDetail.updateVehicleCaution')"
-              :popper="{ placement: 'top' }"
-            >
-              <Icon
-                class="cursor-pointer text-rose-400 dark:text-rose-600"
-                name="i-line-md-alert-circle"
-                size="20px"
-              />
-            </DGTooltip>
-          </div>
-          <div class="w-full flex justify-end">
-            <p
-              v-if="selectedVehicleData?.totalDistance && !editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ $t('unit.distance', { distance: comma(selectedVehicleData.totalDistance) }) }}
-            </p>
-            <AInput
-              v-if="editableTrigger"
-              v-model:input-data="updatedVehicleData.totalDistance"
-              :input-placeholder="$t('placeholder.totalDistance')"
-              input-class="w-full md:w-1/2"
-              input-type="number"
-              clearable
-              @click:clear="() => validateEditTrigger = false"
-              @update:model-value="() => validateInput(updatedVehicleData.totalDistance < 1)"
-            />
-          </div>
-        </div>
-        <DGDivider />
-        <div class="w-full flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <p
-              v-if="selectedVehicleData?.totalFuelAmount"
-              class="text-md font-bold text-pretty"
-            >
-              {{ $t('labelTexts.totalFuelAmount') }}
-            </p>
-            <p
-              v-else
-              class="text-xs text-rose-400 dark:text-rose-600"
-            >
-              {{ $t('placeholder.totalFuelAmount') }}
-            </p>
-            <DGTooltip
-              v-if="editableTrigger"
-              :text="$t('vehicleDetail.updateVehicleCaution')"
-              :popper="{ placement: 'top' }"
-            >
-              <Icon
-                class="cursor-pointer text-rose-400 dark:text-rose-600"
-                name="i-line-md-alert-circle"
-                size="20px"
-              />
-            </DGTooltip>
-          </div>
-          <div class="w-full flex justify-end">
-            <p
-              v-if="selectedVehicleData?.totalFuelAmount && !editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ $t('unit.fuelAmount', { fuelAmount: comma(selectedVehicleData?.totalFuelAmount || 0) }) }}
-            </p>
-            <AInput
-              v-if="editableTrigger"
-              v-model:input-data="updatedVehicleData.totalFuelAmount"
-              :input-placeholder="$t('placeholder.totalFuelAmount')"
-              input-class="w-full md:w-1/2"
-              input-type="number"
-              clearable
-              @click:clear="() => validateEditTrigger = false"
-              @update:model-value="() => validateInput(updatedVehicleData.totalFuelAmount < 1)"
-            />
-          </div>
-        </div>
-        <DGDivider />
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.totalEfficient"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.totalEfficient') }}
-          </p>
-          <p
-            v-if="selectedVehicleData?.totalEfficient"
-            class="text-lg font-bold text-right text-pretty"
-          >
-            {{ $t('unit.fuelEfficient', { efficient: comma(selectedVehicleData?.totalEfficient) }) }}
-          </p>
-        </div>
-        <DGDivider v-if="selectedVehicleData?.totalEfficient" />
-        <div class="w-full flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <p
-              v-if="selectedVehicleData?.totalPaidAmount"
-              class="text-md font-bold text-pretty"
-            >
-              {{ $t('labelTexts.totalPaidAmount') }}
-            </p>
-            <p
-              v-else
-              class="text-xs text-rose-400 dark:text-rose-600"
-            >
-              {{ $t('placeholder.totalPaidAmount') }}
-            </p>
-            <DGTooltip
-              v-if="editableTrigger"
-              :text="$t('vehicleDetail.updateVehicleCaution')"
-              :popper="{ placement: 'top' }"
-            >
-              <Icon
-                class="cursor-pointer text-rose-400 dark:text-rose-600"
-                name="i-line-md-alert-circle"
-                size="20px"
-              />
-            </DGTooltip>
-          </div>
-          <div class="w-full flex justify-end">
-            <p
-              v-if="selectedVehicleData?.totalPaidAmount && !editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ $t('unit.priceText', { price: comma(selectedVehicleData?.totalPaidAmount ?? 0) }) }}
-            </p>
-            <AInput
-              v-if="editableTrigger"
-              v-model:input-data="updatedVehicleData.totalPaidAmount"
-              :input-placeholder="$t('placeholder.totalPaidAmount')"
-              input-class="w-full md:w-1/2"
-              input-type="number"
-              clearable
-              @click:clear="() => validateEditTrigger = false"
-              @update:model-value="() => validateInput(updatedVehicleData.totalPaidAmount < 1)"
-            />
-          </div>
-        </div>
-      </div>
-    </DGCard>
-    <DGCard>
-      <div class="flex flex-col gap-4">
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.fuelData.codeName"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.fuelType') }}
-          </p>
-          <DGSkeleton
-            v-else
-            class="h-8 w-[50px]"
-          />
-          <div
-            v-if="selectedVehicleData?.fuelData.codeName"
-            class="flex flex-col items-end gap-2"
-          >
-            <p
-              v-if="!editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ selectedVehicleData?.fuelData.codeName }}
-            </p>
-            <DGSelect
-              v-else
-              v-model="updatedVehicleData.fuelTypeId"
-              class="w-1/2"
-              :options="fuelDataList"
-              color="amber"
-              value-attribute="id"
-              option-attribute="codeName"
-            />
-          </div>
-          <DGSkeleton
-            v-else
-            class="h-8 w-[50px]"
-          />
-        </div>
-        <DGDivider />
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.tankSize"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.tankSize') }}
-          </p>
-          <p
-            v-else
-            class="text-xs text-rose-400 dark:text-rose-600"
-          >
-            {{ $t('placeholder.tankSize') }}
-          </p>
-          <div class="w-full flex justify-end">
-            <p
-              v-if="selectedVehicleData?.tankSize && !editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ $t('unit.fuelAmount', { fuelAmount: comma(selectedVehicleData?.tankSize) }) }}
-            </p>
-            <AInput
-              v-if="editableTrigger"
-              v-model:input-data="updatedVehicleData.tankSize"
-              :input-placeholder="$t('placeholder.tankSize')"
-              input-class="w-full md:w-1/2"
-              input-type="number"
-              clearable
-              @click:clear="() => validateEditTrigger = false"
-              @update:model-value="() => validateInput(updatedVehicleData.tankSize < 1)"
-            />
-          </div>
-        </div>
-        <DGDivider />
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.officialFuelEfficient"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.officialFuelEfficient') }}
-          </p>
-          <p
-            v-else
-            class="text-xs text-rose-400 dark:text-rose-600"
-          >
-            {{ $t('placeholder.officialFuelEfficient') }}
-          </p>
-          <div class="w-full flex justify-end">
-            <p
-              v-if="selectedVehicleData?.officialFuelEfficient && !editableTrigger"
-              class="text-lg font-bold text-right text-pretty"
-            >
-              {{ $t('unit.fuelEfficient', { efficient: comma(selectedVehicleData?.officialFuelEfficient) }) }}
-            </p>
-            <AInput
-              v-if="editableTrigger"
-              v-model:input-data="updatedVehicleData.officialFuelEfficient"
-              :input-placeholder="$t('placeholder.officialFuelEfficient')"
-              input-class="w-full md:w-1/2"
-              input-type="number"
-              clearable
-              @click:clear="() => validateEditTrigger = false"
-              @update:model-value="() => validateInput(updatedVehicleData.officialFuelEfficient < 1)"
-            />
-          </div>
-        </div>
-        <DGDivider />
-      </div>
-    </DGCard>
-    <DGCard>
-      <div class="flex flex-col gap-4">
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.memo"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.memo') }}
-          </p>
-          <p
-            v-else
-            class="text-xs text-rose-400 dark:text-rose-600"
-          >
-            {{ $t('placeholder.memo') }}
-          </p>
-          <DGTextarea
-            v-model="updatedVehicleData.memo"
-            :disabled="!editableTrigger"
-            color="amber"
-            autoresize
-            :placeholder="selectedVehicleData?.memo"
-          />
-        </div>
-        <DGDivider />
-        <div class="w-full flex flex-col gap-1">
-          <p
-            v-if="selectedVehicleData?.carNumber"
-            class="text-md font-bold text-pretty"
-          >
-            {{ $t('labelTexts.vehicleNumber') }}
-          </p>
-          <DGSkeleton
-            v-else
-            class="h-8 w-[50px]"
-          />
-          <div
-            v-if="selectedVehicleData?.carNumber"
-            class="w-full flex justify-end items-end"
-          >
-            <ALicensePlate
-              v-if="!editableTrigger"
-              :head-text="selectedVehicleData?.plateHeadText ?? '서울'"
-              :middle-text="selectedVehicleData?.plateMiddleText ?? '강남'"
-              :tail-text="selectedVehicleData?.plateTailText ?? '차'"
-              :number-text="parseInt(selectedVehicleData?.plateNumber ?? '1004')"
-            />
-            <div
-              v-else
-              class="w-full flex flex-col items-end gap-2"
-            >
-              <DGSelect
-                v-model="selectPlateHeadId"
-                class="w-1/2"
-                :options="headTextList"
-                color="amber"
-                value-attribute="id"
-                option-attribute="codeName"
-                @update:model-value="(id: string) => selectPlateHeadText(id)"
-              />
-              <DGSelect
-                v-if="selectPlateHeadId"
-                v-model="selectPlateMiddleId"
-                class="w-1/2"
-                :options="middleTextList"
-                color="amber"
-                value-attribute="id"
-                option-attribute="codeName"
-                @update:model-value="(id: string) => selectPlateMiddleText(id)"
-              />
-              <DGSelect
-                v-if="selectPlateHeadId && selectPlateMiddleId"
-                v-model="selectPlateTailId"
-                class="w-1/2"
-                :options="tailTextList"
-                color="amber"
-                value-attribute="id"
-                option-attribute="codeName"
-                @update:model-value="(id: string) => selectPlateTailText(id)"
-              />
-              <AInput
-                v-if="selectPlateTailId"
-                v-model="updatedVehicleData.plateNumber"
-                input-class="w-full md:w-1/2"
-                input-size="sm"
-                clearable
-                @update:model-value="(value: string) => validatePlateNumber(value)"
-                @click:clear="() => updatedVehicleData.plateNumber = ''"
-              />
-            </div>
-          </div>
-          <DGSkeleton
-            v-else
-            class="h-8 w-[50px]"
-          />
-        </div>
-        <DGDivider />
-      </div>
-    </DGCard>
+    <VehiclesHeaderSection
+      v-model:selected-vehicle-data="selectedVehicleData"
+      v-model:updated-vehicle-data="updatedVehicleData"
+      v-model:editable-trigger="editableTrigger"
+      v-model:validate-edit-trigger="validateEditTrigger"
+      @validate:input="validateInput"
+      @update:image="updateImage"
+    />
+    <VehiclesSecondSection
+      v-model:selected-vehicle-data="selectedVehicleData"
+      v-model:updated-vehicle-data="updatedVehicleData"
+      v-model:editable-trigger="editableTrigger"
+      v-model:validate-edit-trigger="validateEditTrigger"
+      @validate:input="validateInput"
+    />
+    <VehiclesThirdSection
+      v-model:selected-vehicle-data="selectedVehicleData"
+      v-model:updated-vehicle-data="updatedVehicleData"
+      v-model:editable-trigger="editableTrigger"
+      v-model:validate-edit-trigger="validateEditTrigger"
+      @validate:input="validateInput"
+    />
+    <VehiclesFourthSection
+      v-model:selected-vehicle-data="selectedVehicleData"
+      v-model:updated-vehicle-data="updatedVehicleData"
+      v-model:editable-trigger="editableTrigger"
+      v-model:validate-edit-trigger="validateEditTrigger"
+      v-model:select-plate-head-id="selectPlateHeadId"
+      v-model:select-plate-middle-id="selectPlateMiddleId"
+      v-model:select-plate-tail-id="selectPlateTailId"
+      @select:plate-head-id="selectPlateHeadText"
+      @select:plate-middle-id="selectPlateMiddleText"
+      @select:plate-tail-id="selectPlateTailText"
+      @validate:plate-number="validatePlateNumber"
+    />
     <div
       v-if="editableTrigger && validateEditTrigger"
       class="w-full flex justify-between"
@@ -694,7 +280,7 @@ await loadCodeList('CTM')
       @close="() => deleteConfirmTrigger = false"
     >
       <p class="break-keep">
-        {{ $t('vehicleDetail.deleteDialog.description') }}
+        {{ $t('vehicleDetail.updateVehicleCaution') }}
       </p>
     </DialogConfirm>
   </div>

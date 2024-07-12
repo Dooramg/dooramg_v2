@@ -36,8 +36,6 @@ const initUserInfoData = async () => {
     return
   }
 
-  console.log(data)
-
   userCoreId.value = user.value?.id ?? ''
   userInfoData.value = data
 

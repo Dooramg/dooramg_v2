@@ -9,8 +9,10 @@ const { checkNumber, numberRegex } = useUi()
 
 const { insertData, updateData } = useFetchComposable()
 const { loadCodeList } = useLoadCode()
+const { refreshVehicleData } = useLoadVehicles()
 
 const { userCoreId } = storeToRefs(useUserInfoStore())
+const { vehicleData: storeVehicleData, selectedVehicleData } = storeToRefs(useVehicleStore())
 const { headTextList, middleTextList, tailTextList } = storeToRefs(usePlateStore())
 
 useHead({
@@ -125,10 +127,17 @@ const addVehicle = async (event: FormSubmitEvent<Schema>) => {
   }
 
   const newVehicleData: SerializeObject = await insertData('vehicles', vehicleData.value)
+
   await updateData('userInfo', { mainVehicleId: newVehicleData?.id ?? '' }, userCoreId.value)
+  await refreshVehicleData()
+  await changeVehicleData(newVehicleData?.id ?? '')
 
   toast.add({ title: t('messages.addVehicleSuccess.title'), description: t('messages.addVehicleSuccess.description'), color: 'amber', timeout: 3000 })
   navigateTo('/vehicles')
+}
+
+const changeVehicleData = (vehicleId: string) => {
+  selectedVehicleData.value = storeVehicleData.value?.find(vehicle => vehicle.id === vehicleId)
 }
 
 await loadCodeList('CMA')

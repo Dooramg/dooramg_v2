@@ -168,7 +168,7 @@ const openReportCommentDialog = (commentId: string) => {
 const reportCommunityComment = async () => {
   const { data }: SerializeObject = await client
     .from('communityCommentReport')
-    .select('*, userInfo(id), boardCommunity(id)')
+    .select('*, userInfo(id), communityCommentList(id)')
     .eq('reportUserId', userCoreId.value)
     .eq('commentId', reportCommentId.value)
 
@@ -178,7 +178,7 @@ const reportCommunityComment = async () => {
   }
 
   await upsertData('communityCommentReport', {
-    boardId: boardId.value,
+    commentId: reportCommentId.value,
     reportUserId: userCoreId.value,
   }, '', '')
 
@@ -299,301 +299,41 @@ onUnmounted(() => {
       }"
     >
       <template #header>
-        <div>
-          <p class="text-xl font-bold">
-            {{ communityDetailData.title }}
-          </p>
-          <div class="flex flex-wrap items-center mt-2 gap-2">
-            <DGBadge
-              v-show="communityDetailData.userId === userCoreId"
-              color="amber"
-              size="md"
-              variant="outline"
-              :label="$t('texts.myArticle')"
-            />
-            <DGBadge
-              color="red"
-              size="md"
-              variant="soft"
-              :label="$t('texts.article')"
-            />
-            <DGBadge
-              v-show="!communityDetailData.isPublished"
-              color="red"
-              size="md"
-              variant="outline"
-              :label="$t('texts.secretArticle')"
-            />
-            <div class="flex-auto" />
-            <ANuxtTime
-              custom-class="flex justify-end text-xs"
-              :date-time="communityDetailData.createdAt"
-            />
-          </div>
-          <div
-            v-show="communityDetailData.userInfo"
-            class="flex items-center justify-center mt-2 gap-2"
-          >
-            <DGChip
-              :show="communityDetailData.userInfo?.isAdmin"
-              size="3xl"
-              color="amber"
-              position="top-left"
-              :ui="{ wrapper: 'cursor-pointer' }"
-            >
-              <DGTooltip
-                :text="userCoreId === communityDetailData?.userId ? communityDetailData?.userInfo?.nickName : $t('buttons.userBlock', { user: communityDetailData.userInfo?.nickName })"
-                :ui="{ wrapper: 'cursor-pointer' }"
-              >
-                <DGBadge
-                  :label="communityDetailData.userInfo?.nickName"
-                  color="amber"
-                  size="md"
-                  variant="soft"
-                  @click="openBlockConfirmDialog(communityDetailData.userId, communityDetailData.userInfo?.nickName ?? '')"
-                />
-              </DGTooltip>
-              <template #content>
-                <Icon name="fluent-emoji-flat:crown" />
-              </template>
-            </DGChip>
-            <div class="flex-auto" />
-            <AButton
-              v-if="communityDetailData.userId === userCoreId"
-              button-size="sm"
-              :button-text="editCommunityTrigger ? $t('buttons.cancel') : $t('buttons.edit')"
-              @click="editingCommunityDetail"
-            />
-            <AButton
-              v-if="communityDetailData.userId === userCoreId && editCommunityTrigger"
-              button-size="sm"
-              :button-text="$t('buttons.save')"
-              @click="updateCommunityArticle"
-            />
-            <AButton
-              v-if="(communityDetailData.userId === userCoreId || adminTrigger) && editCommunityTrigger"
-              button-size="sm"
-              :button-text="$t('buttons.delete')"
-              @click="() => deleteConfirmTrigger = true"
-            />
-            <AButton
-              v-show="!editCommunityTrigger"
-              use-leading
-              button-size="sm"
-              button-color="amber"
-              button-variant="outline"
-              icon-name="i-line-md-thumbs-up"
-              :icon-size="14"
-              :button-text="String(likeCount)"
-              @click="countUpLike"
-            />
-            <AButton
-              v-show="!editCommunityTrigger && communityDetailData.userId !== userCoreId"
-              use-leading
-              button-size="md"
-              button-color="red"
-              button-variant="outline"
-              :tooltip-text="$t('buttons.articleReport')"
-              icon-name="i-line-md-bell"
-              :icon-size="14"
-              @click="() => reportArticleConfirmTrigger = true"
-            />
-            <DGPopover
-              mode="hover"
-              :popper="{ arrow: true, placement: 'top' }"
-              :ui="{ wrapper: 'flex items-center justify-center' }"
-            >
-              <Icon
-                name="i-line-md-alert-loop"
-                color="orange"
-                :width="24"
-                :height="24"
-              />
-              <template #panel>
-                <div class="w-[200px] sm:w-fit break-keep px-2 py-1">
-                  <p
-                    v-for="(text, index) in $tm('validate.inputContentWarning')"
-                    :key="index"
-                  >
-                    {{ $rt(text) }}
-                  </p>
-                </div>
-              </template>
-            </DGPopover>
-          </div>
-        </div>
-      </template>
-      <div class="flex flex-col gap-4">
-        <div
-          v-if="!editCommunityTrigger"
-          v-dompurify-html="communityDetailData.content"
+        <BoardDetailHeader
+          board-type="community"
+          :board-detail-data="communityDetailData"
+          :edit-trigger="editCommunityTrigger"
+          :admin-trigger="adminTrigger"
+          :like-count="likeCount"
+          @edit:board-detail="editingCommunityDetail"
+          @update:board-detail="updateCommunityArticle"
+          @update:count-up-like="countUpLike"
+          @open:block-confirm-dialog="(userId: string, nickName: string) => openBlockConfirmDialog(userId, nickName)"
+          @open:report-article-confirm-dialog="() => reportArticleConfirmTrigger = true"
+          @open:delete-confirm-dialog="() => deleteConfirmTrigger = true"
         />
-        <div
-          v-else
-          class="flex flex-col gap-4"
-        >
-          <AInput
-            v-model:input-data="editCommunityDetailData.title"
-            clearable
-            input-color="amber"
-            :input-placeholder="$t('placeholder.inputTitle')"
-          />
-          <DGCheckbox
-            v-model="editCommunityDetailData.isPublished"
-            color="amber"
-            :label="editCommunityDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
-          />
-          <TiptapTextEditor
-            :text-data="editCommunityDetailData.content"
-            full-option
-            @update:model-value="(text: string) => editCommunityDetailData.content = text"
-          />
-        </div>
-        <div
-          v-if="communityDetailData.useLocation"
-          class="flex flex-col gap-4"
-        >
-          <p v-show="!editCommunityTrigger">
-            {{ $t('naverMaps.address', { address: editCommunityDetailData.locationAddress }) }}
-          </p>
-          <AInput
-            v-show="editCommunityTrigger && editCommunityDetailData.locationAddress"
-            v-model:input-data="editCommunityDetailData.locationAddress"
-            class="w-full"
-            input-disabled
-            clearable
-            input-color="amber"
-            :input-placeholder="$t('placeholder.selectAddress')"
-          />
-          <NaverMaps
-            v-if="naverMapsLoadTrigger && !editCommunityTrigger"
-            is-readable
-            :load-latitude="communityDetailData.latitude"
-            :load-longitude="communityDetailData.longitude"
-          />
-          <NaverMaps
-            v-if="naverMapsLoadTrigger && editCommunityTrigger"
-            :is-readable="false"
-            :load-latitude="editCommunityDetailData.latitude"
-            :load-longitude="editCommunityDetailData.longitude"
-            @update:address="updateNaverMapData"
-          />
-        </div>
-      </div>
+      </template>
+      <BoardDetail
+        v-model:edit-board-detail-data="editCommunityDetailData"
+        :edit-trigger="editCommunityTrigger"
+        :map-load-trigger="naverMapsLoadTrigger"
+        :board-detail-data="communityDetailData"
+        @update:naver-map-data="updateNaverMapData"
+      />
       <template
         v-if="!editCommunityTrigger"
         #footer
       >
-        <p class="text-xl font-bold mt-4">
-          {{ $t('board.commentTitle') }}
-        </p>
-        <div
-          v-for="commentList in commentData"
-          v-show="hideBlockedComment(commentList.userId)"
-          :key="commentList.id"
-        >
-          <DGCard
-            class="mt-4"
-            :ui="{
-              background: userCoreId === commentList.userId ? 'bg-amber-200 dark:bg-amber-900' : 'bg-neutral-100 dark:bg-neutral-900',
-              header: { padding: 'px-1 py-1 sm:p-2' },
-              body: { padding: 'px-2 py-1 sm:p-4' },
-              footer: { padding: 'px-1 py-1 sm:p-2' },
-            }"
-          >
-            <template #header>
-              <div class="flex items-center justify-center px-1 gap-2">
-                <DGChip
-                  :show="commentList.userInfo.isAdmin"
-                  size="3xl"
-                  color="amber"
-                  position="top-left"
-                >
-                  <DGTooltip
-                    :text="userCoreId === commentList?.userId ? commentList?.userInfo?.nickName : $t('buttons.userBlock', { user: commentList.userInfo?.nickName })"
-                    :ui="{ wrapper: 'cursor-pointer' }"
-                  >
-                    <DGBadge
-                      :label="commentList.userInfo?.nickName"
-                      color="amber"
-                      size="md"
-                      variant="soft"
-                      @click="openBlockConfirmDialog(commentList?.userId, commentList.userInfo?.nickName ?? '')"
-                    />
-                  </DGTooltip>
-                  <template #content>
-                    <Icon name="fluent-emoji-flat:crown" />
-                  </template>
-                </DGChip>
-                <DGBadge
-                  v-show="commentList.userId === userCoreId"
-                  color="red"
-                  size="md"
-                  variant="soft"
-                  label="내 댓글"
-                />
-                <div class="flex-auto" />
-                <AButton
-                  v-if="!editCommunityTrigger && commentList.userId !== userCoreId"
-                  use-leading
-                  button-size="md"
-                  button-color="red"
-                  button-variant="outline"
-                  :tooltip-text="$t('buttons.commentReport')"
-                  icon-name="i-line-md-bell"
-                  :icon-size="14"
-                  @click="openReportCommentDialog(commentList.id)"
-                />
-                <AButton
-                  v-if="commentList.userId === userCoreId || userStoreData?.isAdmin"
-                  button-size="md"
-                  :button-text="$t('buttons.delete')"
-                  @click="deleteComment(commentList.id)"
-                />
-              </div>
-            </template>
-            <div v-dompurify-html="commentList.comment" />
-            <template
-              v-if="commentList.userInfo.id === userCoreId || userStoreData?.isAdmin"
-              #footer
-            >
-              <div class="flex justify-start px-1">
-                <ANuxtTime
-                  custom-class="flex justify-end text-xs"
-                  :date-time="commentList.createdAt"
-                />
-              </div>
-            </template>
-          </DGCard>
-        </div>
-        <div class="border-t mt-8 border-dashed border-zinc-800">
-          <p class="text-xl font-bold mt-8">
-            {{ $t('board.commentWriteTitle') }}
-          </p>
-          <DGForm
-            class="my-4"
-            :schema="schema"
-            :state="insertCommentData"
-            @submit="insertComment"
-          >
-            <DGFormGroup
-              name="comment"
-              required
-            >
-              <TiptapTextEditor
-                :text-data="insertCommentData.comment"
-                comment-option
-                @update:model-value="(text: string) => insertCommentData.comment = text"
-              />
-            </DGFormGroup>
-            <DGFormGroup class="flex justify-end mt-4">
-              <AButton
-                button-type="submit"
-                :button-text="$t('buttons.save')"
-              />
-            </DGFormGroup>
-          </DGForm>
-        </div>
+        <BoardDetailComment
+          v-model:insert-comment-data="insertCommentData"
+          :comment-data="commentData"
+          :edit-community-trigger="editCommunityTrigger"
+          @block:comment="(userId: string) => hideBlockedComment(userId)"
+          @delete:comment="(commentId: string) => deleteComment(commentId)"
+          @open:block-confirm-dialog="(writeUserId: string, writeUserNickName: string) => openBlockConfirmDialog(writeUserId, writeUserNickName)"
+          @open:report-comment-dialog="(commentId: string) => openReportCommentDialog(commentId)"
+          @insert:comment="(event: FormSubmitEvent<Schema>) => insertComment(event)"
+        />
       </template>
     </DGCard>
     <DialogConfirm
