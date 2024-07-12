@@ -17,6 +17,7 @@ withDefaults(
     iconName?: string
     iconSize?: number
     buttonText?: string
+    tooltipText?: string
     shortcutsText?: Array<string>
   }>(),
   {
@@ -34,6 +35,7 @@ withDefaults(
     iconName: '',
     iconSize: 24,
     buttonText: '',
+    tooltipText: '',
     shortcutsText: () => [],
   },
 )
@@ -46,9 +48,9 @@ defineEmits([
 
 <template>
   <DGTooltip
-    :text="buttonText"
+    :text="tooltipText ? tooltipText : buttonText"
     :shortcuts="shortcutsText"
-    :ui="{ wrapper: customClass, base: !buttonText ? 'hidden' : '[@media(pointer:coarse)]:hidden h-6 px-2 py-1 text-xs font-normal truncate relative' }"
+    :ui="{ wrapper: customClass, base: !tooltipText && !buttonText ? 'hidden' : '[@media(pointer:coarse)]:hidden h-6 px-2 py-1 text-xs font-normal truncate relative' }"
   >
     <DGButton
       :class="customClass"
@@ -61,7 +63,7 @@ defineEmits([
       :size="buttonSize"
       :type="buttonType"
       :variant="buttonVariant"
-      :label="buttonText"
+      :label="!tooltipText ? buttonText : ''"
       :aria-label="buttonText"
       @mouseenter="$emit('mouseenter:button')"
       @mouseleave="$emit('mouseleave:button')"
