@@ -406,7 +406,10 @@ export default {
     input: 'Input!',
     inputTitle: 'Input title!',
     inputContent: '🚨 Posting inappropriate or offensive content may result in sanctions.',
-    inputContentWarning: '🚨 The processing result after reporting will be reflected within 24 hours. 🚨 The post will not be displayed after processing.',
+    inputContentWarning: [
+      '🚨 The processing result after reporting will be reflected within 24 hours.',
+      '🚨 The post will not be displayed after processing.',
+    ],
     inputComment: 'Input comment!',
     inputNumber: 'Number...',
     input4Digits: '4 Digits...',
