@@ -60,16 +60,17 @@ const insertCommentData = ref<CommentForm>({
   comment: '',
 })
 
+const reportCommentId = ref('')
 const blockUserId = ref('')
+const blockUserNickName = ref('')
 const likeCount = ref(0)
+
 const editCommunityTrigger = ref(false)
 const deleteConfirmTrigger = ref(false)
 const reportArticleConfirmTrigger = ref(false)
 const reportCommentConfirmTrigger = ref(false)
 const blockUserConfirmTrigger = ref(false)
 const naverMapsLoadTrigger = ref(false)
-
-const reportCommentId = ref('')
 
 const { data: blockData } = useAsyncData('blockData', async () => {
   const { data } = await client
@@ -185,12 +186,13 @@ const reportCommunityComment = async () => {
   reportCommentConfirmTrigger.value = false
 }
 
-const openBlockConfirmDialog = (writeUserId: string) => {
+const openBlockConfirmDialog = (writeUserId: string, writeUserNickName: string) => {
   if (userCoreId.value === writeUserId) {
     return
   }
 
   blockUserId.value = writeUserId
+  blockUserNickName.value = writeUserNickName
   blockUserConfirmTrigger.value = true
 }
 
@@ -348,7 +350,7 @@ onUnmounted(() => {
                   color="amber"
                   size="md"
                   variant="soft"
-                  @click="openBlockConfirmDialog(communityDetailData.userId)"
+                  @click="openBlockConfirmDialog(communityDetailData.userId, communityDetailData.userInfo?.nickName ?? '')"
                 />
               </DGTooltip>
               <template #content>
@@ -516,7 +518,7 @@ onUnmounted(() => {
                       color="amber"
                       size="md"
                       variant="soft"
-                      @click="openBlockConfirmDialog(commentList?.userId)"
+                      @click="openBlockConfirmDialog(commentList?.userId, commentList.userInfo?.nickName ?? '')"
                     />
                   </DGTooltip>
                   <template #content>
@@ -643,7 +645,7 @@ onUnmounted(() => {
       :dialog-trigger="blockUserConfirmTrigger"
       title-class="text-2xl font-bold"
       :full-screen="false"
-      :title="$t('board.dialog.blockTitle')"
+      :title="$t('board.dialog.blockTitle', { nickName: blockUserNickName })"
       :first-button-text="$t('board.dialog.confirm')"
       :second-button-text="$t('board.dialog.reject')"
       @click:first-button="blockUser"
@@ -651,7 +653,7 @@ onUnmounted(() => {
       @close="() => blockUserConfirmTrigger = false"
     >
       <p class="break-keep">
-        {{ $t('board.dialog.blockDescription') }}
+        {{ $t('board.dialog.blockDescription', { nickName: blockUserNickName }) }}
       </p>
     </DialogConfirm>
   </div>
