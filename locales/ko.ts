@@ -406,7 +406,10 @@ export default {
     input: '입력해주세요!',
     inputTitle: '제목을 입력해주세요!',
     inputContent: '🚨 부적절하거나 불쾌감을 줄 수 있는 컨텐츠를 게시할 경우 제재를 받을 수 있습니다.',
-    inputContentWarning: '🚨 신고 이후 처리 결과는 24시간 이내 반영되요. 🚨 처리가 완료되면 글이 보여지지 않아요.',
+    inputContentWarning: [
+      '🚨 신고 이후 처리 결과는 24시간 이내 반영되요.',
+      '🚨 처리가 완료되면 글이 보여지지 않아요.',
+    ],
     inputComment: '댓글을 입력해주세요!',
     inputNumber: '숫자를 입력해요!',
     input4Digits: '4자리에요!',

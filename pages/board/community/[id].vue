@@ -263,17 +263,20 @@ onUnmounted(() => {
             <DGBadge
               v-show="communityDetailData.userId === userCoreId"
               color="amber"
+              size="md"
               variant="outline"
               :label="$t('texts.myArticle')"
             />
             <DGBadge
               color="red"
+              size="md"
               variant="soft"
               :label="$t('texts.article')"
             />
             <DGBadge
               v-show="!communityDetailData.isPublished"
               color="red"
+              size="md"
               variant="outline"
               :label="$t('texts.secretArticle')"
             />
@@ -296,6 +299,7 @@ onUnmounted(() => {
               <DGBadge
                 :label="communityDetailData.userInfo?.nickName"
                 color="amber"
+                size="md"
                 variant="soft"
               />
               <template #content>
@@ -304,20 +308,20 @@ onUnmounted(() => {
             </DGChip>
             <div class="flex-auto" />
             <AButton
-              v-show="communityDetailData.userId === userCoreId"
-              button-size="xs"
+              v-if="communityDetailData.userId === userCoreId"
+              button-size="sm"
               :button-text="editCommunityTrigger ? $t('buttons.cancel') : $t('buttons.edit')"
               @click="editingCommunityDetail"
             />
             <AButton
-              v-show="communityDetailData.userId === userCoreId && editCommunityTrigger"
-              button-size="xs"
+              v-if="communityDetailData.userId === userCoreId && editCommunityTrigger"
+              button-size="sm"
               :button-text="$t('buttons.save')"
               @click="updateCommunityArticle"
             />
             <AButton
-              v-show="(communityDetailData.userId === userCoreId || adminTrigger) && editCommunityTrigger"
-              button-size="xs"
+              v-if="(communityDetailData.userId === userCoreId || adminTrigger) && editCommunityTrigger"
+              button-size="sm"
               :button-text="$t('buttons.delete')"
               @click="() => deleteConfirmTrigger = true"
             />
@@ -433,6 +437,7 @@ onUnmounted(() => {
                   <DGBadge
                     :label="commentList.userInfo.nickName"
                     color="amber"
+                    size="md"
                     variant="soft"
                   />
                   <template #content>
@@ -442,12 +447,13 @@ onUnmounted(() => {
                 <DGBadge
                   v-show="commentList.userId === userCoreId"
                   color="red"
+                  size="md"
                   variant="soft"
                   label="내 댓글"
                 />
                 <div class="flex-auto" />
                 <AButton
-                  v-show="!editCommunityTrigger && commentList.userId !== userCoreId"
+                  v-if="!editCommunityTrigger && commentList.userId !== userCoreId"
                   use-leading
                   button-size="md"
                   button-color="red"
@@ -457,8 +463,8 @@ onUnmounted(() => {
                   @click="openReportCommentDialog(commentList.id)"
                 />
                 <AButton
-                  v-show="commentList.userId === userCoreId || userStoreData?.isAdmin"
-                  button-size="xs"
+                  v-if="commentList.userId === userCoreId || userStoreData?.isAdmin"
+                  button-size="md"
                   :button-text="$t('buttons.delete')"
                   @click="deleteComment(commentList.id)"
                 />

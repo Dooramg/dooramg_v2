@@ -11,13 +11,15 @@
       <AButton
         v-if="$pwa.needRefresh"
         custom-class="w-fit"
-        :label="$t('pwa.reload')"
+        :button-text="$t('pwa.reload')"
+        button-variant="outline"
         button-size="xs"
         @click="$pwa.updateServiceWorker()"
       />
       <AButton
         custom-class="w-fit"
-        :label="$t('pwa.close')"
+        :button-text="$t('pwa.close')"
+        button-variant="outline"
         button-size="xs"
         @click="$pwa.cancelPrompt()"
       />
@@ -40,12 +42,14 @@
         </div>
         <div class="flex justify-end gap-2">
           <AButton
-            :label="$t('pwa.install')"
+            :button-text="$t('pwa.install')"
+            button-variant="outline"
             button-size="xs"
             @click="$pwa.install()"
           />
           <AButton
-            :label="$t('pwa.cancel')"
+            :button-text="$t('pwa.cancel')"
+            button-variant="outline"
             button-size="xs"
             @click="$pwa.cancelInstall()"
           />
