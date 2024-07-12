@@ -1,9 +1,11 @@
 <script setup lang="ts">
+const client = useSupabaseClient()
+
 const { t } = useLocale()
 const { query } = useRoute()
 const router = useRouter()
 
-const { userCoreId } = storeToRefs(useUserInfoStore())
+const { userInfoData, userCoreId } = storeToRefs(useUserInfoStore())
 const { communityArticleCount } = storeToRefs(useBoardStore())
 
 useHead({
@@ -40,6 +42,21 @@ watch(() => currentPage.value, () => {
   immediate: true,
 })
 
+const { data: blockData } = useAsyncData('blockData', async () => {
+  const { data } = await client
+    .from('block')
+    .select('*')
+    .eq('blockerUserId', userCoreId.value)
+
+  if (!data) {
+    return null
+  }
+
+  return data
+}, {
+  immediate: true,
+})
+
 const { data: boardCommunityData, refresh: refreshBoardCommunity, pending: _pendingBoardCommunity } = useAsyncData('boardCommunity', async () => {
   const { data: serverData }: SerializeObject = await useFetch('/api/community', {
     headers: useRequestHeaders(['cookie']),
@@ -71,6 +88,12 @@ const { data: boardNoticeData }: SerializeObject = await useFetch('/api/notice',
     dataRange: 4,
   },
 })
+
+const hideBlockedArticle = (writeUserId: string, initialState: boolean) => {
+  const isBlockArticle = blockData.value?.find((block: SupabaseDataBase['public']['Tables']['block']['Row']) => block.blockedUserId === writeUserId)
+
+  return !isBlockArticle && initialState
+}
 
 const searchCommunity = () => {
   searchType.value = searchText.value === '' ? 'searchTotal' : 'searchText'
@@ -116,7 +139,7 @@ const searchCommunity = () => {
       </div>
       <DGCard
         v-for="content, index in boardCommunityData"
-        v-show="(content.userId === userCoreId && !content.isPublished) || content.isPublished"
+        v-show="hideBlockedArticle(content.userId, (userInfoData?.isAdmin && !content.isPublished) || content.isPublished)"
         :key="content.id"
         :ui="{
           base: 'w-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer',

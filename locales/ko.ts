@@ -120,6 +120,9 @@ export default {
     goLogin: '로그인하러 가기!',
     write: '글쓰기',
     reload: '다시 불러오기',
+    articleReport: '게시물 신고',
+    commentReport: '댓글 신고',
+    userBlock: '{user} 블라이드 하기',
     rideInsert: '다이어리 작성 🖊️',
     rideInsertShort: '작성 🖊️',
     rideSetting: '두바퀴 설정 🛠',
@@ -294,6 +297,8 @@ export default {
       deleteTitle: '정말 지울거에요?',
       reportTitle: '정말 신고할거에요?',
       reportDescription: '게시판 이용약관에 따른 신고사유에 맞지 않을 경우 처리되지 않으며, 게시글, 댓글 신고 완료 후 팝업에 "신고 내용은 24시간 이내 조치됩니다. 🚨',
+      blockTitle: '작성자를 정말 블라인드 할거에요?',
+      blockDescription: '차단하면 작성자의 모든 게시글, 댓글을 볼 수 없어요!',
       confirm: '응!',
       reject: '아니!',
     },
@@ -553,6 +558,10 @@ export default {
     communityCommentReportSuccess: {
       title: '커뮤니티 댓글 신고 성공!',
       description: '신고해주셔서 감사해요!',
+    },
+    blockUserSuccess: {
+      title: '{nickName} 블라인드 성공!',
+      description: '앞으로 {nickName}님의 글과 댓글을 볼 수 없어요! 블라인드 해제는 관리자에게 문의하새요!',
     },
     countUpLike: {
       title: '좋아요를 눌렀어요!',

@@ -120,6 +120,9 @@ export default {
     goLogin: 'Go to Login!',
     write: 'Write',
     reload: 'Reload',
+    articleReport: 'Article Report',
+    commentReport: 'Comment Report',
+    userBlock: 'Do {user} Block',
     rideInsert: 'Diary Add 🖊️',
     rideInsertShort: 'Add 🖊️',
     rideSetting: 'Vehicle Setting 🛠',
@@ -294,6 +297,8 @@ export default {
       deleteTitle: 'Are you sure delete?',
       reportTitle: 'Are you sure report?',
       reportDescription: 'If the reason for the report does not comply with the bulletin board terms of use, it will not be processed. After reporting the post or comment, a popup will appear saying "The report will be processed within 24 hours. 🚨',
+      blockTitle: 'Are you sure you want to block user?',
+      blockDescription: 'You will not be able to see any posts or comments from user!',
       confirm: 'Yes!',
       reject: 'No!',
     },
@@ -553,6 +558,10 @@ export default {
     communityCommentReportSuccess: {
       title: 'Community comment report success!',
       description: 'Thank you!',
+    },
+    blockUserSuccess: {
+      title: 'Block {nickName} success!',
+      description: 'You will not be able to see any posts or comments from {nickName}! Please contact the administrator to unblock!',
     },
     countUpLike: {
       title: 'Like success!',
