@@ -97,7 +97,7 @@ const clickClear = () => {
             v-if="useTrailing"
             :button-size="trailingButtonSize"
             button-variant="ghost"
-            :button-padding="false"
+            button-padding
             use-leading
             icon-name="i-line-md-search"
             @click="() => $emit('click:trailing')"

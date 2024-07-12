@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await client
     .from('noticeCommentList')
-    .select('*, boardNotice(*), userInfo(nickName, isAdmin)')
+    .select('*, userInfo(nickName, isAdmin)')
     .order('createdAt', { ascending: false })
     .eq('boardId', query.id as string)
 

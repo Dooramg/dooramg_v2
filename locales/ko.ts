@@ -393,6 +393,7 @@ export default {
     displacement: '배기량을 설정해주세요!',
     title: '여행 제목을 입력해주세요!',
     noticeTitle: '공지사항 제목을 입력해주세요!',
+    communityTitle: '두뮤니티 제목을 입력해주세요!',
     comment: '댓글을 입력해주세요!',
     totalDistance: '총 주행거리를 설정헤주세요!',
     totalFuelAmount: '총 주유량을 설정해주세요!',

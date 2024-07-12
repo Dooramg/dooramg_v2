@@ -6,7 +6,7 @@ const toast = useToast()
 const { t } = useLocale()
 const { params } = useRoute()
 const { url } = useImageStorage()
-const { comma, digitsRoundUp } = useUi()
+const { digitsRoundUp } = useUi()
 
 const { upsertData, updateData } = useFetchComposable()
 const { katechCoords } = storeToRefs(useUserLocation())
@@ -36,17 +36,6 @@ const schema = object({
 
 type Schema = InferType<typeof schema>
 
-const diaryOption = ref([
-  {
-    label: t('management.type.fuel'),
-    value: 'MTC001',
-  },
-  {
-    label: t('management.type.drive'),
-    value: 'MTC002',
-  },
-])
-
 const manageVehicleData = ref<ManageVehicleData>({
   vehicleId: params.vehicleId as string,
   manageTypeId: '',
@@ -71,19 +60,6 @@ const diarySelectOption = ref('')
 const vehicleFuelType = ref('')
 
 const selectStationTrigger = ref(false)
-
-watch(() => vehicleFuelType.value, () => {
-  selectStationId.value = ''
-  selectStationPrice.value = 0
-
-  manageVehicleData.value.fuelStationName = ''
-  manageVehicleData.value.fuelStationCode = ''
-  manageVehicleData.value.stationImage = ''
-
-  selectStationTrigger.value = false
-}, {
-  immediate: true,
-})
 
 const { data: fuelDataList } = useAsyncData('fuelDataList', async () => {
   const { data } = await useFetch('/api/addVehicle/fuelData', {
@@ -122,20 +98,7 @@ const loadManageType = async (code: string) => {
 
   manageVehicleData.value.manageTypeId = data.value.id
 
-  selectStationId.value = ''
-  selectStationPrice.value = 0
-  vehicleFuelType.value = ''
-
-  manageVehicleData.value.title = ''
-  manageVehicleData.value.destination = ''
-  manageVehicleData.value.memo = ''
-  manageVehicleData.value.totalDistance = 0
-  manageVehicleData.value.paidAmount = 0
-  manageVehicleData.value.fuelAmount = 0
-  manageVehicleData.value.driveDistance = 0
-  manageVehicleData.value.fuelStationName = ''
-  manageVehicleData.value.fuelStationCode = ''
-  manageVehicleData.value.stationImage = ''
+  initManageData(true)
 }
 
 const selectFuelType = async () => {
@@ -165,6 +128,71 @@ const loadAroundFuelStation = async (opiData: OpiApiData[], selectFuelCode: stri
   })
 }
 
+const selectCustomStation = () => {
+  selectStationTrigger.value
+    ? initManageData(false)
+    : manageVehicleData.value.stationImage = url(true, '/custom_logo.svg')
+
+  selectStationTrigger.value = !selectStationTrigger.value
+}
+
+const calculateFuelAmountByPaid = (paidAmount: number) => {
+  if (paidAmount > 999 && diarySelectOption.value === 'MTC001') {
+    manageVehicleData.value.fuelAmount = digitsRoundUp(paidAmount / selectStationPrice.value, 'round', 100)
+  }
+}
+
+const addNewDiary = async (event: FormSubmitEvent<Schema>) => {
+  if (!event.isTrusted) {
+    return
+  }
+
+  manageVehicleData.value.driveDistance = manageVehicleData.value.totalDistance - (selectedVehicleData.value?.totalDistance ? selectedVehicleData.value.totalDistance : 0)
+
+  const currentFuelAmount = selectedVehicleData.value?.currentFuelAmount as number > 0
+    ? calculateCurrentFuelAmount(selectedVehicleData.value?.currentFuelAmount as number, calculateFuelAmount(manageVehicleData.value.driveDistance, selectedVehicleData.value?.officialFuelEfficient ?? 10), manageVehicleData.value.fuelAmount)
+    : manageVehicleData.value.fuelAmount
+
+  currentFuelAmount < 0
+    ? manageVehicleData.value.fuelAmount = 0
+    : manageVehicleData.value.fuelAmount = digitsRoundUp(currentFuelAmount, 'round', 100)
+
+  manageVehicleData.value.efficient = calculateEfficient(manageVehicleData.value.driveDistance, manageVehicleData.value.fuelAmount
+    ? manageVehicleData.value.fuelAmount
+    : calculateEfficient(manageVehicleData.value.driveDistance, selectedVehicleData.value?.officialFuelEfficient ?? 10))
+
+  const updateVehicleInfo = {
+    currentFuelAmount: manageVehicleData.value.fuelAmount,
+    totalDistance: manageVehicleData.value.totalDistance,
+    totalFuelAmount: calculateSummery(selectedVehicleData.value?.totalFuelAmount ?? 0, manageVehicleData.value.fuelAmount),
+    totalPaidAmount: calculateSummery(selectedVehicleData.value?.totalPaidAmount ?? 0, manageVehicleData.value.paidAmount),
+    totalEfficient: calculateEfficient(manageVehicleData.value.totalDistance, selectedVehicleData.value?.totalFuelAmount ?? 0 + manageVehicleData.value.fuelAmount),
+  }
+
+  await upsertData('vehicleManagement', manageVehicleData.value, '', '')
+  await updateData('vehicles', updateVehicleInfo, manageVehicleData.value.vehicleId as string)
+
+  toast.add({ title: t('messages.addDiarySuccess.title'), description: t('messages.addDiarySuccess.description'), color: 'amber', timeout: 3000 })
+
+  navigateTo('/')
+}
+
+const calculateCurrentFuelAmount = (currentFuel: number, spendFuel: number, chargeFuel: number) => {
+  return digitsRoundUp(currentFuel - spendFuel + chargeFuel, 'round', 100)
+}
+
+const calculateSummery = (firstNum: number, secondNum: number) => {
+  return digitsRoundUp(firstNum + secondNum, 'round', 100)
+}
+
+const calculateFuelAmount = (distance: number, efficient: number) => {
+  return digitsRoundUp(distance / efficient, 'round', 100)
+}
+
+const calculateEfficient = (distance: number, fuelAmount: number) => {
+  return digitsRoundUp(distance / fuelAmount, 'round', 100)
+}
+
 const selectStation = (station: OpiApiData) => {
   selectStationId.value = station.UNI_ID
   selectStationPrice.value = station.PRICE
@@ -176,91 +204,46 @@ const selectStation = (station: OpiApiData) => {
   selectStationTrigger.value = true
 }
 
-const selectCustomStation = () => {
-  if (!selectStationTrigger.value) {
-    manageVehicleData.value.stationImage = url(true, '/custom_logo.svg')
+const initManageData = (allInitialize: boolean) => {
+  if (allInitialize) {
+    vehicleFuelType.value = ''
+    manageVehicleData.value.title = ''
+    manageVehicleData.value.destination = ''
+    manageVehicleData.value.memo = ''
+    manageVehicleData.value.totalDistance = 0
+    manageVehicleData.value.paidAmount = 0
+    manageVehicleData.value.fuelAmount = 0
+    manageVehicleData.value.driveDistance = 0
   }
-  else {
-    selectStationId.value = ''
-    selectStationPrice.value = 0
 
-    manageVehicleData.value.fuelStationName = ''
-    manageVehicleData.value.fuelStationCode = ''
-    manageVehicleData.value.stationImage = ''
-  }
+  selectStationId.value = ''
+  selectStationPrice.value = 0
 
-  selectStationTrigger.value = !selectStationTrigger.value
+  manageVehicleData.value.fuelStationName = ''
+  manageVehicleData.value.fuelStationCode = ''
+  manageVehicleData.value.stationImage = ''
 }
 
-const calculateFuelAmount = (paidAmount: number) => {
-  if (paidAmount > 999 && diarySelectOption.value === 'MTC001') {
-    manageVehicleData.value.fuelAmount = digitsRoundUp(paidAmount / selectStationPrice.value, 'round', 100)
-  }
-}
+watch(() => vehicleFuelType.value, () => {
+  initManageData(false)
 
-const addDiary = async (event: FormSubmitEvent<Schema>) => {
-  if (!event.isTrusted) {
-    return
-  }
-
-  manageVehicleData.value.driveDistance = manageVehicleData.value.totalDistance - (selectedVehicleData.value?.totalDistance ? selectedVehicleData.value.totalDistance : 0)
-
-  const calculateCurrentFuelAmount = selectedVehicleData.value?.currentFuelAmount as number > 0
-    ? ((selectedVehicleData.value?.currentFuelAmount as number - digitsRoundUp(manageVehicleData.value.driveDistance / (selectedVehicleData.value?.officialFuelEfficient ?? 10), 'round', 100)) + manageVehicleData.value.fuelAmount)
-    : manageVehicleData.value.fuelAmount
-
-  calculateCurrentFuelAmount < 0
-    ? manageVehicleData.value.fuelAmount = 0
-    : manageVehicleData.value.fuelAmount = digitsRoundUp(calculateCurrentFuelAmount, 'round', 100)
-
-  manageVehicleData.value.efficient = digitsRoundUp(manageVehicleData.value.driveDistance / (manageVehicleData.value.fuelAmount ? manageVehicleData.value.fuelAmount : (manageVehicleData.value.driveDistance / (selectedVehicleData.value?.officialFuelEfficient ?? 10))), 'round', 100)
-
-  const updateVehicleInfo = {
-    currentFuelAmount: manageVehicleData.value.fuelAmount,
-    totalDistance: manageVehicleData.value.totalDistance,
-    totalFuelAmount: digitsRoundUp((selectedVehicleData.value?.totalFuelAmount ?? 0) + manageVehicleData.value.fuelAmount, 'round', 100),
-    totalPaidAmount: (selectedVehicleData.value?.totalPaidAmount ?? 0) + manageVehicleData.value.paidAmount,
-    totalEfficient: digitsRoundUp(manageVehicleData.value.totalDistance / (selectedVehicleData.value?.totalFuelAmount ?? 0 + manageVehicleData.value.fuelAmount), 'round', 100),
-  }
-
-  await upsertData('vehicleManagement', manageVehicleData.value, '', '')
-  await updateData('vehicles', updateVehicleInfo, manageVehicleData.value.vehicleId as string)
-
-  toast.add({ title: t('messages.addDiarySuccess.title'), description: t('messages.addDiarySuccess.description'), color: 'amber', timeout: 3000 })
-
-  navigateTo('/')
-}
+  selectStationTrigger.value = false
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
   <div class="w-dvw md:w-[500px] flex flex-col mt-8 px-8 pb-28 gap-4">
-    <div
-      class="w-full flex items-center justify-end flex-wrap gap-4"
-      :class="!diarySelectOption ? 'flex-col items-stretch' : 'flex-row'"
-    >
-      <p class="text-2xl font-bold">
-        {{ $t('management.title') }}
-      </p>
-      <div class="flex-auto" />
-      <DGRadioGroup
-        v-model="diarySelectOption"
-        :options="diaryOption"
-        color="amber"
-        :legend="$t('management.legend')"
-        @update:model-value="(code:string) => loadManageType(code)"
-      />
-    </div>
-    <p
-      v-if="!diarySelectOption"
-      class="w-full text-center text-2xl font-bold mt-10"
-    >
-      {{ $t('management.legend') }}
-    </p>
+    <DiarySelectOption
+      v-model:select-option="diarySelectOption"
+      @update:select-option="(code: string) => loadManageType(code)"
+    />
     <DGForm
       :schema="schema"
       :state="manageVehicleData"
       class="w-auto space-y-4"
-      @submit="addDiary"
+      @submit="addNewDiary"
     >
       <DGFormGroup
         v-if="diarySelectOption === 'MTC001'"
@@ -279,90 +262,22 @@ const addDiary = async (event: FormSubmitEvent<Schema>) => {
             option-attribute="codeName"
             @update:model-value="selectFuelType"
           />
-          <DGCard
-            v-for="(station, index) in aroundStationList"
-            v-show="(vehicleFuelType === 'FUE001' || vehicleFuelType === 'FUE002') && aroundStationList?.length"
-            :key="index"
-            class="cursor-pointer"
-            :class="selectStationId === station.UNI_ID ? 'text-amber-700 dark:text-amber-300' : ''"
-            @click="selectStation(station)"
-          >
-            <template #header>
-              <div class="flex flex-wrap items-center gap-4">
-                <DGAvatar
-                  :src="station.stationImage"
-                  size="lg"
-                  alt="station-logo"
-                  :ui="{ background: 'bg-transparent' }"
-                />
-                <p class="text-xl font-bold">
-                  {{ station.OS_NM }}
-                </p>
-                <div class="flex-auto" />
-                <p v-if="selectStationId === station.UNI_ID">
-                  {{ $t('management.selectStation') }}
-                </p>
-              </div>
-            </template>
-            <div class="flex">
-              <p class="text-lg font-bold">
-                {{ station.fuelTypeName }}
-              </p>
-              <div class="flex-auto" />
-              <p>
-                {{ $t('management.fuelPrice', { price: comma(station.PRICE) }) }}
-              </p>
-            </div>
-          </DGCard>
+          <DiaryAroundStation
+            :around-station-list="aroundStationList"
+            :select-station-id="selectStationId"
+            :vehicle-fuel-type="vehicleFuelType"
+            @select:station="(station: OpiApiData) => selectStation(station)"
+          />
           <div v-if="(vehicleFuelType === 'FUE001' || vehicleFuelType === 'FUE002') && !aroundStationList?.length">
             {{ $t('management.noAroundStation') }}
           </div>
-          <DGCard
-            v-if="vehicleFuelType === 'FUE003' || vehicleFuelType === 'FUE004'"
-            :class="selectStationTrigger ? 'text-amber-700 dark:text-amber-300' : ''"
-          >
-            <template #header>
-              <div class="flex flex-wrap gap-4">
-                <AInput
-                  v-model:input-data="manageVehicleData.fuelStationName"
-                  :input-placeholder="$t('placeholder.inputStationName')"
-                  use-leading
-                  leading-icon-name="i-tabler-gas-station"
-                  clearable
-                />
-                <div class="flex-auto" />
-                <p v-if="selectStationTrigger">
-                  {{ $t('management.selectStation') }}
-                </p>
-              </div>
-            </template>
-            <div class="flex flex-col gap-4">
-              <AInput
-                v-model:input-data="manageVehicleData.fuelStationCode"
-                :input-placeholder="$t('placeholder.inputFuelType')"
-                use-leading
-                leading-icon-name="i-tabler-list-check"
-                clearable
-              />
-              <AInput
-                v-model:input-data="selectStationPrice"
-                :input-placeholder="$t('placeholder.inputStationAmount')"
-                use-leading
-                input-type="number"
-                leading-icon-name="i-tabler-coin"
-                clearable
-              />
-            </div>
-            <template #footer>
-              <AButton
-                button-block
-                button-color="amber"
-                button-size="xl"
-                :button-text="!selectStationTrigger ? $t('buttons.select') : $t('buttons.cancel')"
-                @click="selectCustomStation"
-              />
-            </template>
-          </DGCard>
+          <DiaryManualStation
+            v-model:manage-data="manageVehicleData"
+            v-model:manual-station-price="selectStationPrice"
+            :select-station-trigger="selectStationTrigger"
+            :vehicle-fuel-type="vehicleFuelType"
+            @select:custom-station="selectCustomStation"
+          />
         </div>
       </DGFormGroup>
       <DGFormGroup
@@ -397,7 +312,7 @@ const addDiary = async (event: FormSubmitEvent<Schema>) => {
           input-type="number"
           leading-icon-name="i-tabler-coin"
           clearable
-          @update:model-value="calculateFuelAmount"
+          @update:model-value="calculateFuelAmountByPaid"
         />
       </DGFormGroup>
       <DGFormGroup

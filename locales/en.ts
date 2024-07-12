@@ -393,6 +393,7 @@ export default {
     displacement: 'Setting displacement!',
     title: 'Input title!',
     noticeTitle: 'Input notice title!',
+    communityTitle: 'Input community title!',
     comment: 'Input comment!',
     totalDistance: 'Setting total distance!',
     totalFuelAmount: 'Setting total fuel amount!',

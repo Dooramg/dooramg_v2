@@ -43,78 +43,10 @@ const updateNaverMapData = (markAddress: NaverResAddr, latitude: number, longitu
 </script>
 
 <template>
-  <div class="w-dvw md:w-[500px] flex flex-col items-end mt-8 px-8 gap-4">
-    <p class="w-full text-xl font-bold">
-      {{ $t('board.community.writeTitle') }}
-    </p>
-    <DGDivider />
-    <AInput
-      v-model:input-data="writeCommunityDetailData.title"
-      class="w-full"
-      clearable
-      input-color="amber"
-      :input-placeholder="$t('placeholder.noticeTitle')"
-    />
-    <div class="w-full flex justify-center gap-4">
-      <p class="text-md font-bold">
-        {{ $t('labelTexts.published') }}
-      </p>
-      <div class="flex-auto" />
-      <DGCheckbox
-        v-model="writeCommunityDetailData.isPublished"
-        color="amber"
-        :label="writeCommunityDetailData.isPublished ? $t('buttons.public') : $t('buttons.secret')"
-      />
-    </div>
-    <TiptapTextEditor
-      :text-data="writeCommunityDetailData.content"
-      full-option
-      @update:model-value="(text: string) => writeCommunityDetailData.content = text"
-    />
-    <div class="w-full flex justify-center items-center gap-2">
-      <p class="text-md font-bold">
-        {{ $t('labelTexts.useLocation') }}
-      </p>
-      <DGTooltip
-        :text="$t('board.useMapInformation')"
-        placement="top"
-      >
-        <Icon
-          name="i-line-md-question-circle"
-          :width="20"
-          :height="20"
-        />
-      </DGTooltip>
-      <div class="flex-auto" />
-      <div class="flex items-center gap-2">
-        <p>
-          {{ writeCommunityDetailData.useLocation ? $t('buttons.use') : $t('buttons.noUse') }}
-        </p>
-        <DGToggle
-          v-model="writeCommunityDetailData.useLocation"
-          color="amber"
-        />
-      </div>
-    </div>
-    <NaverMaps
-      v-if="writeCommunityDetailData.useLocation"
-      class="w-full"
-      :is-readable="false"
-      @update:address="updateNaverMapData"
-    />
-    <AInput
-      v-if="writeCommunityDetailData.useLocation && writeCommunityDetailData.locationAddress"
-      v-model:input-data="writeCommunityDetailData.locationAddress"
-      class="w-full"
-      clearable
-      input-color="amber"
-      :input-placeholder="$t('placeholder.selectAddress')"
-    />
-    <DGDivider />
-    <AButton
-      custom-class="w-fit"
-      :button-text="$t('buttons.write')"
-      @click="createCommunityArticle"
-    />
-  </div>
+  <BoardWrite
+    v-model:write-board-data="writeCommunityDetailData"
+    board-type="community"
+    @update:map-data="updateNaverMapData"
+    @create:article="createCommunityArticle"
+  />
 </template>
