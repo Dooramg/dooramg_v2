@@ -99,6 +99,7 @@ const clickClear = () => {
             button-variant="ghost"
             button-padding
             use-leading
+            :tooltip-text="$t('buttons.search')"
             icon-name="i-line-md-search"
             @click="() => $emit('click:trailing')"
           />

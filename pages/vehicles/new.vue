@@ -16,7 +16,7 @@ const { vehicleData: storeVehicleData, selectedVehicleData } = storeToRefs(useVe
 const { headTextList, middleTextList, tailTextList } = storeToRefs(usePlateStore())
 
 useHead({
-  title: t('pageTitle.management'),
+  title: t('pageTitle.new'),
 })
 
 definePageMeta({
@@ -147,7 +147,7 @@ await loadCodeList('CTM')
 <template>
   <div class="w-dvw md:w-[500px] flex flex-col mt-8 px-8 pb-28 gap-4">
     <p class="text-2xl font-bold">
-      {{ $t('pageTitle.management') }}
+      {{ $t('pageTitle.new') }}
     </p>
     <DGForm
       :schema="schema"

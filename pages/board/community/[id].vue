@@ -13,7 +13,7 @@ const { updateData, upsertData, deleteData } = useFetchComposable()
 const { userInfoData: userStoreData, userCoreId } = storeToRefs(useUserInfoStore())
 
 useHead({
-  title: t('pageTitle.notice'),
+  title: t('pageTitle.community'),
 })
 
 definePageMeta({
