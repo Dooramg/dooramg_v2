@@ -31,7 +31,7 @@ defineEmits([
         />
         <div class="flex flex-col gap-1">
           <p class="text-lg font-bold">
-            {{ $t('main.model', { model: vehicle.vehicleModel.name === $t('addVehicle.placeholder.manual') ? vehicle.manualModelName : vehicle.vehicleModel.name, makeYear: vehicle.makeYear }) }}
+            {{ $t('main.model', { model: vehicle.vehicleModel.name === $t('addVehicle.manual') ? vehicle.manualModelName : vehicle.vehicleModel.name, makeYear: vehicle.makeYear }) }}
           </p>
           <p class="text-sm font-bold">
             {{ $t('unit.displacement', { displacement: comma(vehicle.displacement ?? 0) }) }}
