@@ -32,13 +32,13 @@ const { userInfoData } = storeToRefs(useUserInfoStore())
               />
             </div>
             <p class="text-md font-bold">
-              {{ $t('main.model', { model: selectedVehicleData?.vehicleModel.name === $t('addVehicle.placeholder.manual') ? selectedVehicleData.manualModelName : selectedVehicleData?.vehicleModel.name, makeYear: selectedVehicleData?.makeYear }) }}
+              {{ $t('main.model', { model: selectedVehicleData?.vehicleModel.name === $t('addVehicle.manual') ? selectedVehicleData.manualModelName : selectedVehicleData?.vehicleModel.name, makeYear: selectedVehicleData?.makeYear }) }}
             </p>
           </div>
           <div class="w-full flex flex-col-reverse items-end gap-3">
             <div class="w-full flex flex-col gap-2">
               <p class="text-md font-bold">
-                {{ !selectedVehicleData?.currentFuelAmount ? $t('main.noEfficient') : $t('main.currentFuel', { fuel: comma(selectedVehicleData?.currentFuelAmount) }) }}
+                {{ !selectedVehicleData?.currentFuelAmount ? $t('main.noCurrentFuel') : $t('main.currentFuel', { fuel: comma(selectedVehicleData?.currentFuelAmount) }) }}
               </p>
               <p class="text-md font-bold">
                 {{ $t('main.efficient', { efficient: comma(selectedVehicleData?.totalEfficient ?? 0) }) }}

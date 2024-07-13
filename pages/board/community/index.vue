@@ -9,7 +9,7 @@ const { userCoreId } = storeToRefs(useUserInfoStore())
 const { communityArticleCount } = storeToRefs(useBoardStore())
 
 useHead({
-  title: t('pageTitle.notice'),
+  title: t('pageTitle.community'),
 })
 
 definePageMeta({

@@ -7,7 +7,7 @@ const { upsertData } = useFetchComposable()
 const { userCoreId } = storeToRefs(useUserInfoStore())
 
 useHead({
-  title: t('pageTitle.noticeWrite'),
+  title: t('pageTitle.communityWrite'),
 })
 
 definePageMeta({

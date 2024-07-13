@@ -339,7 +339,7 @@ watch(() => vehicleFuelType.value, () => {
       >
         <AInput
           v-model:input-data="manageVehicleData.title"
-          :input-placeholder="$t('placeholder.inputTitle')"
+          :input-placeholder="$t('management.driveTitle')"
           clearable
         />
       </DGFormGroup>
@@ -351,7 +351,7 @@ watch(() => vehicleFuelType.value, () => {
       >
         <AInput
           v-model:input-data="manageVehicleData.destination"
-          :input-placeholder="$t('placeholder.destination')"
+          :input-placeholder="$t('management.driveDestination')"
           clearable
         />
       </DGFormGroup>
