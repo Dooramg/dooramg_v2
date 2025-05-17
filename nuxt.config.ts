@@ -5,21 +5,6 @@ import packageJson from './package.json'
 const sw = process.env.SW === 'true'
 
 export default defineNuxtConfig({
-  devtools: {
-    enabled: true,
-    timeline: {
-      enabled: true,
-    },
-  },
-  app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
-    head: {
-      meta: [
-        { property: 'Imagetoolbar', content: 'no' },
-        { name: 'naver-site-verification', content: '158291e2c0440b1ab952cba20d55d36e61766b00' },
-      ],
-    },
-  },
   extends: [
     '@nuxt/ui-pro',
   ],
@@ -42,55 +27,36 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
   ],
-  css: [
-    '~/assets/scss/style.scss',
-  ],
-  colorMode: {
-    preference: 'dark',
-    fallback: 'light',
-  },
-  ui: {
-    prefix: 'DG',
-    icons: ['tabler'],
-  },
-  eslint: {
-    config: {
-      stylistic: true,
-    },
-    checker: true,
-  },
-  supabase: {
-    redirect: false,
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      exclude: [
-        '/',
-        '/document',
-        '/document/policy',
-        '/document/service-policy',
-        '/document/board',
-      ],
-    },
-    clientOptions: {
-      auth: {
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    },
-  },
   imports: {
     dirs: [
       'composables/**',
       'stores/**',
     ],
   },
-  pinia: {
-    storesDirs: [
-      './stores/**',
-    ],
+  devtools: {
+    enabled: true,
+    timeline: {
+      enabled: true,
+    },
+  },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    head: {
+      meta: [
+        { property: 'Imagetoolbar', content: 'no' },
+        { name: 'naver-site-verification', content: '158291e2c0440b1ab952cba20d55d36e61766b00' },
+      ],
+    },
+  },
+  css: [
+    '~/assets/scss/style.scss',
+  ],
+  site: {
+    url: 'https://www.dooramg.com',
+  },
+  colorMode: {
+    preference: 'dark',
+    fallback: 'light',
   },
   content: {
     highlight: {
@@ -101,6 +67,23 @@ export default defineNuxtConfig({
       },
     },
   },
+  ui: {
+    prefix: 'DG',
+  },
+  runtimeConfig: {
+    public: {
+      appVersion: JSON.stringify(packageJson.version),
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? process.env.NUXT_ENV_VERCEL_URL ?? 'http://localhost:4040',
+      opiKey: process.env.OPINET_KEY,
+      skOpenApiKey: process.env.SK_OPEN_API_KEY,
+      naverClientId: process.env.NAVER_CLIENT_ID,
+    },
+  },
+  sourcemap: {
+    server: true,
+    client: true,
+  },
+  compatibilityDate: '2024-07-06',
   vite: {
     build: {
       sourcemap: true,
@@ -112,6 +95,29 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+  typescript: {
+    shim: false,
+  },
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+    checker: true,
+  },
+  i18n: {
+    langDir: './locales',
+    locales: [
+      { code: 'ko', file: 'ko.ts' },
+      { code: 'en', file: 'en.ts' },
+    ],
+    defaultLocale: 'ko',
+    strategy: 'no_prefix',
+  },
+  pinia: {
+    storesDirs: [
+      './stores/**',
+    ],
   },
   pwa: {
     scope: '/',
@@ -140,50 +146,43 @@ export default defineNuxtConfig({
       periodicSyncForUpdates: 20,
     },
     devOptions: {
-      enabled: true,
+      enabled: false,
       suppressWarnings: true,
       navigateFallbackAllowlist: [/^\/$/],
       type: 'module',
     },
-  },
-  i18n: {
-    langDir: './locales',
-    locales: [
-      { code: 'ko', file: 'ko.ts' },
-      { code: 'en', file: 'en.ts' },
-    ],
-    defaultLocale: 'ko',
-    strategy: 'no_prefix',
-  },
-  stylelint: {
-    lintOnStart: true,
-  },
-  vueuse: {
-    ssrHandlers: false,
-  },
-  typescript: {
-    shim: false,
   },
   robots: {
     rules: [
       { UserAgent: '*', Allow: '/' },
     ],
   },
-  sourcemap: {
-    server: true,
-    client: true,
+  stylelint: {
+    lintOnStart: true,
   },
-  site: {
-    url: 'https://www.dooramg.com',
-  },
-  runtimeConfig: {
-    public: {
-      appVersion: JSON.stringify(packageJson.version),
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? process.env.NUXT_ENV_VERCEL_URL ?? 'http://localhost:4040',
-      opiKey: process.env.OPINET_KEY,
-      skOpenApiKey: process.env.SK_OPEN_API_KEY,
-      naverClientId: process.env.NAVER_CLIENT_ID,
+  supabase: {
+    redirect: false,
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: [
+        '/',
+        '/document',
+        '/document/policy',
+        '/document/service-policy',
+        '/document/board',
+      ],
+    },
+    clientOptions: {
+      auth: {
+        flowType: 'pkce',
+        detectSessionInUrl: true,
+        persistSession: true,
+        autoRefreshToken: true,
+      },
     },
   },
-  compatibilityDate: '2024-07-06',
+  vueuse: {
+    ssrHandlers: false,
+  },
 })
