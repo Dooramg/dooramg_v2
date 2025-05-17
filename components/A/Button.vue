@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ButtonSize, ButtonVariant } from '#ui/types'
+import type { ButtonColor, ButtonSize, ButtonVariant } from '#ui/types'
 
 withDefaults(
   defineProps<{
@@ -9,7 +9,7 @@ withDefaults(
     buttonPadding?: boolean
     buttonBlock?: boolean
     buttonTruncate?: boolean
-    buttonColor?: string
+    buttonColor?: ButtonColor
     buttonType?: 'button' | 'submit' | 'reset'
     buttonSize?: ButtonSize | undefined
     buttonVariant?: ButtonVariant | undefined
@@ -59,7 +59,7 @@ defineEmits([
       :block="buttonBlock"
       :truncate="buttonTruncate"
       :padded="buttonPadding"
-      :color="buttonColor"
+      :color="buttonColor as ButtonColor"
       :size="buttonSize"
       :type="buttonType"
       :variant="buttonVariant"
