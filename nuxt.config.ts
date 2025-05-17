@@ -19,7 +19,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     '@nuxtjs/stylelint-module',
     '@nuxtjs/i18n',
-    'nuxt-icon',
+    '@nuxt/icon',
     'nuxt-time',
     'nuxt-simple-sitemap',
     '@vueuse/nuxt',
