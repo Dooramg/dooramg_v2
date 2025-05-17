@@ -106,7 +106,6 @@ export default defineNuxtConfig({
     checker: true,
   },
   i18n: {
-    langDir: 'locales',
     locales: [
       { code: 'ko', file: 'ko.ts' },
       { code: 'en', file: 'en.ts' },
